@@ -1,0 +1,85 @@
+# ============================
+# Node.js / JavaScript
+# ============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ============================
+# Build Output
+# ============================
+dist/
+build/
+.output/
+.cache/
+.parcel-cache/
+.turbo/
+.vercel/
+.netlify/
+
+# ============================
+# Vite
+# ============================
+*.local
+
+# ============================
+# TypeScript
+# ============================
+*.tsbuildinfo
+
+# ============================
+# Environment & Secrets
+# ============================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# ============================
+# IDE & Editor
+# ============================
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.cursor/
+.windsurf/
+.gemini/
+
+# ============================
+# OS Generated
+# ============================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ============================
+# Testing & Coverage
+# ============================
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+
+# ============================
+# Misc
+# ============================
+*.map
+.eslintcache
+.prettiercache
+.stylelintcache
+Storybook-static/
+
+# ============================
+# Logs
+# ============================
+logs/
+*.log
