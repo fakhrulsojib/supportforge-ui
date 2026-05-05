@@ -63,9 +63,10 @@ export default function ConversationChart({ data = [], isLoading = false }) {
     // Sample ~6 labels along X axis
     const step = Math.max(1, Math.floor(data.length / 6))
     const labels = data
+      .map((d, i) => ({ ...d, _origIdx: i }))
       .filter((_, i) => i % step === 0 || i === data.length - 1)
-      .map((d, _, arr) => {
-        const idx = data.indexOf(d)
+      .map((d) => {
+        const idx = d._origIdx
         const x = PADDING.left + (data.length === 1 ? CHART_W / 2 : (idx / (data.length - 1)) * CHART_W)
         return { x, label: formatDate(d.date, { month: 'short', day: 'numeric' }) }
       })

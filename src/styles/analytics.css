@@ -381,7 +381,9 @@
   font-weight: var(--sf-font-normal);
 }
 
-/* Topic tag color variants (cycled) */
+/* Topic tag color variants (cycled).
+   Variants 0-4 use design system tokens. Variants 5-9 extend with
+   curated HSL values — no --sf-* equivalents exist for these palettes. */
 .topic-tag--0 { background-color: var(--sf-color-primary-50); color: var(--sf-color-primary-700); border-color: var(--sf-color-primary-200); }
 .topic-tag--1 { background-color: var(--sf-color-info-50); color: var(--sf-color-info-600); border-color: hsl(210, 60%, 85%); }
 .topic-tag--2 { background-color: var(--sf-color-success-50); color: var(--sf-color-success-700); border-color: hsl(148, 40%, 82%); }

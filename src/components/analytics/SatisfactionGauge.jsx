@@ -19,7 +19,9 @@ const CENTER = 90
 export default function SatisfactionGauge({ data = null, isLoading = false }) {
   const [mounted, setMounted] = useState(false)
 
-  // Trigger animation after mount
+  // Trigger animation after initial mount.
+  // Intentionally empty deps — animation plays once on first render.
+  // Subsequent data changes update the ring instantly (no re-animation).
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 100)
     return () => clearTimeout(timer)
