@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/layout/ProtectedRoute'
+import AppLayout from './components/layout/AppLayout'
 import LoginPage from './pages/LoginPage'
 import ChatPage from './pages/ChatPage'
 import AdminPage from './pages/AdminPage'
@@ -9,10 +10,8 @@ import AnalyticsPage from './pages/AnalyticsPage'
 /**
  * SupportForge — Root Application Component
  *
- * Phase 3.5: Analytics Dashboard with conversation chart, topic cloud,
- *            and satisfaction gauge.
- * Subsequent sub-phases will add:
- *   3.6: Layout shell (Sidebar, Header), dark mode toggle
+ * Phase 3.6: Layout shell (Sidebar, Header), dark mode toggle,
+ *            ErrorBoundary, LoadingSpinner, micro-animations.
  */
 function App() {
   return (
@@ -24,7 +23,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <ChatPage />
+                <AppLayout>
+                  <ChatPage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -32,7 +33,9 @@ function App() {
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminPage />
+                <AppLayout>
+                  <AdminPage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -40,7 +43,9 @@ function App() {
             path="/analytics"
             element={
               <ProtectedRoute>
-                <AnalyticsPage />
+                <AppLayout>
+                  <AnalyticsPage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />

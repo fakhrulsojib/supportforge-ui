@@ -273,8 +273,38 @@ src/
 - All design tokens defined in `src/styles/index.css` as `--sf-*` custom properties
 - Feature styles go in `src/styles/{feature}.css`
 - Dark mode variables in `src/styles/theme.css`
+- Layout shell in `src/styles/layout.css`
+- Shared component styles in `src/styles/shared.css`
 - Never hardcode colors — always `var(--sf-color-*)`
 - Responsive breakpoints: 375px (mobile), 768px (tablet), 1440px (desktop)
+
+### Layout Shell
+
+The application uses a layout shell (`AppLayout`) that wraps all authenticated pages:
+- `Sidebar` — app-level navigation (Chat, Admin, Analytics) with role-based filtering
+- `Header` — page title, tenant badge, dark mode toggle, user avatar with logout dropdown
+- `ErrorBoundary` — catches render errors with friendly fallback UI
+- Dark mode is toggled via CSS class on `<html>` and persisted in `localStorage` (`sf-theme` key)
+- Sidebar collapse state persisted in `localStorage` (`sf-sidebar-collapsed` key)
+
+> **Note:** Only non-sensitive UI preferences are stored in `localStorage`. Auth tokens remain in React Context (memory) per Security Checklist.
+
+---
+
+## Browser Testing
+
+### Test User Credentials
+
+When a live backend is available, register one test user for browser testing authenticated state:
+
+```
+Email: test@supportforge.dev
+Password: Test1234!@#
+Tenant ID: demo-tenant
+Role: admin
+```
+
+> **Convention:** All browser test tasks that require logged-in state should use these credentials. The test user must be registered via the backend API before browser testing.
 
 ---
 
@@ -286,3 +316,4 @@ VITE_API_BASE_URL=http://localhost:8000
 VITE_WS_URL=ws://localhost:8000/api/v1/ws/chat
 VITE_APP_NAME=SupportForge
 ```
+

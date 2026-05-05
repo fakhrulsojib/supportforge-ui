@@ -64,14 +64,14 @@
 - [x] `AnalyticsPage.jsx` — compose dashboard, date range picker
 - [ ] Browser test: charts render, hover states, empty state _(deferred — requires live backend for data)_
 
-### 3.6 — Layout & Polish
-- [ ] `Sidebar.jsx` — nav links, active state, collapsible on mobile
-- [ ] `Header.jsx` — tenant name, avatar, dark mode toggle, logout
-- [ ] `ErrorBoundary.jsx` — catch render errors, friendly fallback
-- [ ] `LoadingSpinner.jsx` — reusable with size variants
-- [ ] Dark mode: CSS class on `<html>`, localStorage persistence
-- [ ] Micro-animations: message fade-in, sidebar slide, button hover, page transitions
-- [ ] Browser test: dark mode toggle, responsive breakpoints, navigation
+### 3.6 — Layout & Polish ✅
+- [x] `Sidebar.jsx` — nav links, active state, collapsible on mobile
+- [x] `Header.jsx` — tenant name, avatar, dark mode toggle, logout
+- [x] `ErrorBoundary.jsx` — catch render errors, friendly fallback
+- [x] `LoadingSpinner.jsx` — reusable with size variants
+- [x] Dark mode: CSS class on `<html>`, localStorage persistence
+- [x] Micro-animations: message fade-in, sidebar slide, button hover, page transitions
+- [ ] Browser test: dark mode toggle, responsive breakpoints, navigation _(requires live backend for authenticated state)_
 
 ---
 
