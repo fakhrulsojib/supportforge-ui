@@ -27,13 +27,16 @@
 - [x] Verify: `npm run lint` + `npm run build` pass with zero errors
 
 
-### 3.2 — Auth Flow
-- [ ] `AuthContext.jsx` — JWT storage, login/logout/refresh, `isAuthenticated` state
-- [ ] `client.js` — Axios instance with Authorization header interceptor, auto-refresh on 401
-- [ ] `authApi.js` — login, register, refresh
-- [ ] `LoginPage.jsx` — email/password form, error display, redirect
-- [ ] `ProtectedRoute.jsx` — redirect to login if not authenticated
-- [ ] Browser test: login flow, token refresh, logout
+### 3.2 — Auth Flow ✅
+- [x] `AuthContext.jsx` — JWT in-memory storage, login/logout/refresh, `isAuthenticated` state
+- [x] `client.js` — Axios instance with Authorization header interceptor, auto-refresh on 401
+- [x] `authApi.js` — login, register, refreshAccessToken
+- [x] `useAuth.js` — convenience hook (separated for react-refresh compliance)
+- [x] `LoginPage.jsx` — email/password/tenant form, registration mode, error display, redirect
+- [x] `ProtectedRoute.jsx` — redirect to login if not authenticated
+- [x] `auth.css` — login page styling using design system tokens
+- [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
+- [ ] Browser test: login flow, token refresh, logout _(deferred to Phase 3.6)_
 
 ### 3.3 — Chat UI
 - [ ] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect

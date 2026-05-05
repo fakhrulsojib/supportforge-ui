@@ -14,9 +14,9 @@ export const APP_ENV = import.meta.env.VITE_APP_ENV || 'development'
  */
 export const API_ROUTES = {
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    REFRESH: '/auth/refresh',
+    LOGIN: '/api/v1/auth/login',
+    REGISTER: '/api/v1/auth/register',
+    REFRESH: '/api/v1/auth/refresh',
   },
   CHAT: '/api/v1/chat',
   CONVERSATIONS: '/api/v1/conversations',

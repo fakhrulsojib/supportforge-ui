@@ -1,0 +1,152 @@
+/* ============================================================
+   Auth Page — Login / Register form styling
+   ============================================================ */
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sf-space-6);
+  background: var(--sf-color-bg-secondary);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sf-space-8);
+}
+
+/* Header */
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sf-space-3);
+  text-align: center;
+}
+
+.auth-logo {
+  filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--sf-color-primary-500) 30%, transparent));
+}
+
+.auth-title {
+  font-size: var(--sf-text-3xl);
+  font-weight: var(--sf-font-bold);
+  background: var(--sf-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: var(--sf-tracking-tight);
+}
+
+.auth-subtitle {
+  font-size: var(--sf-text-base);
+  color: var(--sf-color-text-secondary);
+}
+
+/* Form */
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-5);
+  padding: var(--sf-space-8);
+  background-color: var(--sf-color-surface-card);
+  border: 1px solid var(--sf-color-border-secondary);
+  border-radius: var(--sf-radius-xl);
+  box-shadow: var(--sf-shadow-lg);
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-1-5);
+}
+
+.auth-label {
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-text-primary);
+}
+
+/* Select styling to match inputs */
+.auth-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sf-space-3) center;
+  padding-right: var(--sf-space-10);
+  cursor: pointer;
+}
+
+/* Error banner */
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sf-space-2);
+  padding: var(--sf-space-3) var(--sf-space-4);
+  background-color: var(--sf-color-error-50);
+  color: var(--sf-color-error-700);
+  border: 1px solid color-mix(in srgb, var(--sf-color-error-500) 20%, transparent);
+  border-radius: var(--sf-radius-md);
+  font-size: var(--sf-text-sm);
+  line-height: var(--sf-leading-relaxed);
+}
+
+.auth-error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Submit button */
+.auth-submit {
+  width: 100%;
+  margin-top: var(--sf-space-1);
+}
+
+/* Loading spinner */
+.auth-spinner {
+  display: inline-block;
+  width: var(--sf-space-5);
+  height: var(--sf-space-5);
+  border: 2px solid var(--sf-color-text-inverse);
+  border-top-color: transparent;
+  border-radius: var(--sf-radius-full);
+  animation: sf-spin 0.6s linear infinite;
+}
+
+/* Toggle link */
+.auth-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  font-size: var(--sf-text-sm);
+}
+
+.auth-toggle-text {
+  color: var(--sf-color-text-tertiary);
+}
+
+.auth-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--sf-color-text-link);
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-medium);
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--sf-transition-fast);
+}
+
+.auth-toggle-btn:hover {
+  color: var(--sf-color-text-link-hover);
+}
+
+.auth-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

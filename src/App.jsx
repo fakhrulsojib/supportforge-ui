@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/layout/ProtectedRoute'
+import LoginPage from './pages/LoginPage'
 import './styles/scaffold.css'
 
 /**
  * SupportForge — Root Application Component
  *
- * Phase 3.1: Scaffold with placeholder route.
+ * Phase 3.2: Auth flow with login/register, AuthContext, ProtectedRoute.
  * Subsequent sub-phases will add:
- *   3.2: AuthContext provider, ProtectedRoute, LoginPage
  *   3.3: ChatPage with WebSocket streaming
  *   3.4: AdminPage with document upload
  *   3.5: AnalyticsPage with dashboard
@@ -15,9 +17,19 @@ import './styles/scaffold.css'
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ScaffoldPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <ScaffoldPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }
@@ -76,9 +88,9 @@ function ScaffoldPage() {
               </svg>
               <span>Dark / Light Theme Ready</span>
             </div>
-            <div className="scaffold-check-item scaffold-check-pending">
+            <div className="scaffold-check-item scaffold-check-done">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="2" />
+                <path d="M4 8L7 11L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span>Auth Flow (Phase 3.2)</span>
             </div>
