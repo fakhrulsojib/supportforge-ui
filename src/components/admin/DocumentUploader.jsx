@@ -13,7 +13,7 @@
  * - No sensitive data logged to console
  */
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { uploadDocument } from '../../api/ingestApi'
 import { extractErrorMessage } from '../../api/client'
 import { UPLOAD } from '../../utils/constants'
@@ -36,17 +36,10 @@ function validateFile(file) {
     }
   }
 
-  // Check MIME type (additional guard — browsers may not always set this)
-  if (file.type && !UPLOAD.ALLOWED_TYPES.includes(file.type)) {
-    // Allow empty MIME type (some OS/browser combos don't set it for .md/.csv)
-    const isKnownExtension = UPLOAD.ALLOWED_EXTENSIONS.includes(ext)
-    if (!isKnownExtension) {
-      return {
-        valid: false,
-        error: `Unsupported file type. Allowed: ${UPLOAD.ALLOWED_EXTENSIONS.join(', ')}`,
-      }
-    }
-  }
+  // Note: MIME type validation is intentionally omitted here.
+  // The extension check above is authoritative. Browser-assigned MIME
+  // types are unreliable (e.g., .md → text/plain, .csv → application/vnd.ms-excel)
+  // and would cause false rejections. The backend performs its own validation.
 
   // Check file size
   if (file.size > UPLOAD.MAX_FILE_SIZE_BYTES) {
@@ -89,6 +82,14 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
     setSuccess(message)
     if (successTimerRef.current) clearTimeout(successTimerRef.current)
     successTimerRef.current = setTimeout(() => setSuccess(null), 3000)
+  }, [])
+
+  /** Clean up timers on unmount to prevent setState on unmounted component. */
+  useEffect(() => {
+    return () => {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
+      if (successTimerRef.current) clearTimeout(successTimerRef.current)
+    }
   }, [])
 
   /** Process a selected file */

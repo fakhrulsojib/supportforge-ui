@@ -34,7 +34,6 @@ export async function uploadDocument(file, onProgress) {
     `${API_ROUTES.DOCUMENTS}/upload`,
     formData,
     {
-      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (event) => {
         if (onProgress && event.total) {
           const percent = Math.round((event.loaded * 100) / event.total)

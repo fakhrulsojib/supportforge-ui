@@ -117,7 +117,7 @@
 }
 
 .admin-model-icon-embed {
-  background: linear-gradient(135deg, var(--sf-color-secondary-400), hsl(180, 50%, 70%));
+  background: linear-gradient(135deg, var(--sf-color-secondary-400), var(--sf-color-secondary-600));
   color: var(--sf-color-neutral-0);
 }
 
@@ -379,18 +379,18 @@
 }
 
 .admin-doc-file-icon-pdf {
-  background-color: hsl(0, 80%, 94%);
-  color: hsl(0, 68%, 48%);
+  background-color: var(--sf-color-error-50);
+  color: var(--sf-color-error-600);
 }
 
 .admin-doc-file-icon-md {
-  background-color: hsl(210, 80%, 94%);
-  color: hsl(210, 68%, 48%);
+  background-color: var(--sf-color-info-50);
+  color: var(--sf-color-info-600);
 }
 
 .admin-doc-file-icon-csv {
-  background-color: hsl(145, 70%, 92%);
-  color: hsl(148, 52%, 36%);
+  background-color: var(--sf-color-success-50);
+  color: var(--sf-color-success-700);
 }
 
 .admin-doc-file-icon-txt {
