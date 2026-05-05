@@ -1,0 +1,106 @@
+/* ============================================================
+   SupportForge — Dark / Light Mode Theme
+   Supports: @media prefers-color-scheme + manual .dark toggle
+   ============================================================ */
+
+/* Dark mode via system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    /* Primary adjustments for dark backgrounds */
+    --sf-color-primary-50: hsl(250, 40%, 18%);
+    --sf-color-primary-100: hsl(249, 42%, 24%);
+    --sf-color-primary-200: hsl(248, 44%, 32%);
+
+    /* Neutral: deep slate */
+    --sf-color-neutral-0: hsl(222, 30%, 10%);
+    --sf-color-neutral-25: hsl(222, 28%, 12%);
+    --sf-color-neutral-50: hsl(222, 26%, 14%);
+    --sf-color-neutral-100: hsl(220, 24%, 18%);
+    --sf-color-neutral-200: hsl(218, 20%, 24%);
+    --sf-color-neutral-300: hsl(216, 16%, 34%);
+    --sf-color-neutral-400: hsl(214, 14%, 48%);
+    --sf-color-neutral-500: hsl(213, 12%, 58%);
+    --sf-color-neutral-600: hsl(212, 14%, 70%);
+    --sf-color-neutral-700: hsl(210, 16%, 80%);
+    --sf-color-neutral-800: hsl(208, 18%, 88%);
+    --sf-color-neutral-900: hsl(206, 20%, 94%);
+    --sf-color-neutral-950: hsl(204, 22%, 97%);
+
+    /* Semantic dark variants */
+    --sf-color-success-50: hsl(150, 30%, 16%);
+    --sf-color-success-500: hsl(148, 48%, 50%);
+    --sf-color-success-700: hsl(145, 52%, 62%);
+    --sf-color-warning-50: hsl(40, 40%, 14%);
+    --sf-color-warning-500: hsl(38, 80%, 58%);
+    --sf-color-error-50: hsl(0, 40%, 16%);
+    --sf-color-error-500: hsl(0, 62%, 58%);
+    --sf-color-error-700: hsl(0, 56%, 68%);
+    --sf-color-info-50: hsl(210, 40%, 16%);
+    --sf-color-info-500: hsl(210, 64%, 58%);
+
+    /* Surface aliases update automatically via neutral changes */
+    --sf-color-bg-overlay: hsla(222, 30%, 4%, 0.7);
+    --sf-color-text-link: var(--sf-color-primary-400);
+    --sf-color-text-link-hover: var(--sf-color-primary-300);
+    --sf-color-border-focus: var(--sf-color-primary-500);
+
+    /* Shadows: softer and darker */
+    --sf-shadow-xs: 0 1px 2px hsla(0, 0%, 0%, 0.2);
+    --sf-shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.25), 0 1px 2px hsla(0, 0%, 0%, 0.15);
+    --sf-shadow-md: 0 4px 6px -1px hsla(0, 0%, 0%, 0.25), 0 2px 4px -2px hsla(0, 0%, 0%, 0.15);
+    --sf-shadow-lg: 0 10px 15px -3px hsla(0, 0%, 0%, 0.3), 0 4px 6px -4px hsla(0, 0%, 0%, 0.15);
+    --sf-shadow-xl: 0 20px 25px -5px hsla(0, 0%, 0%, 0.35), 0 8px 10px -6px hsla(0, 0%, 0%, 0.15);
+    --sf-shadow-focus: 0 0 0 3px hsla(249, 64%, 55%, 0.4);
+  }
+}
+
+/* Dark mode via manual toggle (.dark class on html) */
+html.dark {
+  --sf-color-primary-50: hsl(250, 40%, 18%);
+  --sf-color-primary-100: hsl(249, 42%, 24%);
+  --sf-color-primary-200: hsl(248, 44%, 32%);
+
+  --sf-color-neutral-0: hsl(222, 30%, 10%);
+  --sf-color-neutral-25: hsl(222, 28%, 12%);
+  --sf-color-neutral-50: hsl(222, 26%, 14%);
+  --sf-color-neutral-100: hsl(220, 24%, 18%);
+  --sf-color-neutral-200: hsl(218, 20%, 24%);
+  --sf-color-neutral-300: hsl(216, 16%, 34%);
+  --sf-color-neutral-400: hsl(214, 14%, 48%);
+  --sf-color-neutral-500: hsl(213, 12%, 58%);
+  --sf-color-neutral-600: hsl(212, 14%, 70%);
+  --sf-color-neutral-700: hsl(210, 16%, 80%);
+  --sf-color-neutral-800: hsl(208, 18%, 88%);
+  --sf-color-neutral-900: hsl(206, 20%, 94%);
+  --sf-color-neutral-950: hsl(204, 22%, 97%);
+
+  --sf-color-success-50: hsl(150, 30%, 16%);
+  --sf-color-success-500: hsl(148, 48%, 50%);
+  --sf-color-success-700: hsl(145, 52%, 62%);
+  --sf-color-warning-50: hsl(40, 40%, 14%);
+  --sf-color-warning-500: hsl(38, 80%, 58%);
+  --sf-color-error-50: hsl(0, 40%, 16%);
+  --sf-color-error-500: hsl(0, 62%, 58%);
+  --sf-color-error-700: hsl(0, 56%, 68%);
+  --sf-color-info-50: hsl(210, 40%, 16%);
+  --sf-color-info-500: hsl(210, 64%, 58%);
+
+  --sf-color-bg-overlay: hsla(222, 30%, 4%, 0.7);
+  --sf-color-text-link: var(--sf-color-primary-400);
+  --sf-color-text-link-hover: var(--sf-color-primary-300);
+  --sf-color-border-focus: var(--sf-color-primary-500);
+
+  --sf-shadow-xs: 0 1px 2px hsla(0, 0%, 0%, 0.2);
+  --sf-shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.25), 0 1px 2px hsla(0, 0%, 0%, 0.15);
+  --sf-shadow-md: 0 4px 6px -1px hsla(0, 0%, 0%, 0.25), 0 2px 4px -2px hsla(0, 0%, 0%, 0.15);
+  --sf-shadow-lg: 0 10px 15px -3px hsla(0, 0%, 0%, 0.3), 0 4px 6px -4px hsla(0, 0%, 0%, 0.15);
+  --sf-shadow-xl: 0 20px 25px -5px hsla(0, 0%, 0%, 0.35), 0 8px 10px -6px hsla(0, 0%, 0%, 0.15);
+  --sf-shadow-focus: 0 0 0 3px hsla(249, 64%, 55%, 0.4);
+
+  color-scheme: dark;
+}
+
+/* Ensure light mode override when .light is explicitly set */
+html.light {
+  color-scheme: light;
+}

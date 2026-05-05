@@ -1,0 +1,262 @@
+/* ============================================================
+   SupportForge — Design System Tokens
+   All design tokens use the --sf-* prefix.
+   ============================================================ */
+
+:root {
+  /* Primary: Indigo-Violet */
+  --sf-color-primary-50: hsl(243, 100%, 97%);
+  --sf-color-primary-100: hsl(243, 92%, 93%);
+  --sf-color-primary-200: hsl(244, 87%, 86%);
+  --sf-color-primary-300: hsl(245, 80%, 76%);
+  --sf-color-primary-400: hsl(247, 73%, 65%);
+  --sf-color-primary-500: hsl(249, 64%, 55%);
+  --sf-color-primary-600: hsl(252, 58%, 47%);
+  --sf-color-primary-700: hsl(254, 55%, 40%);
+  --sf-color-primary-800: hsl(255, 49%, 33%);
+  --sf-color-primary-900: hsl(256, 45%, 27%);
+  --sf-color-primary-950: hsl(258, 53%, 17%);
+
+  /* Secondary: Teal-Cyan */
+  --sf-color-secondary-400: hsl(178, 52%, 50%);
+  --sf-color-secondary-500: hsl(179, 60%, 40%);
+  --sf-color-secondary-600: hsl(180, 62%, 33%);
+
+  /* Accent: Amber-Gold */
+  --sf-color-accent-400: hsl(40, 92%, 55%);
+  --sf-color-accent-500: hsl(38, 88%, 48%);
+
+  /* Neutral: Slate Gray */
+  --sf-color-neutral-0: hsl(0, 0%, 100%);
+  --sf-color-neutral-25: hsl(210, 20%, 99%);
+  --sf-color-neutral-50: hsl(210, 20%, 97%);
+  --sf-color-neutral-100: hsl(214, 18%, 94%);
+  --sf-color-neutral-200: hsl(213, 16%, 88%);
+  --sf-color-neutral-300: hsl(213, 14%, 78%);
+  --sf-color-neutral-400: hsl(214, 12%, 63%);
+  --sf-color-neutral-500: hsl(215, 12%, 50%);
+  --sf-color-neutral-600: hsl(215, 14%, 40%);
+  --sf-color-neutral-700: hsl(216, 18%, 32%);
+  --sf-color-neutral-800: hsl(217, 22%, 24%);
+  --sf-color-neutral-900: hsl(218, 28%, 16%);
+  --sf-color-neutral-950: hsl(220, 35%, 10%);
+
+  /* Semantic */
+  --sf-color-success-50: hsl(145, 76%, 95%);
+  --sf-color-success-500: hsl(148, 52%, 42%);
+  --sf-color-success-700: hsl(152, 52%, 28%);
+  --sf-color-warning-50: hsl(45, 100%, 96%);
+  --sf-color-warning-500: hsl(38, 88%, 48%);
+  --sf-color-warning-600: hsl(34, 90%, 40%);
+  --sf-color-error-50: hsl(0, 86%, 96%);
+  --sf-color-error-500: hsl(0, 68%, 52%);
+  --sf-color-error-600: hsl(0, 72%, 44%);
+  --sf-color-error-700: hsl(0, 68%, 36%);
+  --sf-color-info-50: hsl(208, 100%, 96%);
+  --sf-color-info-500: hsl(210, 72%, 50%);
+  --sf-color-info-600: hsl(212, 76%, 42%);
+
+  /* Surface & Text Aliases */
+  --sf-color-bg-primary: var(--sf-color-neutral-0);
+  --sf-color-bg-secondary: var(--sf-color-neutral-50);
+  --sf-color-bg-tertiary: var(--sf-color-neutral-100);
+  --sf-color-bg-elevated: var(--sf-color-neutral-0);
+  --sf-color-bg-overlay: hsla(220, 35%, 10%, 0.5);
+  --sf-color-surface-card: var(--sf-color-neutral-0);
+  --sf-color-surface-card-hover: var(--sf-color-neutral-25);
+  --sf-color-surface-input: var(--sf-color-neutral-0);
+  --sf-color-surface-sidebar: var(--sf-color-neutral-25);
+  --sf-color-text-primary: var(--sf-color-neutral-900);
+  --sf-color-text-secondary: var(--sf-color-neutral-600);
+  --sf-color-text-tertiary: var(--sf-color-neutral-400);
+  --sf-color-text-inverse: var(--sf-color-neutral-0);
+  --sf-color-text-link: var(--sf-color-primary-600);
+  --sf-color-text-link-hover: var(--sf-color-primary-700);
+  --sf-color-border-primary: var(--sf-color-neutral-200);
+  --sf-color-border-secondary: var(--sf-color-neutral-100);
+  --sf-color-border-focus: var(--sf-color-primary-400);
+  --sf-color-border-error: var(--sf-color-error-500);
+
+  /* Spacing (4px base) */
+  --sf-space-0: 0;
+  --sf-space-px: 1px;
+  --sf-space-0-5: 0.125rem;
+  --sf-space-1: 0.25rem;
+  --sf-space-1-5: 0.375rem;
+  --sf-space-2: 0.5rem;
+  --sf-space-2-5: 0.625rem;
+  --sf-space-3: 0.75rem;
+  --sf-space-3-5: 0.875rem;
+  --sf-space-4: 1rem;
+  --sf-space-5: 1.25rem;
+  --sf-space-6: 1.5rem;
+  --sf-space-7: 1.75rem;
+  --sf-space-8: 2rem;
+  --sf-space-10: 2.5rem;
+  --sf-space-12: 3rem;
+  --sf-space-16: 4rem;
+  --sf-space-20: 5rem;
+  --sf-space-24: 6rem;
+
+  /* Typography */
+  --sf-font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sf-font-family-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --sf-text-xs: 0.75rem;
+  --sf-text-sm: 0.875rem;
+  --sf-text-base: 1rem;
+  --sf-text-lg: 1.125rem;
+  --sf-text-xl: 1.25rem;
+  --sf-text-2xl: 1.5rem;
+  --sf-text-3xl: 1.875rem;
+  --sf-text-4xl: 2.25rem;
+  --sf-text-5xl: 3rem;
+  --sf-leading-none: 1;
+  --sf-leading-tight: 1.25;
+  --sf-leading-snug: 1.375;
+  --sf-leading-normal: 1.5;
+  --sf-leading-relaxed: 1.625;
+  --sf-font-normal: 400;
+  --sf-font-medium: 500;
+  --sf-font-semibold: 600;
+  --sf-font-bold: 700;
+  --sf-tracking-tight: -0.025em;
+  --sf-tracking-normal: 0em;
+  --sf-tracking-wide: 0.025em;
+
+  /* Border Radius */
+  --sf-radius-sm: 0.375rem;
+  --sf-radius-md: 0.5rem;
+  --sf-radius-lg: 0.75rem;
+  --sf-radius-xl: 1rem;
+  --sf-radius-2xl: 1.5rem;
+  --sf-radius-full: 9999px;
+
+  /* Shadows */
+  --sf-shadow-xs: 0 1px 2px hsla(220, 35%, 10%, 0.04);
+  --sf-shadow-sm: 0 1px 3px hsla(220, 35%, 10%, 0.06), 0 1px 2px hsla(220, 35%, 10%, 0.04);
+  --sf-shadow-md: 0 4px 6px -1px hsla(220, 35%, 10%, 0.06), 0 2px 4px -2px hsla(220, 35%, 10%, 0.04);
+  --sf-shadow-lg: 0 10px 15px -3px hsla(220, 35%, 10%, 0.06), 0 4px 6px -4px hsla(220, 35%, 10%, 0.04);
+  --sf-shadow-xl: 0 20px 25px -5px hsla(220, 35%, 10%, 0.08), 0 8px 10px -6px hsla(220, 35%, 10%, 0.04);
+  --sf-shadow-focus: 0 0 0 3px hsla(249, 64%, 55%, 0.3);
+
+  /* Z-Index */
+  --sf-z-dropdown: 50;
+  --sf-z-sidebar: 100;
+  --sf-z-header: 200;
+  --sf-z-modal-backdrop: 250;
+  --sf-z-modal: 300;
+  --sf-z-toast: 400;
+
+  /* Transitions */
+  --sf-transition-fast: 150ms ease;
+  --sf-transition-normal: 250ms ease;
+  --sf-transition-slow: 350ms ease;
+  --sf-transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --sf-sidebar-width: 260px;
+  --sf-sidebar-width-collapsed: 64px;
+  --sf-header-height: 64px;
+  --sf-content-max-width: 1200px;
+  --sf-chat-max-width: 800px;
+
+  /* Gradients */
+  --sf-gradient-primary: linear-gradient(135deg, var(--sf-color-primary-500) 0%, var(--sf-color-primary-700) 100%);
+  --sf-gradient-primary-hover: linear-gradient(135deg, var(--sf-color-primary-400) 0%, var(--sf-color-primary-600) 100%);
+  --sf-gradient-accent: linear-gradient(135deg, var(--sf-color-secondary-400), var(--sf-color-primary-500), var(--sf-color-accent-400));
+}
+
+/* Global Reset */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+body {
+  font-family: var(--sf-font-family-sans);
+  font-size: var(--sf-text-base);
+  font-weight: var(--sf-font-normal);
+  line-height: var(--sf-leading-normal);
+  color: var(--sf-color-text-primary);
+  background-color: var(--sf-color-bg-primary);
+  min-height: 100vh;
+  transition: background-color var(--sf-transition-normal), color var(--sf-transition-normal);
+}
+
+/* Typography Base */
+h1, h2, h3, h4, h5, h6 { font-weight: var(--sf-font-semibold); line-height: var(--sf-leading-tight); color: var(--sf-color-text-primary); }
+h1 { font-size: var(--sf-text-4xl); }
+h2 { font-size: var(--sf-text-3xl); }
+h3 { font-size: var(--sf-text-2xl); }
+h4 { font-size: var(--sf-text-xl); }
+p { line-height: var(--sf-leading-relaxed); color: var(--sf-color-text-secondary); }
+a { color: var(--sf-color-text-link); text-decoration: none; transition: color var(--sf-transition-fast); }
+a:hover { color: var(--sf-color-text-link-hover); }
+code, pre { font-family: var(--sf-font-family-mono); font-size: var(--sf-text-sm); }
+
+/* Focus & Accessibility */
+:focus-visible { outline: none; box-shadow: var(--sf-shadow-focus); }
+::selection { background-color: var(--sf-color-primary-100); color: var(--sf-color-primary-900); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Utility Classes */
+.sf-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+.sf-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-scrollbar-thin { scrollbar-width: thin; scrollbar-color: var(--sf-color-neutral-300) transparent; }
+
+/* Button Base */
+.sf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sf-space-2);
+  padding: var(--sf-space-2-5) var(--sf-space-5);
+  font-family: var(--sf-font-family-sans); font-size: var(--sf-text-sm); font-weight: var(--sf-font-medium);
+  border-radius: var(--sf-radius-md); border: 1px solid transparent; cursor: pointer;
+  transition: all var(--sf-transition-fast); user-select: none; white-space: nowrap;
+}
+.sf-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+.sf-btn:active:not(:disabled) { transform: scale(0.98); }
+.sf-btn-primary { background: var(--sf-gradient-primary); color: var(--sf-color-text-inverse); box-shadow: var(--sf-shadow-sm); }
+.sf-btn-primary:hover:not(:disabled) { background: var(--sf-gradient-primary-hover); box-shadow: var(--sf-shadow-md); transform: translateY(-1px); }
+.sf-btn-secondary { background-color: var(--sf-color-bg-primary); color: var(--sf-color-text-primary); border-color: var(--sf-color-border-primary); }
+.sf-btn-secondary:hover:not(:disabled) { background-color: var(--sf-color-bg-secondary); }
+.sf-btn-ghost { background-color: transparent; color: var(--sf-color-text-secondary); }
+.sf-btn-ghost:hover:not(:disabled) { background-color: var(--sf-color-bg-tertiary); color: var(--sf-color-text-primary); }
+.sf-btn-danger { background-color: var(--sf-color-error-500); color: var(--sf-color-text-inverse); }
+.sf-btn-danger:hover:not(:disabled) { background-color: var(--sf-color-error-600); }
+.sf-btn-sm { padding: var(--sf-space-1-5) var(--sf-space-3); font-size: var(--sf-text-xs); }
+.sf-btn-lg { padding: var(--sf-space-3-5) var(--sf-space-7); font-size: var(--sf-text-base); }
+.sf-btn-icon { padding: var(--sf-space-2); }
+
+/* Input Base */
+.sf-input {
+  width: 100%; padding: var(--sf-space-2-5) var(--sf-space-3-5);
+  font-family: var(--sf-font-family-sans); font-size: var(--sf-text-sm); color: var(--sf-color-text-primary);
+  background-color: var(--sf-color-surface-input); border: 1px solid var(--sf-color-border-primary);
+  border-radius: var(--sf-radius-md); transition: border-color var(--sf-transition-fast), box-shadow var(--sf-transition-fast);
+}
+.sf-input::placeholder { color: var(--sf-color-text-tertiary); }
+.sf-input:focus { border-color: var(--sf-color-border-focus); box-shadow: var(--sf-shadow-focus); outline: none; }
+.sf-input-error { border-color: var(--sf-color-border-error); }
+
+/* Card Base */
+.sf-card { background-color: var(--sf-color-surface-card); border: 1px solid var(--sf-color-border-secondary); border-radius: var(--sf-radius-lg); box-shadow: var(--sf-shadow-sm); }
+.sf-card-interactive:hover { box-shadow: var(--sf-shadow-md); transform: translateY(-2px); }
+
+/* Badge Base */
+.sf-badge { display: inline-flex; align-items: center; gap: var(--sf-space-1); padding: var(--sf-space-0-5) var(--sf-space-2-5); font-size: var(--sf-text-xs); font-weight: var(--sf-font-medium); border-radius: var(--sf-radius-full); }
+.sf-badge-success { background-color: var(--sf-color-success-50); color: var(--sf-color-success-700); }
+.sf-badge-warning { background-color: var(--sf-color-warning-50); color: var(--sf-color-warning-600); }
+.sf-badge-error { background-color: var(--sf-color-error-50); color: var(--sf-color-error-700); }
+.sf-badge-info { background-color: var(--sf-color-info-50); color: var(--sf-color-info-600); }
+.sf-badge-neutral { background-color: var(--sf-color-neutral-100); color: var(--sf-color-neutral-700); }
+
+/* Animations */
+@keyframes sf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sf-fade-in-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sf-slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes sf-scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes sf-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes sf-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes sf-bounce-dot { 0%, 80%, 100% { transform: scale(0); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+.sf-animate-fade-in { animation: sf-fade-in var(--sf-transition-normal) ease forwards; }
+.sf-animate-fade-in-up { animation: sf-fade-in-up var(--sf-transition-normal) ease forwards; }
+.sf-animate-scale-in { animation: sf-scale-in var(--sf-transition-spring) forwards; }
+.sf-animate-pulse { animation: sf-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }

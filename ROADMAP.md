@@ -16,15 +16,16 @@
 
 > **Branch:** `phase-3/frontend-implementation`
 
-### 3.1 — React + Vite Scaffold
-- [ ] Initialize with `npx -y create-vite@latest ./ -- --template react`
-- [ ] Install dependencies: `axios`, `react-router-dom`
-- [ ] Create directory structure: `api/`, `hooks/`, `context/`, `pages/`, `components/`, `styles/`, `utils/`
-- [ ] Design system: `index.css` with CSS custom properties (colors, spacing, typography, shadows)
-- [ ] Theme: `theme.css` with dark/light mode variables
-- [ ] Import Google Font (Inter) in `index.html`
-- [ ] `vite.config.js` with API proxy → `http://localhost:8000`
-- [ ] Verify: `npm run dev` starts, app renders at `localhost:5173`
+### 3.1 — React + Vite Scaffold ✅
+- [x] Initialize with `npx -y create-vite@latest ./ -- --template react`
+- [x] Install dependencies: `axios`, `react-router-dom`
+- [x] Create directory structure: `api/`, `hooks/`, `context/`, `pages/`, `components/`, `styles/`, `utils/`
+- [x] Design system: `index.css` with CSS custom properties (colors, spacing, typography, shadows)
+- [x] Theme: `theme.css` with dark/light mode variables
+- [x] Import Google Font (Inter) in `index.html`
+- [x] `vite.config.js` with API proxy → `http://localhost:8000`
+- [x] Verify: `npm run lint` + `npm run build` pass with zero errors
+
 
 ### 3.2 — Auth Flow
 - [ ] `AuthContext.jsx` — JWT storage, login/logout/refresh, `isAuthenticated` state
