@@ -48,13 +48,13 @@
 - [x] `ChatPage.jsx` — compose all chat components
 - [ ] Browser test: full chat flow at 375px, 768px, 1440px _(deferred — requires live backend)_
 
-### 3.4 — Admin Panel
-- [ ] `ingestApi.js` — upload, list, delete documents
-- [ ] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
-- [ ] `IngestionStatus.jsx` — document table with status badges
-- [ ] `ModelSelector.jsx` — display current models (read-only)
-- [ ] `AdminPage.jsx` — compose admin components, admin-only check
-- [ ] Browser test: upload flow, status polling, delete
+### 3.4 — Admin Panel ✅
+- [x] `ingestApi.js` — upload, list, delete documents
+- [x] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
+- [x] `IngestionStatus.jsx` — document table with status badges
+- [x] `ModelSelector.jsx` — display current models (read-only)
+- [x] `AdminPage.jsx` — compose admin components, admin-only check
+- [ ] Browser test: upload flow, status polling, delete _(deferred — requires live backend)_
 
 ### 3.5 — Analytics Dashboard
 - [ ] `analyticsApi.js` — daily stats, top intents, satisfaction
