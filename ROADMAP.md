@@ -38,15 +38,15 @@
 - [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
 - [ ] Browser test: login flow, token refresh, logout _(deferred to Phase 3.6)_
 
-### 3.3 — Chat UI
-- [ ] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect
-- [ ] `ChatWindow.jsx` — message list + input, auto-scroll
-- [ ] `MessageBubble.jsx` — user vs assistant, markdown rendering
-- [ ] `StreamingIndicator.jsx` — typing dots animation
-- [ ] `SourceCitation.jsx` — collapsible source cards
-- [ ] `FeedbackButtons.jsx` — 👍/👎 per message
-- [ ] `ChatPage.jsx` — compose all chat components
-- [ ] Browser test: full chat flow at 375px, 768px, 1440px
+### 3.3 — Chat UI ✅
+- [x] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect
+- [x] `ChatWindow.jsx` — message list + input, auto-scroll
+- [x] `MessageBubble.jsx` — user vs assistant, markdown rendering
+- [x] `StreamingIndicator.jsx` — typing dots animation
+- [x] `SourceCitation.jsx` — collapsible source cards
+- [x] `FeedbackButtons.jsx` — 👍/👎 per message
+- [x] `ChatPage.jsx` — compose all chat components
+- [ ] Browser test: full chat flow at 375px, 768px, 1440px _(deferred — requires live backend)_
 
 ### 3.4 — Admin Panel
 - [ ] `ingestApi.js` — upload, list, delete documents
