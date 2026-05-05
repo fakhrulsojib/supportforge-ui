@@ -2,19 +2,24 @@
  * ProtectedRoute — auth guard component.
  *
  * Wraps child routes and redirects to /login if user is not authenticated.
- * Shows nothing while auth state is loading to prevent flash of protected content.
+ * Shows a loading spinner while auth state is being verified.
  */
 
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import LoadingSpinner from '../shared/LoadingSpinner'
 
 export default function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()
 
-  // While auth is being verified, render nothing to prevent flash
+  // While auth is being verified, show a centered spinner
   if (isLoading) {
-    return null
+    return (
+      <div className="protected-route-loading">
+        <LoadingSpinner size="lg" label="Verifying authentication…" />
+      </div>
+    )
   }
 
   if (!isAuthenticated) {

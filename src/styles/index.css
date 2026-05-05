@@ -157,6 +157,7 @@
   --sf-sidebar-width: 260px;
   --sf-sidebar-width-collapsed: 64px;
   --sf-header-height: 64px;
+  --sf-header-height-mobile: 56px;
   --sf-content-max-width: 1200px;
   --sf-chat-max-width: 800px;
 

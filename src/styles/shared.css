@@ -64,6 +64,16 @@
   stroke-linecap: round;
 }
 
+/* ── Protected Route Loading ─────────────────────────────────── */
+
+.protected-route-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--sf-color-bg-primary);
+}
+
 /* ── Page Transition Wrapper ─────────────────────────────────── */
 
 .page-transition {
