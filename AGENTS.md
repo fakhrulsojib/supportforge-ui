@@ -300,11 +300,12 @@ When a live backend is available, register one test user for browser testing aut
 ```
 Email: test@supportforge.dev
 Password: Test1234!@#
-Tenant ID: demo-tenant
-Role: admin
+Tenant ID: 44aff2a2-4869-467c-b707-6a697bfefe29
+Tenant Slug: demo-tenant
+Role: viewer (default registration role)
 ```
 
-> **Convention:** All browser test tasks that require logged-in state should use these credentials. The test user must be registered via the backend API before browser testing.
+> **Convention:** All browser test tasks that require logged-in state should use these credentials. The Tenant ID field requires the UUID, not the slug. The test user must be registered via the backend API before browser testing.
 
 ---
 
