@@ -24,6 +24,11 @@ export const API_ROUTES = {
   CONVERSATIONS: '/api/v1/conversations',
   DOCUMENTS: '/api/v1/documents',
   TENANTS: '/api/v1/tenants',
+  ANALYTICS: {
+    DAILY_STATS: '/api/v1/analytics/daily-stats',
+    TOP_INTENTS: '/api/v1/analytics/top-intents',
+    SATISFACTION: '/api/v1/analytics/satisfaction',
+  },
   HEALTH: '/health',
 }
 

@@ -56,13 +56,13 @@
 - [x] `AdminPage.jsx` — compose admin components, admin-only check
 - [ ] Browser test: upload flow, status polling, delete _(deferred — requires live backend)_
 
-### 3.5 — Analytics Dashboard
-- [ ] `analyticsApi.js` — daily stats, top intents, satisfaction
-- [ ] `ConversationChart.jsx` — line chart (CSS/SVG, no heavy lib)
-- [ ] `TopicCloud.jsx` — sized intent tags
-- [ ] `SatisfactionGauge.jsx` — percentage ring
-- [ ] `AnalyticsPage.jsx` — compose dashboard, date range picker
-- [ ] Browser test: charts render, hover states, empty state
+### 3.5 — Analytics Dashboard ✅
+- [x] `analyticsApi.js` — daily stats, top intents, satisfaction
+- [x] `ConversationChart.jsx` — line chart (CSS/SVG, no heavy lib)
+- [x] `TopicCloud.jsx` — sized intent tags
+- [x] `SatisfactionGauge.jsx` — percentage ring
+- [x] `AnalyticsPage.jsx` — compose dashboard, date range picker
+- [ ] Browser test: charts render, hover states, empty state _(deferred — requires live backend for data)_
 
 ### 3.6 — Layout & Polish
 - [ ] `Sidebar.jsx` — nav links, active state, collapsible on mobile
