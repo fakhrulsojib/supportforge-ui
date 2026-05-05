@@ -26,6 +26,10 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 4. **Do NOT start the next phase** until the previous phase's PR is merged to `main`
 5. **Use conventional commit messages** within each branch: `feat:`, `fix:`, `style:`, `refactor:`, `docs:`, `chore:`
 
+### Scope Rules
+
+> **One sub-phase per conversation.** Large phases (e.g., Phase 3 has multiple sub-phases: auth, chat, admin, analytics, layout) MUST be implemented one sub-phase at a time. Commit after each sub-phase. This prevents context loss and ensures each unit of work receives full validation. Do NOT implement multiple sub-phases in a single session.
+
 ---
 
 ## Task Execution Pipeline
@@ -37,8 +41,10 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 1. Read `ROADMAP.md` and identify the current phase and the specific task to work on
 2. Read all files in the directories that will be affected by the task
 3. If this task depends on work from a previous task (e.g. an API endpoint, a context provider), verify that dependency exists and is functional
+4. **Cross-cutting audit:** If this task introduces or modifies a cross-cutting concern (auth context, error boundaries, tenant context, theming), identify **ALL existing pages and components** that must also be updated. List them explicitly before writing any code.
+5. **Impact analysis:** For any component being moved, renamed, or refactored — grep for all import references and list every file that will need updating.
 
-> **Gate:** You can describe what you're about to build, which files you'll create or modify, and which existing components you'll compose with.
+> **Gate:** You can describe what you're about to build, which files you'll create or modify, which existing components need updating for cross-cutting concerns, and how the new code fits into the existing codebase.
 
 ### Step 2 — Implement
 
@@ -52,6 +58,9 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
    - **No Tailwind, no CSS-in-JS** — vanilla CSS with custom properties only
    - **State management** — React Context + hooks only, no Redux
    - **Dark mode** — must work via `prefers-color-scheme` and manual toggle
+   - **All API error responses** must be handled with user-facing feedback (toast, inline error, etc.)
+   - **Auth tokens** — store in memory (React Context), NOT in `localStorage`
+   - **Sensitive data** — never log tokens, passwords, or API keys to `console.*`
 
 > **Gate:** The new component/page renders without errors in the browser console.
 
@@ -69,7 +78,25 @@ npm run build
 
 > **Gate:** Both commands exit with code 0.
 
-### Step 4 — Browser Test (if browser available)
+### Step 4 — Self-Review
+
+> **This step exists because lint and build checks only catch syntax and import errors — they do NOT catch design flaws, security gaps, UX issues, or cross-cutting inconsistencies. Those are the issues that code reviewers find.**
+
+1. Run `git diff --cached` (full diff — **NOT** `--stat`) and read through every changed line as if you are an independent reviewer seeing this code for the first time.
+2. For **every file**, systematically ask:
+   - **Security:** Does this component check auth state before rendering protected content? Are tokens handled securely?
+   - **Consistency:** Does this component follow the same patterns as other components in the same feature area? (Same prop naming, same CSS class naming, same error handling)
+   - **Error handling:** What happens when the API returns 401? 403? 500? Network error? Does the user see helpful feedback?
+   - **Cross-cutting:** Does this change affect any OTHER page or component? Did I update all consumers/importers?
+   - **Cleanup:** Are there unused imports, dead CSS classes, or stale component files left from refactoring?
+   - **Accessibility:** Does this component have proper ARIA labels, keyboard navigation, and focus management?
+3. Check all components against the **Security Checklist** (below).
+4. Check against the **Consistency Checklist** (below).
+5. If you find ANY issue, go back to Step 2 and fix before continuing.
+
+> **Gate:** You can explain why every component handles auth correctly, every error state has user feedback, every cross-cutting concern is addressed, and no deprecated code remains.
+
+### Step 5 — Browser Test (if browser available)
 
 1. Start the dev server: `npm run dev`
 2. Navigate to `http://localhost:5173`
@@ -81,11 +108,13 @@ npm run build
 5. Toggle dark mode — verify no broken colors or invisible text
 6. Open browser console — verify zero errors or warnings
 7. If chat-related: send a message → verify streaming → check source citations appear
-8. Screenshot any visual bugs
+8. **Auth flow:** If protected route — verify redirect to login when unauthenticated
+9. **Error states:** Disconnect network / mock API errors → verify graceful degradation
+10. Screenshot any visual bugs
 
 > **Gate:** Feature works at all three viewports, in both light and dark mode, with zero console errors.
 
-### Step 5 — Update Documentation
+### Step 6 — Update Documentation
 
 For each markdown file, check if this task requires an update:
 
@@ -98,7 +127,7 @@ For each markdown file, check if this task requires an update:
 
 > **Gate:** All affected markdown files are updated. No stale information remains.
 
-### Step 6 — Commit
+### Step 7 — Commit
 
 1. Stage all changes: `git add -A`
 2. Review staged changes: `git diff --cached --stat`
@@ -112,7 +141,7 @@ For each markdown file, check if this task requires an update:
 
 > **Gate:** `git status` shows a clean working tree.
 
-### Step 7 — Update Master Plan
+### Step 8 — Update Master Plan
 
 1. Open `../supportforge_plan.md` (the master implementation plan in the parent directory)
 2. Find the checklist items that correspond to the task(s) you just completed
@@ -120,6 +149,79 @@ For each markdown file, check if this task requires an update:
 4. Do **not** modify any other content in the plan
 
 > **Gate:** Every task you completed in this session is marked `[x]` in `supportforge_plan.md`.
+
+---
+
+## Security Checklist
+
+> **Check EVERY item before committing ANY auth-related or data-handling code.** This checklist exists because security gaps were the #1 category of code review findings in the backend and the same patterns apply to the frontend.
+
+### Authentication & Authorization
+- [ ] All protected routes are wrapped in `<ProtectedRoute>` or equivalent auth guard
+- [ ] Unauthenticated users are redirected to login — protected content is never briefly visible
+- [ ] Auth tokens are stored in React Context (memory) — **NEVER** in `localStorage` or `sessionStorage`
+- [ ] Token refresh is handled automatically by the API client interceptor
+- [ ] Logout clears all auth state and redirects to login
+
+### Sensitive Data
+- [ ] No tokens, passwords, or API keys are logged to `console.*` in production
+- [ ] No sensitive data appears in URL query parameters
+- [ ] Error messages shown to users do not include stack traces, raw API errors, or internal IDs
+- [ ] Form inputs for passwords use `type="password"` and are not autocompleted for shared machines
+
+### Multi-Tenant Isolation
+- [ ] Tenant context is set from the authenticated user's token — never from URL params or user input
+- [ ] Admin UI only shows data for the authenticated tenant (no global admin view unless role allows)
+- [ ] Switching tenants invalidates cached data from the previous tenant
+
+### Input Handling
+- [ ] All user inputs are trimmed and validated before sending to the API
+- [ ] File uploads validate type and size on the client before sending
+- [ ] Rich text / markdown rendering uses safe rendering (no `dangerouslySetInnerHTML` with user content)
+
+---
+
+## Consistency Checklist
+
+> **Check EVERY item to ensure the codebase is internally consistent.** Inconsistency is a frequent source of review findings.
+
+### Patterns
+- [ ] All API calls go through `src/api/client.js` — no raw `fetch()` or `axios` anywhere
+- [ ] All components in the same feature area follow the same prop naming conventions
+- [ ] All error states use the same pattern (toast, inline error, error boundary — pick one per context)
+- [ ] All loading states use the same pattern (`<LoadingSpinner>` or skeleton, consistently)
+
+### CSS & Theming
+- [ ] No hardcoded colors — all use `var(--sf-color-*)`
+- [ ] No hardcoded spacing — all use `var(--sf-space-*)`
+- [ ] Dark mode variables are defined for every custom property used
+- [ ] CSS class names follow the same naming convention (BEM, feature-prefix, etc.)
+
+### Imports & Structure
+- [ ] No deprecated import paths left after refactoring — all consumers use the canonical path
+- [ ] No orphan component files (created but never imported/rendered)
+- [ ] No unused CSS files or dead CSS classes
+- [ ] All components have a meaningful display name (for React DevTools debugging)
+
+---
+
+## Phase Completion Checklist
+
+> **Before marking ANY phase as complete, verify EVERY item below.** This is the final gate before a phase branch can be submitted as a PR.
+
+- [ ] Every protected route has an auth guard (checked against Security Checklist)
+- [ ] Every data-displaying component handles loading, error, and empty states
+- [ ] All deprecated component files from refactoring are removed — no orphans remain
+- [ ] All new `VITE_` env vars are in `.env.example` with documentation
+- [ ] All new dependencies are in `package.json`
+- [ ] `git diff main --name-only` shows no unexpected files
+- [ ] Full self-review of `git diff main` completed (not just `--stat`)
+- [ ] All items in `ROADMAP.md` for this phase are marked `[x]`
+- [ ] All items in `../supportforge_plan.md` for this phase are marked `[x]`
+- [ ] `npm run lint` passes with zero warnings
+- [ ] `npm run build` passes with zero warnings
+- [ ] All three viewports tested (375px, 768px, 1440px)
+- [ ] Dark mode tested — no broken colors or invisible text
 
 ---
 
