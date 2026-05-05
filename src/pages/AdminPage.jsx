@@ -198,7 +198,7 @@ export default function AdminPage() {
 
       {/* Error Bar */}
       {error && (
-        <div className="admin-error-bar sf-animate-fade-in" role="alert">
+        <div className="admin-error-bar" role="alert">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
             <path d="M8 5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

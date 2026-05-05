@@ -256,7 +256,7 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
           <div className="admin-upload-progress-bar-track">
             <div
               className="admin-upload-progress-bar-fill"
-              style={{ width: `${uploadProgress}%` }}
+              style={{ '--progress-width': `${uploadProgress}%` }}
               role="progressbar"
               aria-valuenow={uploadProgress}
               aria-valuemin={0}
