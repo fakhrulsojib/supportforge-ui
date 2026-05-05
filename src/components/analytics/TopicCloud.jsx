@@ -80,7 +80,7 @@ export default function TopicCloud({ intents = [], isLoading = false }) {
         <span
           key={intent.name}
           className={`topic-tag topic-tag--${index % COLOR_VARIANT_COUNT}`}
-          style={{ fontSize: computeFontSize(intent.count, minCount, maxCount) }}
+          style={{ '--topic-size': computeFontSize(intent.count, minCount, maxCount) }}
           role="listitem"
           title={`${formatIntentName(intent.name)}: ${intent.count} occurrences`}
         >

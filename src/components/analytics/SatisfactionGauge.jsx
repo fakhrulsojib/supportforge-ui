@@ -107,7 +107,7 @@ export default function SatisfactionGauge({ data = null, isLoading = false }) {
             r={RING_RADIUS}
             strokeDasharray={RING_CIRCUMFERENCE}
             strokeDashoffset={mounted ? negativeOffset : RING_CIRCUMFERENCE}
-            style={{ transformOrigin: `${CENTER}px ${CENTER}px`, transform: `rotate(${negativeRotation}deg)` }}
+            style={{ '--gauge-rotate': `${negativeRotation}deg` }}
           />
         </svg>
 

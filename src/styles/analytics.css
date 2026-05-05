@@ -281,6 +281,8 @@
   box-shadow: var(--sf-shadow-lg);
   z-index: var(--sf-z-dropdown);
   white-space: nowrap;
+  left: var(--chart-tip-x, 0);
+  top: var(--chart-tip-y, 0);
   transform: translate(-50%, -100%);
   margin-top: calc(var(--sf-space-2) * -1);
   opacity: 0;
@@ -365,6 +367,7 @@
   border-radius: var(--sf-radius-full);
   font-family: var(--sf-font-family-sans);
   font-weight: var(--sf-font-medium);
+  font-size: var(--topic-size, 1rem);
   cursor: default;
   transition: transform var(--sf-transition-fast), box-shadow var(--sf-transition-fast);
   border: 1px solid transparent;
@@ -437,6 +440,8 @@
   stroke-width: 12;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: 90px 90px;
+  transform: rotate(var(--gauge-rotate, 0deg));
 }
 
 .gauge-center {

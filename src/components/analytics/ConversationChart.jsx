@@ -49,8 +49,8 @@ export default function ConversationChart({ data = [], isLoading = false }) {
       return { maxY: 10, points: [], xLabels: [] }
     }
 
-    const maxConv = Math.max(...data.map((d) => d.total_conversations), 0)
-    const maxMsg = Math.max(...data.map((d) => d.total_messages), 0)
+    const maxConv = data.reduce((max, d) => Math.max(max, d.total_conversations), 0)
+    const maxMsg = data.reduce((max, d) => Math.max(max, d.total_messages), 0)
     const yMax = niceMax(Math.max(maxConv, maxMsg))
 
     const pts = data.map((d, i) => {
@@ -170,8 +170,8 @@ export default function ConversationChart({ data = [], isLoading = false }) {
         </defs>
 
         {/* Grid lines + Y labels */}
-        {yLabels.map((l) => (
-          <g key={l.value}>
+        {yLabels.map((l, i) => (
+          <g key={`y-${i}`}>
             <line
               className="chart-grid-line"
               x1={PADDING.left}
@@ -232,7 +232,7 @@ export default function ConversationChart({ data = [], isLoading = false }) {
       {/* Tooltip */}
       <div
         className={`chart-tooltip ${tooltip.visible ? 'chart-tooltip--visible' : ''}`}
-        style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }}
+        style={{ '--chart-tip-x': `${tooltip.x}px`, '--chart-tip-y': `${tooltip.y}px` }}
         aria-hidden="true"
       >
         {tooltip.item && (
