@@ -44,9 +44,18 @@ export default function LoginPage() {
       setError('Password is required')
       return false
     }
-    if (isRegisterMode && formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
-      return false
+    if (isRegisterMode) {
+      const pw = formData.password
+      const missing = []
+      if (pw.length < 8) missing.push('at least 8 characters')
+      if (!/[A-Z]/.test(pw)) missing.push('an uppercase letter')
+      if (!/[a-z]/.test(pw)) missing.push('a lowercase letter')
+      if (!/\d/.test(pw)) missing.push('a digit')
+      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(pw)) missing.push('a special character')
+      if (missing.length > 0) {
+        setError(`Password must contain ${missing.join(', ')}`)
+        return false
+      }
     }
     if (!formData.tenantId.trim()) {
       setError('Tenant ID is required')

@@ -152,18 +152,27 @@ client.interceptors.response.use(
 
 /**
  * Extract a user-facing error message from an Axios error.
- * Handles the backend's { detail: "..." } format.
+ * Handles the backend's { error: { code, message } } format,
+ * FastAPI's { detail: "..." } format, and generic Axios errors.
  *
  * @param {import('axios').AxiosError} error
  * @returns {string}
  */
 export function extractErrorMessage(error) {
-  if (error.response?.data?.detail) {
-    return error.response.data.detail
+  const data = error.response?.data
+  // SupportForge API format: { error: { code: "...", message: "..." } }
+  if (data?.error?.message) {
+    return data.error.message
   }
-  if (error.response?.data?.message) {
-    return error.response.data.message
+  // FastAPI default format: { detail: "..." }
+  if (data?.detail) {
+    return data.detail
   }
+  // Flat message format: { message: "..." }
+  if (data?.message) {
+    return data.message
+  }
+  // Axios network error
   if (error.message) {
     return error.message
   }
