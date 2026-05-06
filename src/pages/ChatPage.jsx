@@ -214,7 +214,7 @@ export default function ChatPage() {
                 <path d="M3 4c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2H8l-3 3v-3H5c-1.1 0-2-.9-2-2V4z" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span className="chat-sidebar-item-text sf-truncate">
-                {conv.status === 'active' ? 'Active' : conv.status === 'resolved' ? 'Resolved' : 'Escalated'}
+                {conv.title || (conv.status === 'active' ? 'New conversation' : conv.status === 'resolved' ? 'Resolved' : 'Escalated')}
               </span>
               {conv.started_at && (
                 <span className="chat-sidebar-item-time">

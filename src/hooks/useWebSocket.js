@@ -55,6 +55,14 @@ export function useWebSocket() {
   const reconnectTimerRef = useRef(null)
   const shouldReconnectRef = useRef(true)
 
+  /**
+   * Refs to accumulate streaming state without relying on
+   * React state setter callbacks (which are double-invoked
+   * by StrictMode, causing duplicate side effects).
+   */
+  const streamingTextRef = useRef('')
+  const sourcesRef = useRef([])
+
   /** Callbacks that consumers can register for completed messages */
   const onMessageCompleteRef = useRef(null)
 
@@ -81,6 +89,9 @@ export function useWebSocket() {
       wsRef.current.close()
     }
 
+    // Ensure auto-reconnect is enabled on fresh connect
+    shouldReconnectRef.current = true
+
     const wsUrl = `${WS_URL}?token=${encodeURIComponent(token)}`
     const ws = new WebSocket(wsUrl)
 
@@ -96,11 +107,13 @@ export function useWebSocket() {
 
         switch (frame.type) {
           case 'token':
-            setStreamingText((prev) => prev + frame.data)
+            streamingTextRef.current += frame.data
+            setStreamingText(streamingTextRef.current)
             break
 
           case 'source':
-            setSources((prev) => [...prev, frame.data])
+            sourcesRef.current = [...sourcesRef.current, frame.data]
+            setSources(sourcesRef.current)
             break
 
           case 'done': {
@@ -108,16 +121,14 @@ export function useWebSocket() {
             setLastConversationId(convId)
             setIsStreaming(false)
 
-            // Notify consumer of completed message
+            // Notify consumer with the ref-accumulated values (safe from StrictMode)
             if (onMessageCompleteRef.current) {
-              // Read final streaming text via a setter callback to get current value
-              setStreamingText((currentText) => {
-                setSources((currentSources) => {
-                  onMessageCompleteRef.current(currentText, currentSources, convId, frame.data)
-                  return currentSources
-                })
-                return currentText
-              })
+              onMessageCompleteRef.current(
+                streamingTextRef.current,
+                sourcesRef.current,
+                convId,
+                frame.data,
+              )
             }
             break
           }
@@ -136,6 +147,11 @@ export function useWebSocket() {
     }
 
     ws.onclose = () => {
+      // Only update state and reconnect if this is still the active connection.
+      // In StrictMode, the cleanup effect closes the old WS, but its onclose
+      // fires asynchronously after a new connection has already been opened.
+      if (wsRef.current !== ws) return
+
       setIsConnected(false)
 
       // Auto-reconnect with exponential backoff
@@ -154,7 +170,9 @@ export function useWebSocket() {
 
     ws.onerror = () => {
       // onerror is always followed by onclose, so reconnection is handled there
-      setError('Connection error')
+      if (wsRef.current === ws) {
+        setError('Connection error')
+      }
     }
 
     wsRef.current = ws
@@ -188,6 +206,8 @@ export function useWebSocket() {
     }
 
     // Reset streaming state for new message
+    streamingTextRef.current = ''
+    sourcesRef.current = []
     setStreamingText('')
     setSources([])
     setError(null)

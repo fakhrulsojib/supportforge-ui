@@ -15,11 +15,14 @@ import { API_BASE_URL, API_ROUTES } from '../utils/constants'
 
 /**
  * In-memory token store.
- * Tokens are NEVER persisted to localStorage or sessionStorage
- * per AGENTS.md Security Checklist.
+ * Access tokens are NEVER persisted to localStorage or sessionStorage.
+ * Refresh tokens are stored in sessionStorage to survive page reloads
+ * (sessionStorage is tab-scoped and cleared when the tab closes).
  */
 let accessToken = null
 let refreshTokenValue = null
+
+const REFRESH_TOKEN_KEY = 'sf_rt'
 
 /** @param {string|null} token */
 export function setAccessToken(token) {
@@ -34,17 +37,42 @@ export function getAccessToken() {
 /** @param {string|null} token */
 export function setRefreshToken(token) {
   refreshTokenValue = token
+  try {
+    if (token) {
+      sessionStorage.setItem(REFRESH_TOKEN_KEY, token)
+    } else {
+      sessionStorage.removeItem(REFRESH_TOKEN_KEY)
+    }
+  } catch {
+    // sessionStorage unavailable (e.g. private browsing) — memory-only fallback
+  }
 }
 
 /** @returns {string|null} */
 export function getRefreshToken() {
-  return refreshTokenValue
+  if (refreshTokenValue) return refreshTokenValue
+  // Recover from sessionStorage after a page reload
+  try {
+    const stored = sessionStorage.getItem(REFRESH_TOKEN_KEY)
+    if (stored) {
+      refreshTokenValue = stored
+      return stored
+    }
+  } catch {
+    // sessionStorage unavailable
+  }
+  return null
 }
 
-/** Clear all in-memory tokens (used on logout). */
+/** Clear all in-memory tokens and session storage (used on logout). */
 export function clearTokens() {
   accessToken = null
   refreshTokenValue = null
+  try {
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY)
+  } catch {
+    // sessionStorage unavailable
+  }
 }
 
 /**
@@ -52,7 +80,6 @@ export function clearTokens() {
  */
 const client = axios.create({
   baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 })
 

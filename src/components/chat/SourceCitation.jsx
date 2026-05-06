@@ -1,15 +1,15 @@
 /**
  * SourceCitation — collapsible source cards showing RAG citation details.
  *
- * Displays a compact summary by default, expanding to show full source
- * content and relevance scores on click.
+ * Displays document-level sources (grouped by filename) with the
+ * highest relevance score per document. Shows a compact summary
+ * by default, expanding to show details on click.
  */
 
 import { useState, useId } from 'react'
-import { truncate } from '../../utils/formatters'
 
 /**
- * @param {{ sources: Array<{content: string, score: number, id: string}> }} props
+ * @param {{ sources: Array<{filename?: string, content?: string, score: number, id: string}> }} props
  */
 export default function SourceCitation({ sources }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -48,15 +48,16 @@ export default function SourceCitation({ sources }) {
           {sources.map((source, index) => (
             <div className="chat-source-card" key={source.id || index}>
               <div className="chat-source-content">
-                {truncate(source.content, 200)}
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }}>
+                  <path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M10 2v3h3" stroke="currentColor" strokeWidth="1.3" />
+                </svg>
+                <span className="sf-truncate">{source.filename || source.content || 'Unknown source'}</span>
               </div>
               <div className="chat-source-meta">
                 <span className="sf-badge sf-badge-info chat-source-score">
                   {Math.round(source.score * 100)}% match
                 </span>
-                {source.id && (
-                  <span className="chat-source-id sf-truncate">{truncate(source.id, 24)}</span>
-                )}
               </div>
             </div>
           ))}

@@ -51,7 +51,8 @@ function decodeTokenPayload(token) {
  */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  // Start loading if a refresh token exists (silent re-auth attempt)
+  const [isLoading, setIsLoading] = useState(() => !!getRefreshToken())
   const navigate = useNavigate()
   const refreshTimerRef = useRef(null)
 
@@ -97,6 +98,54 @@ export function AuthProvider({ children }) {
       }
     }, refreshMs)
   }, [])
+
+  /**
+   * On mount: attempt silent re-authentication if a refresh token
+   * is available in sessionStorage (e.g. after a page reload).
+   */
+  useEffect(() => {
+    const storedRefresh = getRefreshToken()
+    if (!storedRefresh) {
+      setIsLoading(false)
+      return
+    }
+
+    let cancelled = false
+
+    ;(async () => {
+      try {
+        const data = await refreshAccessToken(storedRefresh)
+        if (cancelled) return
+
+        setAccessToken(data.access_token)
+        setRefreshToken(data.refresh_token)
+
+        const decoded = decodeTokenPayload(data.access_token)
+        if (decoded) {
+          setUser({
+            userId: decoded.user_id,
+            tenantId: decoded.tenant_id,
+            role: decoded.role,
+          })
+          scheduleRefresh(data.expires_in)
+        }
+      } catch {
+        // Stored refresh token is expired/invalid — clear it
+        if (!cancelled) {
+          clearTokens()
+          setUser(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [scheduleRefresh])
 
   /** Clean up refresh timer on unmount. */
   useEffect(() => {
