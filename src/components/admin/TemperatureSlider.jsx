@@ -71,7 +71,10 @@ export default function TemperatureSlider() {
     setSuccess(false)
 
     try {
-      await updateTenantConfig(tenantId, { temperature })
+      // Read current config first, then merge temperature into it
+      const current = await getTenantConfig(tenantId)
+      const mergedConfig = { ...(current?.config_json || {}), temperature }
+      await updateTenantConfig(tenantId, mergedConfig)
       setSavedTemperature(temperature)
       setSuccess(true)
     } catch (err) {

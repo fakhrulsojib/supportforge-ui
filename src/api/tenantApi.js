@@ -9,6 +9,7 @@
  */
 
 import client from './client'
+import { API_ROUTES } from '../utils/constants'
 
 /**
  * Fetch the current tenant's configuration.
@@ -16,7 +17,7 @@ import client from './client'
  * @returns {Promise<object>} Tenant data including config_json.
  */
 export async function getTenantConfig(tenantId) {
-  const response = await client.get(`/api/v1/tenants/${tenantId}`)
+  const response = await client.get(`${API_ROUTES.TENANTS}/${tenantId}`)
   return response.data
 }
 
@@ -27,7 +28,7 @@ export async function getTenantConfig(tenantId) {
  * @returns {Promise<object>} Updated tenant data.
  */
 export async function updateTenantConfig(tenantId, configJson) {
-  const response = await client.patch(`/api/v1/tenants/${tenantId}`, {
+  const response = await client.patch(`${API_ROUTES.TENANTS}/${tenantId}`, {
     config_json: configJson,
   })
   return response.data

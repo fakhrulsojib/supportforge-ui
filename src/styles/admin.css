@@ -233,7 +233,7 @@
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: var(--sf-radius-full);
   background: var(--sf-color-primary-500);
   cursor: pointer;
   box-shadow: var(--sf-shadow-sm);
@@ -248,7 +248,7 @@
 .admin-temp-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: var(--sf-radius-full);
   background: var(--sf-color-primary-500);
   cursor: pointer;
   border: none;
