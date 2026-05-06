@@ -161,6 +161,136 @@
   font-weight: var(--sf-font-medium);
 }
 
+/* ── Temperature Slider Card ─────────────────────────────────── */
+
+.admin-temp-card {
+  padding: var(--sf-space-5) var(--sf-space-6);
+  margin-top: var(--sf-space-5);
+  animation: sf-fade-in-up var(--sf-transition-normal) ease forwards;
+}
+
+.admin-temp-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-4);
+  margin-bottom: var(--sf-space-4);
+}
+
+.admin-temp-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--sf-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--sf-color-warning-100), var(--sf-color-warning-200));
+  color: var(--sf-color-warning-600);
+}
+
+.admin-temp-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-0-5);
+}
+
+.admin-temp-value {
+  font-size: var(--sf-text-xl);
+  font-weight: var(--sf-font-bold);
+  color: var(--sf-color-text-primary);
+  font-family: var(--sf-font-family-mono);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.admin-temp-label-tag {
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  padding: var(--sf-space-0-5) var(--sf-space-2);
+  border-radius: var(--sf-radius-sm);
+  background-color: var(--sf-color-primary-50);
+  color: var(--sf-color-primary-600);
+  font-family: var(--sf-font-family-base);
+}
+
+.admin-temp-slider-wrap {
+  margin-bottom: var(--sf-space-4);
+}
+
+.admin-temp-slider {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--sf-color-neutral-200);
+  border-radius: var(--sf-radius-full);
+  outline: none;
+  cursor: pointer;
+}
+
+.admin-temp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sf-color-primary-500);
+  cursor: pointer;
+  box-shadow: var(--sf-shadow-sm);
+  transition: transform var(--sf-transition-fast), box-shadow var(--sf-transition-fast);
+}
+
+.admin-temp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: var(--sf-shadow-md);
+}
+
+.admin-temp-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sf-color-primary-500);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--sf-shadow-sm);
+}
+
+.admin-temp-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--sf-space-1);
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+}
+
+.admin-temp-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-3);
+}
+
+.admin-temp-save-btn {
+  min-width: 80px;
+}
+
+.admin-temp-error {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-error-600);
+}
+
+.admin-temp-success {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-success-700);
+  font-weight: var(--sf-font-medium);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+}
+
+.admin-temp-loading {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+  padding: var(--sf-space-4) 0;
+}
+
 /* ── Upload Zone ─────────────────────────────────────────────── */
 
 .admin-upload-zone {

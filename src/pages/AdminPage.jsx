@@ -26,6 +26,7 @@ import { extractErrorMessage } from '../api/client'
 import DocumentUploader from '../components/admin/DocumentUploader'
 import IngestionStatus from '../components/admin/IngestionStatus'
 import ModelSelector from '../components/admin/ModelSelector'
+import TemperatureSlider from '../components/admin/TemperatureSlider'
 import '../styles/admin.css'
 
 /** Status values that trigger polling. */
@@ -218,6 +219,7 @@ export default function AdminPage() {
           Model Configuration
         </h2>
         <ModelSelector />
+        <TemperatureSlider />
       </section>
 
       {/* Document Upload */}
