@@ -8,6 +8,7 @@
  * Includes basic inline markdown rendering (bold, italic, code, code blocks).
  */
 
+import { useRef, useEffect } from 'react'
 import SourceCitation from './SourceCitation'
 import FeedbackButtons from './FeedbackButtons'
 import { formatRelativeTime } from '../../utils/formatters'
@@ -164,6 +165,14 @@ export default function MessageBubble({
   isStreaming = false,
 }) {
   const isUser = role === 'user'
+  const thinkingContentRef = useRef(null)
+
+  // Auto-scroll thinking content as new tokens arrive during streaming
+  useEffect(() => {
+    if (isStreaming && thinking && thinkingContentRef.current) {
+      thinkingContentRef.current.scrollTop = thinkingContentRef.current.scrollHeight
+    }
+  }, [thinking, isStreaming])
 
   return (
     <div className={`chat-bubble-row ${isUser ? 'chat-bubble-row-user' : 'chat-bubble-row-assistant'} sf-animate-fade-in-up`}>
@@ -180,7 +189,7 @@ export default function MessageBubble({
       <div className={`chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-assistant'}`}>
         {/* Thinking section — collapsible, grayed */}
         {!isUser && thinking && (
-          <details className="chat-thinking">
+          <details className="chat-thinking" open={isStreaming || undefined}>
             <summary className="chat-thinking-toggle">
               <svg className="chat-thinking-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
@@ -188,12 +197,12 @@ export default function MessageBubble({
                 <circle cx="8" cy="8" r="1" fill="currentColor" opacity="0.5" />
                 <circle cx="10.5" cy="8" r="1" fill="currentColor" opacity="0.5" />
               </svg>
-              <span>Thinking…</span>
+              <span>{isStreaming ? 'Thinking…' : 'Thought process'}</span>
               <svg className="chat-thinking-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                 <path d="M3 4.5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </summary>
-            <div className="chat-thinking-content">
+            <div className="chat-thinking-content" ref={thinkingContentRef}>
               {renderMarkdown(thinking)}
             </div>
           </details>
