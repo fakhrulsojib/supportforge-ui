@@ -305,7 +305,16 @@ Tenant Slug: demo-tenant
 Role: viewer (default registration role)
 ```
 
-> **Convention:** All browser test tasks that require logged-in state should use these credentials. The Tenant ID field requires the UUID, not the slug. The test user must be registered via the backend API before browser testing.
+**Admin test user** (full access — Chat, Admin, Analytics):
+
+```
+Email: admin@supportforge.dev
+Password: Admin1234!@#
+Tenant ID: 44aff2a2-4869-467c-b707-6a697bfefe29
+Role: admin
+```
+
+> **Convention:** All browser test tasks that require logged-in state should use these credentials. Use the **admin** credentials when testing Admin/Analytics pages. The Tenant ID field requires the UUID, not the slug. The test users must be registered via the backend API before browser testing.
 
 ---
 

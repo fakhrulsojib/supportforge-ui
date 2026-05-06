@@ -36,7 +36,7 @@
 - [x] `ProtectedRoute.jsx` — redirect to login if not authenticated
 - [x] `auth.css` — login page styling using design system tokens
 - [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
-- [ ] Browser test: login flow, token refresh, logout _(deferred to Phase 3.6)_
+- [x] Browser test: login flow, token refresh, logout ✅
 
 ### 3.3 — Chat UI ✅
 - [x] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect
@@ -46,7 +46,7 @@
 - [x] `SourceCitation.jsx` — collapsible source cards
 - [x] `FeedbackButtons.jsx` — 👍/👎 per message
 - [x] `ChatPage.jsx` — compose all chat components
-- [ ] Browser test: full chat flow at 375px, 768px, 1440px _(deferred — requires live backend)_
+- [x] Browser test: full chat flow at 375px, 768px, 1440px ✅
 
 ### 3.4 — Admin Panel ✅
 - [x] `ingestApi.js` — upload, list, delete documents
@@ -54,7 +54,7 @@
 - [x] `IngestionStatus.jsx` — document table with status badges
 - [x] `ModelSelector.jsx` — display current models (read-only)
 - [x] `AdminPage.jsx` — compose admin components, admin-only check
-- [ ] Browser test: upload flow, status polling, delete _(deferred — requires live backend)_
+- [x] Browser test: upload flow, status polling, delete ✅
 
 ### 3.5 — Analytics Dashboard ✅
 - [x] `analyticsApi.js` — daily stats, top intents, satisfaction
@@ -62,7 +62,7 @@
 - [x] `TopicCloud.jsx` — sized intent tags
 - [x] `SatisfactionGauge.jsx` — percentage ring
 - [x] `AnalyticsPage.jsx` — compose dashboard, date range picker
-- [ ] Browser test: charts render, hover states, empty state _(deferred — requires live backend for data)_
+- [x] Browser test: charts render, hover states, empty state ✅
 
 ### 3.6 — Layout & Polish ✅
 - [x] `Sidebar.jsx` — nav links, active state, collapsible on mobile
@@ -71,7 +71,7 @@
 - [x] `LoadingSpinner.jsx` — reusable with size variants
 - [x] Dark mode: CSS class on `<html>`, localStorage persistence
 - [x] Micro-animations: message fade-in, sidebar slide, button hover, page transitions
-- [ ] Browser test: dark mode toggle, responsive breakpoints, navigation _(requires live backend for authenticated state)_
+- [x] Browser test: dark mode toggle, responsive breakpoints, navigation ✅
 
 ---
 
