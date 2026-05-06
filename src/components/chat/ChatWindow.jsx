@@ -30,6 +30,7 @@ export default function ChatWindow({
   onSendMessage,
   isStreaming,
   streamingText,
+  streamingThinking,
   streamingSources,
   isConnected,
   error,
@@ -126,6 +127,7 @@ export default function ChatWindow({
             key={msg.id || `msg-${index}`}
             role={msg.role}
             content={msg.content}
+            thinking={msg.thinking}
             sources={msg.sources_json || msg.sources}
             messageId={msg.id}
             feedback={msg.feedback}
@@ -134,17 +136,18 @@ export default function ChatWindow({
         ))}
 
         {/* Streaming assistant message (in-progress) */}
-        {isStreaming && streamingText && (
+        {isStreaming && (streamingText || streamingThinking) && (
           <MessageBubble
             role="assistant"
             content={streamingText}
+            thinking={streamingThinking}
             sources={streamingSources}
             isStreaming
           />
         )}
 
         {/* Streaming indicator (before first token) */}
-        {isStreaming && !streamingText && (
+        {isStreaming && !streamingText && !streamingThinking && (
           <StreamingIndicator />
         )}
 

@@ -29,6 +29,7 @@ export default function ChatPage() {
     isConnected,
     isStreaming,
     streamingText,
+    streamingThinking,
     sources: streamingSources,
     error: wsError,
     lastConversationId,
@@ -62,7 +63,7 @@ export default function ChatPage() {
 
   /** Register the message-complete callback */
   useEffect(() => {
-    setOnMessageComplete((text, msgSources, convId) => {
+    setOnMessageComplete((text, msgSources, convId, doneData, thinkingText) => {
       // Update conversation ID for subsequent messages
       if (convId) {
         conversationIdRef.current = convId
@@ -76,6 +77,7 @@ export default function ChatPage() {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
           content: text,
+          thinking: thinkingText || '',
           sources_json: msgSources,
           feedback: 'none',
           created_at: new Date().toISOString(),
@@ -255,6 +257,7 @@ export default function ChatPage() {
           onSendMessage={handleSendMessage}
           isStreaming={isStreaming}
           streamingText={streamingText}
+          streamingThinking={streamingThinking}
           streamingSources={streamingSources}
           isConnected={isConnected}
           error={wsError}

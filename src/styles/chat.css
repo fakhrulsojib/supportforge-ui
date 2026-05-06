@@ -308,6 +308,65 @@
   color: inherit;
 }
 
+/* ── Thinking Section (collapsible reasoning) ────────────── */
+.chat-thinking {
+  margin-bottom: var(--sf-space-2);
+  border: 1px solid var(--sf-color-border-secondary);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-color-bg-secondary);
+}
+
+.chat-thinking-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-1-5);
+  padding: var(--sf-space-2) var(--sf-space-3);
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-text-tertiary);
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--sf-font-family-sans);
+  transition: color var(--sf-transition-fast);
+  user-select: none;
+}
+
+.chat-thinking-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.chat-thinking-toggle:hover {
+  color: var(--sf-color-text-secondary);
+}
+
+.chat-thinking-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.chat-thinking-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform var(--sf-transition-fast);
+}
+
+.chat-thinking[open] .chat-thinking-chevron {
+  transform: rotate(180deg);
+}
+
+.chat-thinking-content {
+  padding: var(--sf-space-2) var(--sf-space-3) var(--sf-space-3);
+  border-top: 1px solid var(--sf-color-border-secondary);
+  font-size: var(--sf-text-xs);
+  line-height: var(--sf-leading-relaxed);
+  color: var(--sf-color-text-tertiary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-style: italic;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 /* Blinking cursor during streaming */
 .chat-cursor {
   display: inline-block;

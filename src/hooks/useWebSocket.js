@@ -10,10 +10,11 @@
  * Protocol (matches backend chat_ws.py):
  *   Client → Server: {"message": "...", "conversation_id": "..."}
  *   Server → Client:
- *     {"type": "source", "data": {"content": "...", "score": 0.9, "id": "..."}}
- *     {"type": "token",  "data": "partial text"}
- *     {"type": "done",   "data": {"conversation_id": "...", ...}}
- *     {"type": "error",  "data": {"message": "..."}}
+ *     {"type": "source",   "data": {"content": "...", "score": 0.9, "id": "..."}}
+ *     {"type": "thinking", "data": "reasoning text"}
+ *     {"type": "token",    "data": "partial text"}
+ *     {"type": "done",     "data": {"conversation_id": "...", "thinking_text": "...", ...}}
+ *     {"type": "error",    "data": {"message": "..."}}
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react'
@@ -46,6 +47,7 @@ export function useWebSocket() {
   const [isConnected, setIsConnected] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingText, setStreamingText] = useState('')
+  const [streamingThinking, setStreamingThinking] = useState('')
   const [sources, setSources] = useState([])
   const [error, setError] = useState(null)
   const [lastConversationId, setLastConversationId] = useState(null)
@@ -61,6 +63,7 @@ export function useWebSocket() {
    * by StrictMode, causing duplicate side effects).
    */
   const streamingTextRef = useRef('')
+  const streamingThinkingRef = useRef('')
   const sourcesRef = useRef([])
 
   /** Callbacks that consumers can register for completed messages */
@@ -106,6 +109,11 @@ export function useWebSocket() {
         const frame = JSON.parse(event.data)
 
         switch (frame.type) {
+          case 'thinking':
+            streamingThinkingRef.current += frame.data
+            setStreamingThinking(streamingThinkingRef.current)
+            break
+
           case 'token':
             streamingTextRef.current += frame.data
             setStreamingText(streamingTextRef.current)
@@ -128,6 +136,7 @@ export function useWebSocket() {
                 sourcesRef.current,
                 convId,
                 frame.data,
+                streamingThinkingRef.current,
               )
             }
             break
@@ -207,8 +216,10 @@ export function useWebSocket() {
 
     // Reset streaming state for new message
     streamingTextRef.current = ''
+    streamingThinkingRef.current = ''
     sourcesRef.current = []
     setStreamingText('')
+    setStreamingThinking('')
     setSources([])
     setError(null)
     setIsStreaming(true)
@@ -238,6 +249,7 @@ export function useWebSocket() {
     isConnected,
     isStreaming,
     streamingText,
+    streamingThinking,
     sources,
     error,
     lastConversationId,

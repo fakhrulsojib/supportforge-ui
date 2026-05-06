@@ -145,6 +145,7 @@ function splitNewlines(text, baseKey = 0) {
  * @param {{
  *   role: 'user' | 'assistant',
  *   content: string,
+ *   thinking?: string,
  *   sources?: Array<{content: string, score: number, id: string}>,
  *   messageId?: string,
  *   feedback?: string,
@@ -155,6 +156,7 @@ function splitNewlines(text, baseKey = 0) {
 export default function MessageBubble({
   role,
   content,
+  thinking,
   sources,
   messageId,
   feedback,
@@ -176,6 +178,27 @@ export default function MessageBubble({
       )}
 
       <div className={`chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-assistant'}`}>
+        {/* Thinking section — collapsible, grayed */}
+        {!isUser && thinking && (
+          <details className="chat-thinking">
+            <summary className="chat-thinking-toggle">
+              <svg className="chat-thinking-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+                <circle cx="5.5" cy="8" r="1" fill="currentColor" opacity="0.5" />
+                <circle cx="8" cy="8" r="1" fill="currentColor" opacity="0.5" />
+                <circle cx="10.5" cy="8" r="1" fill="currentColor" opacity="0.5" />
+              </svg>
+              <span>Thinking…</span>
+              <svg className="chat-thinking-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M3 4.5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </summary>
+            <div className="chat-thinking-content">
+              {renderMarkdown(thinking)}
+            </div>
+          </details>
+        )}
+
         <div className="chat-bubble-content">
           {renderMarkdown(content)}
           {isStreaming && <span className="chat-cursor" aria-hidden="true" />}
