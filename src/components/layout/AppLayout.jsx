@@ -15,6 +15,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import ErrorBoundary from '../shared/ErrorBoundary'
+import { useAuth } from '../../hooks/useAuth'
 
 /** LocalStorage key for sidebar collapsed state. */
 const SIDEBAR_COLLAPSED_KEY = 'sf-sidebar-collapsed'
@@ -44,10 +45,25 @@ function getInitialCollapsed() {
 /**
  * @param {{ children: React.ReactNode }} props
  */
+/** Navigation items — must stay in sync with Sidebar.jsx NAV_ITEMS. */
+const NAV_ITEMS = [
+  { roles: null },          // Chat — visible to all
+  { roles: ['admin', 'agent'] }, // Admin
+  { roles: ['admin', 'agent'] }, // Analytics
+]
+
 export default function AppLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsed)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(getInitialDarkMode)
+  const { user } = useAuth()
+
+  const userRole = user?.role || ''
+  const visibleItemCount = NAV_ITEMS.filter(
+    (item) => !item.roles || item.roles.includes(userRole),
+  ).length
+  /** Hide sidebar when user only has one nav option (viewers). */
+  const hasSidebar = visibleItemCount > 1
 
   /** Apply or remove .dark class on <html> element. */
   useEffect(() => {
@@ -96,34 +112,39 @@ export default function AppLayout({ children }) {
 
   const contentClasses = [
     'layout-content',
-    isCollapsed ? 'layout-content-collapsed' : '',
+    !hasSidebar ? 'layout-content-no-sidebar' : isCollapsed ? 'layout-content-collapsed' : '',
   ]
     .filter(Boolean)
     .join(' ')
 
   return (
     <div className="layout-shell">
-      {/* Mobile overlay */}
-      <div
-        className={`sidebar-mobile-overlay ${isMobileOpen ? 'sidebar-mobile-overlay-visible' : ''}`}
-        onClick={closeMobileMenu}
-        role="presentation"
-      />
+      {hasSidebar && (
+        <>
+          {/* Mobile overlay */}
+          <div
+            className={`sidebar-mobile-overlay ${isMobileOpen ? 'sidebar-mobile-overlay-visible' : ''}`}
+            onClick={closeMobileMenu}
+            role="presentation"
+          />
 
-      {/* Sidebar */}
-      <Sidebar
-        isCollapsed={isCollapsed}
-        onToggleCollapse={toggleCollapse}
-        isMobileOpen={isMobileOpen}
-        onMobileClose={closeMobileMenu}
-      />
+          {/* Sidebar */}
+          <Sidebar
+            isCollapsed={isCollapsed}
+            onToggleCollapse={toggleCollapse}
+            isMobileOpen={isMobileOpen}
+            onMobileClose={closeMobileMenu}
+          />
+        </>
+      )}
 
       {/* Content area */}
       <div className={contentClasses}>
         <Header
-          onMobileMenuToggle={toggleMobileMenu}
+          onMobileMenuToggle={hasSidebar ? toggleMobileMenu : undefined}
           isDarkMode={isDarkMode}
           onToggleDarkMode={toggleDarkMode}
+          hasSidebar={hasSidebar}
         />
         <main className="layout-main">
           <ErrorBoundary>

@@ -34,7 +34,7 @@ const PAGE_TITLES = {
  *   onToggleDarkMode: () => void,
  * }} props
  */
-export default function Header({ onMobileMenuToggle, isDarkMode, onToggleDarkMode }) {
+export default function Header({ onMobileMenuToggle, isDarkMode, onToggleDarkMode, hasSidebar = true }) {
   const { user, logout } = useAuth()
   const location = useLocation()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -86,33 +86,35 @@ export default function Header({ onMobileMenuToggle, isDarkMode, onToggleDarkMod
   return (
     <header className="header" role="banner">
       <div className="header-left">
-        {/* Mobile sidebar toggle */}
-        <button
-          type="button"
-          className="header-mobile-toggle"
-          onClick={onMobileMenuToggle}
-          aria-label="Toggle navigation menu"
-          id="header-mobile-toggle"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path
-              d="M3 5h14M3 10h14M3 15h14"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
+        {/* Mobile sidebar toggle — hidden when sidebar is absent */}
+        {hasSidebar && (
+          <button
+            type="button"
+            className="header-mobile-toggle"
+            onClick={onMobileMenuToggle}
+            aria-label="Toggle navigation menu"
+            id="header-mobile-toggle"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M3 5h14M3 10h14M3 15h14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        )}
 
         <h1 className="header-page-title">{pageTitle}</h1>
       </div>
 
       <div className="header-right">
         {/* Tenant badge */}
-        {user?.tenantId && (
-          <div className="header-tenant" aria-label={`Tenant: ${user.tenantId}`}>
+        {(user?.tenantName || user?.tenantId) && (
+          <div className="header-tenant" aria-label={`Tenant: ${user.tenantName || user.tenantId}`}>
             <span className="header-tenant-dot" aria-hidden="true" />
-            <span>{user.tenantId}</span>
+            <span>{user.tenantName || user.tenantId}</span>
           </div>
         )}
 
@@ -166,7 +168,7 @@ export default function Header({ onMobileMenuToggle, isDarkMode, onToggleDarkMod
               {/* User info */}
               <div className="header-dropdown-info">
                 <strong>{user?.role || 'User'}</strong>
-                {user?.tenantId && <span>Tenant: {user.tenantId}</span>}
+                {(user?.tenantName || user?.tenantId) && <span>Tenant: {user.tenantName || user.tenantId}</span>}
               </div>
 
               <div className="header-dropdown-divider" />

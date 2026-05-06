@@ -36,6 +36,7 @@ function decodeTokenPayload(token) {
     return {
       user_id: payload.user_id || payload.sub || '',
       tenant_id: payload.tenant_id || '',
+      tenant_name: payload.tenant_name || '',
       role: payload.role || '',
       exp: payload.exp || 0,
     }
@@ -84,6 +85,7 @@ export function AuthProvider({ children }) {
           setUser({
             userId: decoded.user_id,
             tenantId: decoded.tenant_id,
+            tenantName: decoded.tenant_name,
             role: decoded.role,
           })
           scheduleRefresh(data.expires_in)
@@ -125,6 +127,7 @@ export function AuthProvider({ children }) {
           setUser({
             userId: decoded.user_id,
             tenantId: decoded.tenant_id,
+            tenantName: decoded.tenant_name,
             role: decoded.role,
           })
           scheduleRefresh(data.expires_in)
@@ -170,6 +173,7 @@ export function AuthProvider({ children }) {
         setUser({
           userId: decoded.user_id,
           tenantId: decoded.tenant_id,
+          tenantName: decoded.tenant_name,
           role: decoded.role,
         })
       }

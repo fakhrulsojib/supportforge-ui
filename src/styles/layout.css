@@ -25,6 +25,10 @@
   margin-left: var(--sf-sidebar-width-collapsed);
 }
 
+.layout-content-no-sidebar {
+  margin-left: 0;
+}
+
 .layout-main {
   flex: 1;
   overflow-y: auto;
