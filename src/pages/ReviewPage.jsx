@@ -12,6 +12,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import {
   getNegativeFeedback,
@@ -72,6 +73,7 @@ function formatTrigger(trigger) {
 
 export default function ReviewPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const isAdmin = user?.role === 'admin'
 
   const [activeTab, setActiveTab] = useState('negative')
@@ -346,13 +348,14 @@ export default function ReviewPage() {
 
             {/* Conversation Link */}
             <div className="review-detail-actions">
-              <a
-                href={`/chat?conversation=${item.conversation_id}`}
+              <button
+                type="button"
                 className="review-detail-link"
                 title="View full conversation in chat"
+                onClick={() => navigate(`/chat?conversation=${item.conversation_id}`)}
               >
                 💬 View Full Conversation
-              </a>
+              </button>
             </div>
           </div>
         </td>
@@ -654,13 +657,13 @@ export default function ReviewPage() {
                         <span className="review-cell-time">{formatDate(item.started_at)}</span>
                       </td>
                       <td data-label="Action">
-                        <a
-                          href={`/chat?conversation=${item.conversation_id}`}
+                        <button
+                          type="button"
                           className="review-mark-btn"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => { e.stopPropagation(); navigate(`/chat?conversation=${item.conversation_id}`) }}
                         >
                           💬 View Chat
-                        </a>
+                        </button>
                       </td>
                     </tr>,
                     isExpanded && renderEscalationDetail(item),
