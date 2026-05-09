@@ -75,19 +75,16 @@
 
 ---
 
-## Phase 4 — Production Polish 🔲
+## Upcoming Phases (8–22) 🔲
 
-> **Branch:** `phase-4/production-polish`
+> See `supportforge_plan.md` for detailed task lists and gotchas.
 
-### 4.3 — Embeddable Chat Widget
-- [ ] `widget/` directory — standalone JS bundle
-- [ ] `<script>` tag with `data-tenant` attribute
-- [ ] Floating chat bubble → expandable chat window
-- [ ] Shadow DOM for CSS isolation
-- [ ] Tenant-scoped WebSocket
+| Phase | Name | Priority | Status |
+|---|---|---|---|
+| 8 | Feedback Review Queue | High | 🔲 |
+| 12 | Tenant Provisioning UI | High | 🔲 |
+| 17 | User Management UI | Medium | 🔲 |
+| 19 | Moderation Dashboard UI | Medium | 🔲 |
+| 20 | A/B Testing & Tenant Config | Low | 🔲 |
+| 22 | Deployment, Docs & E2E | Low | 🔲 |
 
-### 4.6 — UI Polish
-- [ ] Screenshots for README
-- [ ] Final responsive audit
-- [ ] Accessibility pass (ARIA, keyboard nav, focus management)
-- [ ] Performance audit (bundle size, lazy loading)
