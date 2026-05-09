@@ -2,7 +2,7 @@
  * Sidebar — main navigation panel with route-aware active states.
  *
  * Features:
- * - Navigation links: Chat, Admin, Analytics
+ * - Navigation links: Chat, Admin, Analytics, Review Queue
  * - Active state indicator (left accent bar + highlight)
  * - Collapsible (desktop) / slide-out (mobile)
  * - Role-based visibility: Admin/Analytics visible to admin/agent only
@@ -17,6 +17,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { APP_NAME } from '../../utils/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { getReviewStats } from '../../api/reviewApi'
+import '../../styles/review.css'
 
 /**
  * Navigation items with role restrictions.
