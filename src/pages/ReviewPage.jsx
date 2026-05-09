@@ -3,6 +3,7 @@
  *
  * Tabs: Negative Feedback | Escalations | Flagged Messages
  * Each tab shows a paginated, filterable table with "Mark Reviewed" actions.
+ * Rows are expandable to reveal full Q&A, sources, and reviewer info.
  *
  * Security:
  * - Role guard: only admin users can view this page
@@ -57,6 +58,18 @@ function truncate(text, max = 80) {
   return text.length > max ? `${text.slice(0, max)}…` : text
 }
 
+/**
+ * Format an escalation trigger value for display.
+ * @param {string} trigger
+ * @returns {string}
+ */
+function formatTrigger(trigger) {
+  if (!trigger) return '—'
+  return trigger
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 export default function ReviewPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
@@ -70,6 +83,7 @@ export default function ReviewPage() {
   const [reviewedFilter, setReviewedFilter] = useState('unreviewed')
   const [stats, setStats] = useState(null)
   const [markingIds, setMarkingIds] = useState(new Set())
+  const [expandedId, setExpandedId] = useState(null)
 
   // ── Fetch Stats ──────────────────────────────────────────────
 
@@ -119,9 +133,10 @@ export default function ReviewPage() {
     }
   }, [isAdmin, fetchData, fetchStats])
 
-  // Reset offset when switching tabs or filters
+  // Reset offset and collapse when switching tabs or filters
   useEffect(() => {
     setOffset(0)
+    setExpandedId(null)
   }, [activeTab, reviewedFilter])
 
   // ── Mark Reviewed ────────────────────────────────────────────
@@ -141,6 +156,12 @@ export default function ReviewPage() {
         return next
       })
     }
+  }
+
+  // ── Toggle Row Expand ────────────────────────────────────────
+
+  function toggleExpand(id) {
+    setExpandedId((prev) => (prev === id ? null : id))
   }
 
   // ── Access Denied ────────────────────────────────────────────
@@ -192,6 +213,152 @@ export default function ReviewPage() {
   const canNext = offset + PAGE_SIZE < total
   const pageStart = total > 0 ? offset + 1 : 0
   const pageEnd = Math.min(offset + PAGE_SIZE, total)
+
+  // ── Detail Panel for Negative/Flagged ────────────────────────
+
+  function renderDetailPanel(item) {
+    const sources = item.sources_json || []
+    return (
+      <tr className="review-detail-row" key={`${item.message_id}-detail`}>
+        <td colSpan={6} className="review-detail-cell">
+          <div className="review-detail-panel">
+            {/* Full Question */}
+            <div className="review-detail-section">
+              <h4 className="review-detail-label">User Question</h4>
+              <p className="review-detail-text">{item.user_question || '—'}</p>
+            </div>
+
+            {/* Full AI Answer */}
+            <div className="review-detail-section">
+              <h4 className="review-detail-label">AI Answer</h4>
+              <p className="review-detail-text review-detail-answer">{item.ai_answer || '—'}</p>
+            </div>
+
+            {/* Source Citations */}
+            {sources.length > 0 && (
+              <div className="review-detail-section">
+                <h4 className="review-detail-label">Sources Referenced</h4>
+                <div className="review-detail-sources">
+                  {sources.map((s, i) => (
+                    <span key={i} className="review-detail-source-tag">
+                      📄 {s.filename || `Doc ${i + 1}`}
+                      {s.score != null && (
+                        <span className="review-detail-source-score">
+                          {(s.score * 100).toFixed(0)}%
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Moderation Reason (Flagged only) */}
+            {item.moderation_reason && (
+              <div className="review-detail-section">
+                <h4 className="review-detail-label">Moderation Reason</h4>
+                <p className="review-detail-text review-detail-moderation">
+                  {item.moderation_reason}
+                  {item.moderation_matched_term && (
+                    <span className="review-detail-matched-term">
+                      Matched: &quot;{item.moderation_matched_term}&quot;
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Reviewer Info */}
+            {item.reviewed_at && (
+              <div className="review-detail-section">
+                <h4 className="review-detail-label">Review Audit</h4>
+                <p className="review-detail-text review-detail-audit">
+                  ✓ Reviewed on {formatDate(item.reviewed_at)}
+                  {item.reviewed_by && (
+                    <span className="review-detail-reviewer"> by {item.reviewed_by.slice(0, 8)}…</span>
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Conversation Link */}
+            <div className="review-detail-actions">
+              <a
+                href={`/chat?conversation=${item.conversation_id}`}
+                className="review-detail-link"
+                title="View full conversation in chat"
+              >
+                💬 View Conversation
+              </a>
+              {!item.reviewed_at && (
+                <button
+                  type="button"
+                  className="review-mark-btn review-mark-btn-lg"
+                  onClick={() => handleMarkReviewed(item.message_id)}
+                  disabled={markingIds.has(item.message_id)}
+                  id={`review-detail-mark-${item.message_id}`}
+                >
+                  {markingIds.has(item.message_id) ? '…' : '✓ Mark Reviewed'}
+                </button>
+              )}
+            </div>
+          </div>
+        </td>
+      </tr>
+    )
+  }
+
+  // ── Detail Panel for Escalations ─────────────────────────────
+
+  function renderEscalationDetail(item) {
+    return (
+      <tr className="review-detail-row" key={`${item.conversation_id}-detail`}>
+        <td colSpan={5} className="review-detail-cell">
+          <div className="review-detail-panel">
+            {/* Full First Message */}
+            <div className="review-detail-section">
+              <h4 className="review-detail-label">First Message</h4>
+              <p className="review-detail-text">{item.first_message || '—'}</p>
+            </div>
+
+            {/* Escalation Info */}
+            <div className="review-detail-section">
+              <h4 className="review-detail-label">Escalation Details</h4>
+              <div className="review-detail-meta-grid">
+                <div className="review-detail-meta-item">
+                  <span className="review-detail-meta-label">Trigger</span>
+                  <span className="review-badge review-badge-escalated">
+                    {formatTrigger(item.trigger)}
+                  </span>
+                </div>
+                <div className="review-detail-meta-item">
+                  <span className="review-detail-meta-label">Status</span>
+                  <span className="review-badge review-badge-flagged">
+                    {item.status}
+                  </span>
+                </div>
+                <div className="review-detail-meta-item">
+                  <span className="review-detail-meta-label">Started</span>
+                  <span className="review-cell-time">{formatDate(item.started_at)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Conversation Link */}
+            <div className="review-detail-actions">
+              <a
+                href={`/chat?conversation=${item.conversation_id}`}
+                className="review-detail-link"
+                title="View full conversation in chat"
+              >
+                💬 View Full Conversation
+              </a>
+            </div>
+          </div>
+        </td>
+      </tr>
+    )
+  }
 
   // ── Render ───────────────────────────────────────────────────
 
@@ -314,10 +481,12 @@ export default function ReviewPage() {
       {/* Table: Negative / Flagged */}
       {!loading && items.length > 0 && activeTab !== 'escalations' && (
         <>
+          <p className="review-hint">Click a row to expand details</p>
           <div className="review-table-wrap">
             <table className="review-table" id="review-table">
               <thead>
                 <tr>
+                  <th style={{ width: '28px' }}></th>
                   <th>Question</th>
                   <th>AI Answer</th>
                   <th>Status</th>
@@ -327,59 +496,75 @@ export default function ReviewPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.message_id}>
-                    <td data-label="Question">
-                      <span className="review-cell-question" title={item.user_question}>
-                        {truncate(item.user_question, 60)}
-                      </span>
-                    </td>
-                    <td data-label="Answer">
-                      <span className="review-cell-answer" title={item.ai_answer}>
-                        {truncate(item.ai_answer, 80)}
-                      </span>
-                    </td>
-                    <td data-label="Status">
-                      {activeTab === 'negative' && (
-                        <span className="review-badge review-badge-negative">👎 Negative</span>
-                      )}
-                      {activeTab === 'flagged' && (
-                        <span className="review-badge review-badge-flagged">⚠ Flagged</span>
-                      )}
-                    </td>
-                    <td data-label="Date">
-                      <span className="review-cell-time">{formatDate(item.created_at)}</span>
-                    </td>
-                    <td data-label="Reviewed">
-                      {item.reviewed_at ? (
-                        <span className="review-badge review-badge-reviewed">✓ Reviewed</span>
-                      ) : (
-                        <span className="review-cell-time">—</span>
-                      )}
-                    </td>
-                    <td data-label="Action">
-                      {item.reviewed_at ? (
-                        <button
-                          type="button"
-                          className="review-mark-btn review-mark-btn-done"
-                          disabled
-                        >
-                          ✓ Done
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="review-mark-btn"
-                          onClick={() => handleMarkReviewed(item.message_id)}
-                          disabled={markingIds.has(item.message_id)}
-                          id={`review-mark-${item.message_id}`}
-                        >
-                          {markingIds.has(item.message_id) ? '…' : '✓ Mark Reviewed'}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {items.map((item) => {
+                  const isExpanded = expandedId === item.message_id
+                  return [
+                    <tr
+                      key={item.message_id}
+                      className={`review-row-clickable ${isExpanded ? 'review-row-expanded' : ''}`}
+                      onClick={() => toggleExpand(item.message_id)}
+                    >
+                      <td className="review-cell-chevron" data-label="">
+                        <span className={`review-chevron ${isExpanded ? 'review-chevron-open' : ''}`}>
+                          ›
+                        </span>
+                      </td>
+                      <td data-label="Question">
+                        <span className="review-cell-question" title={item.user_question}>
+                          {truncate(item.user_question, 60)}
+                        </span>
+                      </td>
+                      <td data-label="Answer">
+                        <span className="review-cell-answer" title={item.ai_answer}>
+                          {truncate(item.ai_answer, 80)}
+                        </span>
+                      </td>
+                      <td data-label="Status">
+                        {activeTab === 'negative' && (
+                          <span className="review-badge review-badge-negative">👎 Negative</span>
+                        )}
+                        {activeTab === 'flagged' && (
+                          <span className="review-badge review-badge-flagged">⚠ Flagged</span>
+                        )}
+                      </td>
+                      <td data-label="Date">
+                        <span className="review-cell-time">{formatDate(item.created_at)}</span>
+                      </td>
+                      <td data-label="Reviewed">
+                        {item.reviewed_at ? (
+                          <span className="review-badge review-badge-reviewed">✓ Reviewed</span>
+                        ) : (
+                          <span className="review-badge review-badge-pending">⏳ Pending</span>
+                        )}
+                      </td>
+                      <td data-label="Action">
+                        {item.reviewed_at ? (
+                          <button
+                            type="button"
+                            className="review-mark-btn review-mark-btn-done"
+                            disabled
+                          >
+                            ✓ Done
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="review-mark-btn"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleMarkReviewed(item.message_id)
+                            }}
+                            disabled={markingIds.has(item.message_id)}
+                            id={`review-mark-${item.message_id}`}
+                          >
+                            {markingIds.has(item.message_id) ? '…' : '✓ Mark Reviewed'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>,
+                    isExpanded && renderDetailPanel(item),
+                  ]
+                })}
               </tbody>
             </table>
           </div>
@@ -416,39 +601,64 @@ export default function ReviewPage() {
       {/* Table: Escalations */}
       {!loading && items.length > 0 && activeTab === 'escalations' && (
         <>
+          <p className="review-hint">Click a row to expand details</p>
           <div className="review-table-wrap">
             <table className="review-table" id="review-table-escalations">
               <thead>
                 <tr>
+                  <th style={{ width: '28px' }}></th>
                   <th>First Message</th>
                   <th>Trigger</th>
                   <th>Status</th>
                   <th>Started</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.conversation_id}>
-                    <td data-label="Message">
-                      <span className="review-cell-question" title={item.first_message}>
-                        {truncate(item.first_message, 80)}
-                      </span>
-                    </td>
-                    <td data-label="Trigger">
-                      <span className="review-badge review-badge-escalated">
-                        {item.trigger}
-                      </span>
-                    </td>
-                    <td data-label="Status">
-                      <span className="review-badge review-badge-flagged">
-                        {item.status}
-                      </span>
-                    </td>
-                    <td data-label="Started">
-                      <span className="review-cell-time">{formatDate(item.started_at)}</span>
-                    </td>
-                  </tr>
-                ))}
+                {items.map((item) => {
+                  const isExpanded = expandedId === item.conversation_id
+                  return [
+                    <tr
+                      key={item.conversation_id}
+                      className={`review-row-clickable ${isExpanded ? 'review-row-expanded' : ''}`}
+                      onClick={() => toggleExpand(item.conversation_id)}
+                    >
+                      <td className="review-cell-chevron" data-label="">
+                        <span className={`review-chevron ${isExpanded ? 'review-chevron-open' : ''}`}>
+                          ›
+                        </span>
+                      </td>
+                      <td data-label="Message">
+                        <span className="review-cell-question" title={item.first_message}>
+                          {truncate(item.first_message, 80)}
+                        </span>
+                      </td>
+                      <td data-label="Trigger">
+                        <span className="review-badge review-badge-escalated">
+                          {formatTrigger(item.trigger)}
+                        </span>
+                      </td>
+                      <td data-label="Status">
+                        <span className="review-badge review-badge-flagged">
+                          {item.status}
+                        </span>
+                      </td>
+                      <td data-label="Started">
+                        <span className="review-cell-time">{formatDate(item.started_at)}</span>
+                      </td>
+                      <td data-label="Action">
+                        <a
+                          href={`/chat?conversation=${item.conversation_id}`}
+                          className="review-mark-btn"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          💬 View Chat
+                        </a>
+                      </td>
+                    </tr>,
+                    isExpanded && renderEscalationDetail(item),
+                  ]
+                })}
               </tbody>
             </table>
           </div>

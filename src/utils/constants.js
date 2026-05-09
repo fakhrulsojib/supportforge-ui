@@ -5,7 +5,7 @@
  */
 
 export const APP_NAME = import.meta.env.VITE_APP_NAME || 'SupportForge'
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 export const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1/ws/chat'
 export const APP_ENV = import.meta.env.VITE_APP_ENV || 'development'
 export const CHAT_MODEL = import.meta.env.VITE_CHAT_MODEL || 'qwen3:4b'
