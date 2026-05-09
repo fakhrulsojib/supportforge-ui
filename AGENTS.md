@@ -16,7 +16,9 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 |---|---|---|
 | Phase 0 | `phase-0/repository-bootstrap` | Repo setup, docs, env config |
 | Phase 3 | `phase-3/frontend-implementation` | Vite scaffold, auth, chat UI, admin panel, analytics, layout & polish |
-| Phase 4 | `phase-4/production-polish` | Embeddable widget, final polish, accessibility, performance audit |
+| Phase 10 | `phase-10/feedback-review-queue` | Review Queue page for negative feedback, escalations, flagged messages |
+| Phase 11 | `phase-11/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
+| Phase 13 | `phase-13/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
 
 ### Branch Rules
 
@@ -30,11 +32,22 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 
 > **One sub-phase per conversation.** Large phases (e.g., Phase 3 has multiple sub-phases: auth, chat, admin, analytics, layout) MUST be implemented one sub-phase at a time. Commit after each sub-phase. This prevents context loss and ensures each unit of work receives full validation. Do NOT implement multiple sub-phases in a single session.
 
+### Cross-Repo Phases
+
+Some phases (10, 11, 13) span both `supportforge-api` and `supportforge-ui`. When working on a cross-repo phase:
+1. The **backend portion** follows `supportforge-api/AGENTS.md`'s pipeline (Steps 1–9)
+2. The **frontend portion** follows this file's pipeline (Steps 1–8)
+3. Execute backend tasks first, then frontend tasks (frontend depends on API endpoints)
+4. Commit in **each repo separately** with its own conventional commit message
+5. Use the **same branch name** in both repos
+
 ---
 
 ## Task Execution Pipeline
 
 > **This is the exact sequence an agent MUST follow for every task.** No step may be skipped. Each step has a gate condition that must be satisfied before proceeding to the next.
+>
+> **Failure protocol:** If a gate fails, fix the issue and re-run. **Maximum 3 attempts per gate.** After 3 failures on the same gate, STOP and report the error with full context (command output, file paths, error messages). Do NOT continue to the next step.
 
 ### Step 1 — Orient
 
@@ -82,7 +95,7 @@ npm run build
 
 > **This step exists because lint and build checks only catch syntax and import errors — they do NOT catch design flaws, security gaps, UX issues, or cross-cutting inconsistencies. Those are the issues that code reviewers find.**
 
-1. Run `git diff --cached` (full diff — **NOT** `--stat`) and read through every changed line as if you are an independent reviewer seeing this code for the first time.
+1. Stage all changes first: `git add -A`, then run `git diff --cached` (full diff — **NOT** `--stat`) and read through every changed line as if you are an independent reviewer seeing this code for the first time.
 2. For **every file**, systematically ask:
    - **Security:** Does this component check auth state before rendering protected content? Are tokens handled securely?
    - **Consistency:** Does this component follow the same patterns as other components in the same feature area? (Same prop naming, same CSS class naming, same error handling)
