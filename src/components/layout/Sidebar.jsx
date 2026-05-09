@@ -139,7 +139,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
   /** Check if a path is the current active route. */
   function isActive(path) {
     if (path === '/') {
-      return location.pathname === '/'
+      return location.pathname === '/' || location.pathname === '/chat'
     }
     return location.pathname.startsWith(path)
   }

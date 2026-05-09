@@ -285,13 +285,14 @@ export default function ReviewPage() {
 
             {/* Conversation Link */}
             <div className="review-detail-actions">
-              <a
-                href={`/chat?conversation=${item.conversation_id}`}
+              <button
+                type="button"
                 className="review-detail-link"
                 title="View full conversation in chat"
+                onClick={() => navigate(`/chat?conversation=${item.conversation_id}`)}
               >
                 💬 View Conversation
-              </a>
+              </button>
               {!item.reviewed_at && (
                 <button
                   type="button"

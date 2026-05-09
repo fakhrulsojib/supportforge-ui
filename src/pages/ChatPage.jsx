@@ -123,10 +123,10 @@ export default function ChatPage() {
   /** Auto-load conversation from URL ?conversation=<id> (e.g. from Review Queue) */
   const [searchParams] = useSearchParams()
   const urlConversationId = searchParams.get('conversation')
-  const urlLoadedRef = useRef(false)
+  const urlLoadedRef = useRef(null)
   useEffect(() => {
-    if (urlConversationId && !urlLoadedRef.current) {
-      urlLoadedRef.current = true
+    if (urlConversationId && urlLoadedRef.current !== urlConversationId) {
+      urlLoadedRef.current = urlConversationId
       loadConversation(urlConversationId)
     }
   }, [urlConversationId, loadConversation])
