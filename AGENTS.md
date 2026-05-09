@@ -207,6 +207,8 @@ For each markdown file, check if this task requires an update:
 ### CSS & Theming
 - [ ] No hardcoded colors — all use `var(--sf-color-*)`
 - [ ] No hardcoded spacing — all use `var(--sf-space-*)`
+- [ ] CSS positioning is correct — every `position: absolute` child has a `position: relative` (or other positioned) ancestor
+- [ ] New CSS animations and transitions render correctly — not invisible, not misplaced, not clipped by overflow
 - [ ] Dark mode variables are defined for every custom property used
 - [ ] CSS class names follow the same naming convention (BEM, feature-prefix, etc.)
 
