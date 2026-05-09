@@ -626,6 +626,32 @@
   color: var(--sf-color-error-500);
 }
 
+/* ── Read-Only Bar (admin viewing another user's conversation) ── */
+.chat-readonly-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  padding: var(--sf-space-3) var(--sf-space-4);
+  border-top: 1px solid var(--sf-color-border-secondary);
+  background-color: var(--sf-color-bg-secondary);
+  max-width: var(--sf-chat-max-width);
+  width: 100%;
+  margin: 0 auto;
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+}
+
+.chat-readonly-bar svg {
+  flex-shrink: 0;
+  color: var(--sf-color-text-tertiary);
+  opacity: 0.7;
+}
+
+.chat-readonly-bar strong {
+  color: var(--sf-color-text-primary);
+  font-weight: var(--sf-font-semibold);
+}
+
 /* ── Input Bar ────────────────────────────────────────────── */
 .chat-input-bar {
   padding: var(--sf-space-3) var(--sf-space-4) var(--sf-space-4);

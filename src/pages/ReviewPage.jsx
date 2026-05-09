@@ -222,7 +222,7 @@ export default function ReviewPage() {
     const sources = item.sources_json || []
     return (
       <tr className="review-detail-row" key={`${item.message_id}-detail`}>
-        <td colSpan={6} className="review-detail-cell">
+        <td colSpan={8} className="review-detail-cell">
           <div className="review-detail-panel">
             {/* Full Question */}
             <div className="review-detail-section">
@@ -316,7 +316,7 @@ export default function ReviewPage() {
   function renderEscalationDetail(item) {
     return (
       <tr className="review-detail-row" key={`${item.conversation_id}-detail`}>
-        <td colSpan={5} className="review-detail-cell">
+        <td colSpan={7} className="review-detail-cell">
           <div className="review-detail-panel">
             {/* Full First Message */}
             <div className="review-detail-section">
@@ -498,6 +498,7 @@ export default function ReviewPage() {
               <thead>
                 <tr>
                   <th style={{ width: '28px' }}></th>
+                  <th>User</th>
                   <th>Question</th>
                   <th>AI Answer</th>
                   <th>Status</th>
@@ -518,6 +519,11 @@ export default function ReviewPage() {
                       <td className="review-cell-chevron" data-label="">
                         <span className={`review-chevron ${isExpanded ? 'review-chevron-open' : ''}`}>
                           ›
+                        </span>
+                      </td>
+                      <td data-label="User">
+                        <span className="review-cell-user" title={item.user_email}>
+                          {item.user_email ? truncate(item.user_email, 25) : '—'}
                         </span>
                       </td>
                       <td data-label="Question">
@@ -618,6 +624,7 @@ export default function ReviewPage() {
               <thead>
                 <tr>
                   <th style={{ width: '28px' }}></th>
+                  <th>User</th>
                   <th>First Message</th>
                   <th>Trigger</th>
                   <th>Status</th>
@@ -637,6 +644,11 @@ export default function ReviewPage() {
                       <td className="review-cell-chevron" data-label="">
                         <span className={`review-chevron ${isExpanded ? 'review-chevron-open' : ''}`}>
                           ›
+                        </span>
+                      </td>
+                      <td data-label="User">
+                        <span className="review-cell-user" title={item.user_email}>
+                          {item.user_email ? truncate(item.user_email, 25) : '—'}
                         </span>
                       </td>
                       <td data-label="Message">

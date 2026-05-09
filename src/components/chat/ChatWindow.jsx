@@ -34,6 +34,8 @@ export default function ChatWindow({
   streamingSources,
   isConnected,
   error,
+  readOnly = false,
+  readOnlyLabel = '',
 }) {
   const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef(null)
@@ -154,35 +156,44 @@ export default function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input bar */}
-      <div className="chat-input-bar">
-        <div className="chat-input-wrapper">
-          <textarea
-            ref={textareaRef}
-            className="chat-input sf-input"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isConnected ? 'Type your message…' : 'Connecting…'}
-            disabled={!isConnected || isStreaming}
-            rows={1}
-            aria-label="Chat message input"
-            id="chat-message-input"
-          />
-          <button
-            type="button"
-            className="chat-send-btn sf-btn sf-btn-primary sf-btn-icon"
-            onClick={handleSend}
-            disabled={!inputValue.trim() || isStreaming || !isConnected}
-            aria-label="Send message"
-            id="chat-send-btn"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <path d="M2 9l7-7v5h7v4h-7v5L2 9z" fill="currentColor" transform="rotate(-90 9 9)" />
-            </svg>
-          </button>
+      {/* Input bar — hidden in read-only mode */}
+      {readOnly ? (
+        <div className="chat-readonly-bar">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 1a4 4 0 0 0-4 4v3H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zm-2.5 4a2.5 2.5 0 0 1 5 0v3h-5V5z" fill="currentColor" />
+          </svg>
+          <span>Read-only — Viewing conversation by <strong>{readOnlyLabel || 'another user'}</strong></span>
         </div>
-      </div>
+      ) : (
+        <div className="chat-input-bar">
+          <div className="chat-input-wrapper">
+            <textarea
+              ref={textareaRef}
+              className="chat-input sf-input"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={isConnected ? 'Type your message…' : 'Connecting…'}
+              disabled={!isConnected || isStreaming}
+              rows={1}
+              aria-label="Chat message input"
+              id="chat-message-input"
+            />
+            <button
+              type="button"
+              className="chat-send-btn sf-btn sf-btn-primary sf-btn-icon"
+              onClick={handleSend}
+              disabled={!inputValue.trim() || isStreaming || !isConnected}
+              aria-label="Send message"
+              id="chat-send-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M2 9l7-7v5h7v4h-7v5L2 9z" fill="currentColor" transform="rotate(-90 9 9)" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

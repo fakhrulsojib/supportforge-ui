@@ -176,6 +176,17 @@
 
 /* ── Cell Content ────────────────────────────────────────────── */
 
+.review-cell-user {
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-primary-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  display: inline-block;
+}
+
 .review-cell-question {
   max-width: 220px;
   overflow: hidden;

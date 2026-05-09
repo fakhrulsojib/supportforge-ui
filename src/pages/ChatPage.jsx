@@ -47,6 +47,7 @@ export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [sidebarLoading, setSidebarLoading] = useState(false)
   const [loadError, setLoadError] = useState(null)
+  const [viewingUserEmail, setViewingUserEmail] = useState('')
 
   // Track conversation ID for sending messages
   const conversationIdRef = useRef(null)
@@ -110,15 +111,20 @@ export default function ChatPage() {
     conversationIdRef.current = conversationId
     setIsSidebarOpen(false)
     setLoadError(null)
+    setViewingUserEmail('')
 
     try {
       const data = await getConversation(conversationId)
       setMessages(data.messages || [])
+      // Track owner email for read-only admin view
+      if (data.user_id && data.user_id !== user?.id) {
+        setViewingUserEmail(data.user_email || '')
+      }
     } catch (err) {
       setLoadError(extractErrorMessage(err))
       setMessages([])
     }
-  }, [])
+  }, [user?.id])
 
   /** Auto-load conversation from URL ?conversation=<id> (e.g. from Review Queue) */
   const [searchParams] = useSearchParams()
@@ -136,6 +142,7 @@ export default function ChatPage() {
     setActiveConversationId(null)
     conversationIdRef.current = null
     setMessages([])
+    setViewingUserEmail('')
     setIsSidebarOpen(false)
   }
 
@@ -274,6 +281,8 @@ export default function ChatPage() {
           streamingSources={streamingSources}
           isConnected={isConnected}
           error={wsError}
+          readOnly={!!viewingUserEmail}
+          readOnlyLabel={viewingUserEmail}
         />
       </main>
     </div>
