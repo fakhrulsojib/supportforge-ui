@@ -31,6 +31,16 @@ function App() {
             }
           />
           <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ChatPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin"
             element={
               <ProtectedRoute>

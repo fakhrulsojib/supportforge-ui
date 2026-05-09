@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useWebSocket } from '../hooks/useWebSocket'
 import { listConversations, getConversation } from '../api/chatApi'
@@ -60,6 +61,7 @@ export default function ChatPage() {
   useEffect(() => {
     loadConversations()
   }, [])
+
 
   /** Register the message-complete callback */
   useEffect(() => {
@@ -117,6 +119,17 @@ export default function ChatPage() {
       setMessages([])
     }
   }, [])
+
+  /** Auto-load conversation from URL ?conversation=<id> (e.g. from Review Queue) */
+  const [searchParams] = useSearchParams()
+  const urlConversationId = searchParams.get('conversation')
+  const urlLoadedRef = useRef(false)
+  useEffect(() => {
+    if (urlConversationId && !urlLoadedRef.current) {
+      urlLoadedRef.current = true
+      loadConversation(urlConversationId)
+    }
+  }, [urlConversationId, loadConversation])
 
   /** Start a new conversation */
   function handleNewChat() {

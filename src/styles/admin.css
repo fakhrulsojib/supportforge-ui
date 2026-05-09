@@ -48,14 +48,58 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sf-space-2);
+  padding: var(--sf-space-2) var(--sf-space-4);
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-primary-400);
+  background: linear-gradient(
+    135deg,
+    hsla(252, 80%, 60%, 0.08) 0%,
+    hsla(252, 80%, 50%, 0.04) 100%
+  );
+  border: 1px solid var(--sf-color-primary-400);
+  border-radius: var(--sf-radius-lg);
+  cursor: pointer;
+  transition: all var(--sf-transition-normal) ease;
+}
+
+.admin-refresh-btn:hover:not(:disabled) {
+  color: var(--sf-color-primary-300);
+  border-color: var(--sf-color-primary-300);
+  background: linear-gradient(
+    135deg,
+    hsla(252, 80%, 60%, 0.15) 0%,
+    hsla(252, 80%, 50%, 0.08) 100%
+  );
+  box-shadow: 0 0 16px hsla(252, 80%, 60%, 0.2),
+              0 0 4px hsla(252, 80%, 60%, 0.1);
+  transform: translateY(-1px);
+}
+
+.admin-refresh-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 0 8px hsla(252, 80%, 60%, 0.15);
+}
+
+.admin-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .admin-refresh-btn svg {
-  transition: transform var(--sf-transition-normal);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.admin-refresh-btn:hover svg {
-  transform: rotate(180deg);
+.admin-refresh-btn:hover:not(:disabled) svg {
+  transform: rotate(360deg);
+}
+
+.admin-refresh-btn:disabled svg {
+  animation: admin-spin 1s linear infinite;
+}
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Section Dividers ────────────────────────────────────────── */

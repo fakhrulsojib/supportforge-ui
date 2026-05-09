@@ -381,12 +381,19 @@ export default function ReviewPage() {
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
-              d="M14 8A6 6 0 114 3.47"
+              d="M2 8a6 6 0 0 1 10-4.47"
               stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
             />
-            <path d="M14 2v4h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 2v4h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M14 8a6 6 0 0 1-10 4.47"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path d="M14 14v-4h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           Refresh
         </button>
