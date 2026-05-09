@@ -202,6 +202,7 @@ For each markdown file, check if this task requires an update:
 - [ ] All API calls go through `src/api/client.js` — no raw `fetch()` or `axios` anywhere
 - [ ] All components in the same feature area follow the same prop naming conventions
 - [ ] All error states use the same pattern (toast, inline error, error boundary — pick one per context)
+- [ ] WebSocket frame handlers account for ALL frame types defined by the backend (`token`, `source`, `done`, `thinking`, `error`, `disclaimer`). If the backend adds a new frame type, the frontend must handle or explicitly ignore it.
 - [ ] All loading states use the same pattern (`<LoadingSpinner>` or skeleton, consistently)
 
 ### CSS & Theming
