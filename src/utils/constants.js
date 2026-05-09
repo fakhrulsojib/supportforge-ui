@@ -29,6 +29,13 @@ export const API_ROUTES = {
     TOP_INTENTS: '/api/v1/analytics/top-intents',
     SATISFACTION: '/api/v1/analytics/satisfaction',
   },
+  ADMIN: {
+    NEGATIVE_FEEDBACK: '/api/v1/admin/feedback/negative',
+    ESCALATIONS: '/api/v1/admin/escalations',
+    FLAGGED: '/api/v1/admin/flagged',
+    FEEDBACK_BASE: '/api/v1/admin/feedback',
+    STATS: '/api/v1/admin/feedback/stats',
+  },
   HEALTH: '/health',
 }
 

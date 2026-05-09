@@ -15,6 +15,8 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { APP_NAME } from '../../utils/constants'
+import { useCallback, useEffect, useState } from 'react'
+import { getReviewStats } from '../../api/reviewApi'
 
 /**
  * Navigation items with role restrictions.
@@ -38,6 +40,13 @@ const NAV_ITEMS = [
     label: 'Analytics',
     roles: ['admin', 'agent'],
     icon: 'analytics',
+  },
+  {
+    path: '/review',
+    label: 'Review Queue',
+    roles: ['admin'],
+    icon: 'review',
+    hasBadge: true,
   },
 ]
 
@@ -78,6 +87,14 @@ function NavIcon({ name }) {
           />
         </svg>
       )
+    case 'review':
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M7 7l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M7 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      )
     default:
       return null
   }
@@ -92,6 +109,26 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
   const { user } = useAuth()
 
   const userRole = user?.role || ''
+
+  // Fetch unreviewed count for badge
+  const [badgeCount, setBadgeCount] = useState(0)
+  const fetchBadge = useCallback(async () => {
+    if (userRole !== 'admin') return
+    try {
+      const data = await getReviewStats()
+      setBadgeCount(
+        (data.unreviewed_negative || 0) +
+        (data.unreviewed_flagged || 0) +
+        (data.open_escalations || 0),
+      )
+    } catch {
+      // badge is non-critical
+    }
+  }, [userRole])
+
+  useEffect(() => {
+    fetchBadge()
+  }, [fetchBadge])
 
   /** Filter nav items by user role. */
   const visibleItems = NAV_ITEMS.filter(
@@ -154,6 +191,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
                 <NavIcon name={item.icon} />
               </span>
               <span className="sidebar-link-text">{item.label}</span>
+              {item.hasBadge && badgeCount > 0 && (
+                <span className="review-tab-badge review-tab-badge-alert">{badgeCount}</span>
+              )}
             </button>
           ))}
         </div>
