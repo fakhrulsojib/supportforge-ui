@@ -435,6 +435,7 @@
   padding: var(--sf-space-3) var(--sf-space-4);
   align-self: flex-start;
   margin-left: calc(32px + var(--sf-space-2-5));
+  position: relative;
 }
 
 .chat-streaming-dots {
