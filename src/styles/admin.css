@@ -1,0 +1,768 @@
+/* ============================================================
+   SupportForge — Admin Panel Styles
+   Naming convention: .admin-* (matches chat-*, auth-* patterns)
+   All colors via var(--sf-color-*), spacing via var(--sf-space-*)
+   ============================================================ */
+
+/* ── Page Layout ─────────────────────────────────────────────── */
+
+.admin-page {
+  max-width: var(--sf-content-max-width);
+  margin: 0 auto;
+  padding: var(--sf-space-8) var(--sf-space-6);
+  min-height: 100vh;
+  animation: sf-fade-in var(--sf-transition-normal) ease forwards;
+}
+
+/* ── Page Header ─────────────────────────────────────────────── */
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sf-space-8);
+}
+
+.admin-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-1);
+}
+
+.admin-title {
+  font-size: var(--sf-text-3xl);
+  font-weight: var(--sf-font-bold);
+  letter-spacing: var(--sf-tracking-tight);
+  background: var(--sf-gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.admin-subtitle {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+}
+
+.admin-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.admin-refresh-btn svg {
+  transition: transform var(--sf-transition-normal);
+}
+
+.admin-refresh-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* ── Section Dividers ────────────────────────────────────────── */
+
+.admin-section {
+  margin-bottom: var(--sf-space-8);
+}
+
+.admin-section-title {
+  font-size: var(--sf-text-lg);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-primary);
+  margin-bottom: var(--sf-space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.admin-section-title svg {
+  color: var(--sf-color-primary-500);
+  flex-shrink: 0;
+}
+
+/* ── Model Cards Grid ────────────────────────────────────────── */
+
+.admin-model-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sf-space-5);
+}
+
+.admin-model-card {
+  padding: var(--sf-space-5) var(--sf-space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-5);
+  transition: box-shadow var(--sf-transition-fast), transform var(--sf-transition-fast);
+  animation: sf-fade-in-up var(--sf-transition-normal) ease forwards;
+}
+
+.admin-model-card:hover {
+  box-shadow: var(--sf-shadow-md);
+  transform: translateY(-2px);
+}
+
+.admin-model-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--sf-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-model-icon-chat {
+  background: linear-gradient(135deg, var(--sf-color-primary-100), var(--sf-color-primary-200));
+  color: var(--sf-color-primary-600);
+}
+
+.admin-model-icon-embed {
+  background: linear-gradient(135deg, var(--sf-color-secondary-400), var(--sf-color-secondary-600));
+  color: var(--sf-color-neutral-0);
+}
+
+.admin-model-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-0-5);
+  min-width: 0;
+}
+
+.admin-model-label {
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--sf-tracking-wide);
+}
+
+.admin-model-name {
+  font-size: var(--sf-text-base);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-primary);
+  font-family: var(--sf-font-family-mono);
+}
+
+.admin-model-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  margin-top: var(--sf-space-3);
+}
+
+.admin-model-footer-text {
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+}
+
+.admin-model-footer a {
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-link);
+  font-weight: var(--sf-font-medium);
+}
+
+/* ── Temperature Slider Card ─────────────────────────────────── */
+
+.admin-temp-card {
+  padding: var(--sf-space-5) var(--sf-space-6);
+  margin-top: var(--sf-space-5);
+  animation: sf-fade-in-up var(--sf-transition-normal) ease forwards;
+}
+
+.admin-temp-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-4);
+  margin-bottom: var(--sf-space-4);
+}
+
+.admin-temp-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--sf-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--sf-color-warning-100), var(--sf-color-warning-200));
+  color: var(--sf-color-warning-600);
+}
+
+.admin-temp-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-0-5);
+}
+
+.admin-temp-value {
+  font-size: var(--sf-text-xl);
+  font-weight: var(--sf-font-bold);
+  color: var(--sf-color-text-primary);
+  font-family: var(--sf-font-family-mono);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.admin-temp-label-tag {
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  padding: var(--sf-space-0-5) var(--sf-space-2);
+  border-radius: var(--sf-radius-sm);
+  background-color: var(--sf-color-primary-50);
+  color: var(--sf-color-primary-600);
+  font-family: var(--sf-font-family-base);
+}
+
+.admin-temp-slider-wrap {
+  margin-bottom: var(--sf-space-4);
+}
+
+.admin-temp-slider {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--sf-color-neutral-200);
+  border-radius: var(--sf-radius-full);
+  outline: none;
+  cursor: pointer;
+}
+
+.admin-temp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--sf-radius-full);
+  background: var(--sf-color-primary-500);
+  cursor: pointer;
+  box-shadow: var(--sf-shadow-sm);
+  transition: transform var(--sf-transition-fast), box-shadow var(--sf-transition-fast);
+}
+
+.admin-temp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: var(--sf-shadow-md);
+}
+
+.admin-temp-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--sf-radius-full);
+  background: var(--sf-color-primary-500);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--sf-shadow-sm);
+}
+
+.admin-temp-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--sf-space-1);
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+}
+
+.admin-temp-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-3);
+}
+
+.admin-temp-save-btn {
+  min-width: 80px;
+}
+
+.admin-temp-error {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-error-600);
+}
+
+.admin-temp-success {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-success-700);
+  font-weight: var(--sf-font-medium);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+}
+
+.admin-temp-loading {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+  padding: var(--sf-space-4) 0;
+}
+
+/* ── Upload Zone ─────────────────────────────────────────────── */
+
+.admin-upload-zone {
+  border: 2px dashed var(--sf-color-border-primary);
+  border-radius: var(--sf-radius-xl);
+  padding: var(--sf-space-10) var(--sf-space-8);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--sf-transition-fast),
+              background-color var(--sf-transition-fast),
+              transform var(--sf-transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-upload-zone:hover {
+  border-color: var(--sf-color-primary-400);
+  background-color: var(--sf-color-primary-50);
+}
+
+.admin-upload-zone:focus-visible {
+  border-color: var(--sf-color-border-focus);
+  box-shadow: var(--sf-shadow-focus);
+  outline: none;
+}
+
+.admin-upload-zone-active {
+  border-color: var(--sf-color-primary-500);
+  background-color: var(--sf-color-primary-50);
+  border-style: solid;
+  transform: scale(1.01);
+}
+
+.admin-upload-zone-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.admin-upload-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--sf-space-4);
+  color: var(--sf-color-primary-400);
+  transition: color var(--sf-transition-fast), transform var(--sf-transition-fast);
+}
+
+.admin-upload-zone:hover .admin-upload-icon,
+.admin-upload-zone-active .admin-upload-icon {
+  color: var(--sf-color-primary-500);
+  transform: translateY(-2px);
+}
+
+.admin-upload-title {
+  font-size: var(--sf-text-base);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-primary);
+  margin-bottom: var(--sf-space-1);
+}
+
+.admin-upload-subtitle {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+  margin-bottom: var(--sf-space-2);
+}
+
+.admin-upload-formats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sf-space-2);
+  flex-wrap: wrap;
+}
+
+.admin-upload-format-tag {
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  padding: var(--sf-space-0-5) var(--sf-space-2);
+  border-radius: var(--sf-radius-sm);
+  background-color: var(--sf-color-neutral-100);
+  color: var(--sf-color-text-secondary);
+  font-family: var(--sf-font-family-mono);
+}
+
+.admin-upload-input {
+  display: none;
+}
+
+/* Upload Progress */
+.admin-upload-progress {
+  margin-top: var(--sf-space-5);
+}
+
+.admin-upload-progress-bar-track {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  background-color: var(--sf-color-neutral-200);
+  border-radius: var(--sf-radius-full);
+  margin: 0 auto var(--sf-space-2);
+  overflow: hidden;
+}
+
+.admin-upload-progress-bar-fill {
+  height: 100%;
+  background: var(--sf-gradient-primary);
+  border-radius: var(--sf-radius-full);
+  width: var(--progress-width, 0%);
+  transition: width var(--sf-transition-fast);
+}
+
+.admin-upload-progress-text {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-secondary);
+  font-weight: var(--sf-font-medium);
+}
+
+/* Upload Messages */
+.admin-upload-error {
+  margin-top: var(--sf-space-4);
+  padding: var(--sf-space-3) var(--sf-space-4);
+  background-color: var(--sf-color-error-50);
+  color: var(--sf-color-error-600);
+  border-radius: var(--sf-radius-md);
+  font-size: var(--sf-text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.admin-upload-success {
+  margin-top: var(--sf-space-4);
+  padding: var(--sf-space-3) var(--sf-space-4);
+  background-color: var(--sf-color-success-50);
+  color: var(--sf-color-success-700);
+  border-radius: var(--sf-radius-md);
+  font-size: var(--sf-text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Document Table ──────────────────────────────────────────── */
+
+.admin-doc-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--sf-color-border-secondary);
+  border-radius: var(--sf-radius-lg);
+  animation: sf-fade-in-up var(--sf-transition-normal) ease forwards;
+}
+
+.admin-doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sf-text-sm);
+}
+
+.admin-doc-table th {
+  text-align: left;
+  padding: var(--sf-space-3) var(--sf-space-4);
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--sf-tracking-wide);
+  background-color: var(--sf-color-bg-secondary);
+  border-bottom: 1px solid var(--sf-color-border-secondary);
+  white-space: nowrap;
+}
+
+.admin-doc-table td {
+  padding: var(--sf-space-3) var(--sf-space-4);
+  border-bottom: 1px solid var(--sf-color-border-secondary);
+  color: var(--sf-color-text-primary);
+  vertical-align: middle;
+}
+
+.admin-doc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-doc-table tbody tr {
+  transition: background-color var(--sf-transition-fast);
+}
+
+.admin-doc-table tbody tr:hover {
+  background-color: var(--sf-color-surface-card-hover);
+}
+
+/* File info cell */
+.admin-doc-file {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-3);
+  min-width: 0;
+}
+
+.admin-doc-file-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--sf-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-bold);
+  text-transform: uppercase;
+}
+
+.admin-doc-file-icon-pdf {
+  background-color: var(--sf-color-error-50);
+  color: var(--sf-color-error-700);
+}
+
+.admin-doc-file-icon-md {
+  background-color: var(--sf-color-info-50);
+  color: var(--sf-color-info-600);
+}
+
+.admin-doc-file-icon-csv {
+  background-color: var(--sf-color-success-50);
+  color: var(--sf-color-success-700);
+}
+
+.admin-doc-file-icon-txt {
+  background-color: var(--sf-color-neutral-100);
+  color: var(--sf-color-neutral-600);
+}
+
+.admin-doc-filename {
+  font-weight: var(--sf-font-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 240px;
+}
+
+/* Status badge extensions */
+.admin-doc-status-processing {
+  animation: sf-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Actions cell */
+.admin-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+/* Delete confirmation */
+.admin-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  animation: sf-scale-in var(--sf-transition-spring) forwards;
+}
+
+.admin-delete-confirm-text {
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-error-600);
+  font-weight: var(--sf-font-medium);
+  white-space: nowrap;
+}
+
+/* Document count badge in section title */
+.admin-doc-count-badge {
+  margin-left: var(--sf-space-2);
+}
+
+/* ── Empty State ─────────────────────────────────────────────── */
+
+.admin-empty-state {
+  text-align: center;
+  padding: var(--sf-space-16) var(--sf-space-8);
+  animation: sf-fade-in var(--sf-transition-normal) ease forwards;
+}
+
+.admin-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--sf-space-5);
+  color: var(--sf-color-neutral-300);
+}
+
+.admin-empty-title {
+  font-size: var(--sf-text-lg);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-primary);
+  margin-bottom: var(--sf-space-2);
+}
+
+.admin-empty-text {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+}
+
+/* ── Loading Skeleton ────────────────────────────────────────── */
+
+.admin-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-4);
+  padding: var(--sf-space-4);
+  border-bottom: 1px solid var(--sf-color-border-secondary);
+}
+
+.admin-skeleton-block {
+  height: 14px;
+  background-color: var(--sf-color-neutral-200);
+  border-radius: var(--sf-radius-sm);
+  animation: sf-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.admin-skeleton-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--sf-radius-md);
+}
+
+.admin-skeleton-wide {
+  width: 40%;
+}
+
+.admin-skeleton-narrow {
+  width: 15%;
+}
+
+.admin-skeleton-medium {
+  width: 20%;
+}
+
+/* ── Error Bar (reuses chat-error-bar pattern) ───────────────── */
+
+.admin-error-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  padding: var(--sf-space-3) var(--sf-space-4);
+  margin-bottom: var(--sf-space-5);
+  background-color: var(--sf-color-error-50);
+  color: var(--sf-color-error-600);
+  border-radius: var(--sf-radius-md);
+  font-size: var(--sf-text-sm);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+}
+
+/* ── Access Denied ───────────────────────────────────────────── */
+
+.admin-access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  animation: sf-fade-in var(--sf-transition-normal) ease forwards;
+}
+
+.admin-access-denied-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--sf-color-warning-500);
+  margin-bottom: var(--sf-space-5);
+}
+
+.admin-access-denied-title {
+  font-size: var(--sf-text-2xl);
+  font-weight: var(--sf-font-bold);
+  color: var(--sf-color-text-primary);
+  margin-bottom: var(--sf-space-2);
+}
+
+.admin-access-denied-text {
+  font-size: var(--sf-text-sm);
+  color: var(--sf-color-text-tertiary);
+  margin-bottom: var(--sf-space-6);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .admin-page {
+    padding: var(--sf-space-5) var(--sf-space-4);
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sf-space-4);
+  }
+
+  .admin-model-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-upload-zone {
+    padding: var(--sf-space-8) var(--sf-space-5);
+  }
+
+  /* Card layout for table on mobile */
+  .admin-doc-table-wrap {
+    border: none;
+    border-radius: 0;
+  }
+
+  .admin-doc-table thead {
+    display: none;
+  }
+
+  .admin-doc-table,
+  .admin-doc-table tbody,
+  .admin-doc-table tr,
+  .admin-doc-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-doc-table tr {
+    margin-bottom: var(--sf-space-3);
+    border: 1px solid var(--sf-color-border-secondary);
+    border-radius: var(--sf-radius-lg);
+    background-color: var(--sf-color-surface-card);
+    overflow: hidden;
+  }
+
+  .admin-doc-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sf-space-2-5) var(--sf-space-4);
+    border-bottom: 1px solid var(--sf-color-border-secondary);
+  }
+
+  .admin-doc-table td:last-child {
+    border-bottom: none;
+  }
+
+  .admin-doc-table td::before {
+    content: attr(data-label);
+    font-size: var(--sf-text-xs);
+    font-weight: var(--sf-font-semibold);
+    color: var(--sf-color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--sf-tracking-wide);
+    flex-shrink: 0;
+    margin-right: var(--sf-space-3);
+  }
+
+  .admin-doc-filename {
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 375px) {
+  .admin-title {
+    font-size: var(--sf-text-2xl);
+  }
+
+  .admin-upload-zone {
+    padding: var(--sf-space-6) var(--sf-space-4);
+  }
+
+  .admin-doc-filename {
+    max-width: 140px;
+  }
+}

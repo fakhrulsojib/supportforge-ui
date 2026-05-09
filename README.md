@@ -2,7 +2,7 @@
 
 > Production-grade AI customer support agent — Frontend
 
-![React](https://img.shields.io/badge/React-19+-61DAFB?style=flat-square&logo=react&logoColor=black)
+![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6+-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS-Custom_Properties-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
@@ -25,9 +25,9 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 
 | Component | Technology |
 |---|---|
-| Framework | React 19 |
+| Framework | React 18 |
 | Build Tool | Vite 6 |
-| Routing | React Router v7 |
+| Routing | React Router v6 |
 | HTTP Client | Axios |
 | Styling | Vanilla CSS + Custom Properties |
 | State | React Context + Hooks |

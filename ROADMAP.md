@@ -16,58 +16,62 @@
 
 > **Branch:** `phase-3/frontend-implementation`
 
-### 3.1 — React + Vite Scaffold
-- [ ] Initialize with `npx -y create-vite@latest ./ -- --template react`
-- [ ] Install dependencies: `axios`, `react-router-dom`
-- [ ] Create directory structure: `api/`, `hooks/`, `context/`, `pages/`, `components/`, `styles/`, `utils/`
-- [ ] Design system: `index.css` with CSS custom properties (colors, spacing, typography, shadows)
-- [ ] Theme: `theme.css` with dark/light mode variables
-- [ ] Import Google Font (Inter) in `index.html`
-- [ ] `vite.config.js` with API proxy → `http://localhost:8000`
-- [ ] Verify: `npm run dev` starts, app renders at `localhost:5173`
+### 3.1 — React + Vite Scaffold ✅
+- [x] Initialize with `npx -y create-vite@latest ./ -- --template react`
+- [x] Install dependencies: `axios`, `react-router-dom`
+- [x] Create directory structure: `api/`, `hooks/`, `context/`, `pages/`, `components/`, `styles/`, `utils/`
+- [x] Design system: `index.css` with CSS custom properties (colors, spacing, typography, shadows)
+- [x] Theme: `theme.css` with dark/light mode variables
+- [x] Import Google Font (Inter) in `index.html`
+- [x] `vite.config.js` with API proxy → `http://localhost:8000`
+- [x] Verify: `npm run lint` + `npm run build` pass with zero errors
 
-### 3.2 — Auth Flow
-- [ ] `AuthContext.jsx` — JWT storage, login/logout/refresh, `isAuthenticated` state
-- [ ] `client.js` — Axios instance with Authorization header interceptor, auto-refresh on 401
-- [ ] `authApi.js` — login, register, refresh
-- [ ] `LoginPage.jsx` — email/password form, error display, redirect
-- [ ] `ProtectedRoute.jsx` — redirect to login if not authenticated
-- [ ] Browser test: login flow, token refresh, logout
 
-### 3.3 — Chat UI
-- [ ] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect
-- [ ] `ChatWindow.jsx` — message list + input, auto-scroll
-- [ ] `MessageBubble.jsx` — user vs assistant, markdown rendering
-- [ ] `StreamingIndicator.jsx` — typing dots animation
-- [ ] `SourceCitation.jsx` — collapsible source cards
-- [ ] `FeedbackButtons.jsx` — 👍/👎 per message
-- [ ] `ChatPage.jsx` — compose all chat components
-- [ ] Browser test: full chat flow at 375px, 768px, 1440px
+### 3.2 — Auth Flow ✅
+- [x] `AuthContext.jsx` — JWT in-memory storage, login/logout/refresh, `isAuthenticated` state
+- [x] `client.js` — Axios instance with Authorization header interceptor, auto-refresh on 401
+- [x] `authApi.js` — login, register, refreshAccessToken
+- [x] `useAuth.js` — convenience hook (separated for react-refresh compliance)
+- [x] `LoginPage.jsx` — email/password/tenant form, registration mode, error display, redirect
+- [x] `ProtectedRoute.jsx` — redirect to login if not authenticated
+- [x] `auth.css` — login page styling using design system tokens
+- [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
+- [x] Browser test: login flow, token refresh, logout ✅
 
-### 3.4 — Admin Panel
-- [ ] `ingestApi.js` — upload, list, delete documents
-- [ ] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
-- [ ] `IngestionStatus.jsx` — document table with status badges
-- [ ] `ModelSelector.jsx` — display current models (read-only)
-- [ ] `AdminPage.jsx` — compose admin components, admin-only check
-- [ ] Browser test: upload flow, status polling, delete
+### 3.3 — Chat UI ✅
+- [x] `useWebSocket.js` — connect, send, receive streaming tokens, reconnect
+- [x] `ChatWindow.jsx` — message list + input, auto-scroll
+- [x] `MessageBubble.jsx` — user vs assistant, markdown rendering
+- [x] `StreamingIndicator.jsx` — typing dots animation
+- [x] `SourceCitation.jsx` — collapsible source cards
+- [x] `FeedbackButtons.jsx` — 👍/👎 per message
+- [x] `ChatPage.jsx` — compose all chat components
+- [x] Browser test: full chat flow at 375px, 768px, 1440px ✅
 
-### 3.5 — Analytics Dashboard
-- [ ] `analyticsApi.js` — daily stats, top intents, satisfaction
-- [ ] `ConversationChart.jsx` — line chart (CSS/SVG, no heavy lib)
-- [ ] `TopicCloud.jsx` — sized intent tags
-- [ ] `SatisfactionGauge.jsx` — percentage ring
-- [ ] `AnalyticsPage.jsx` — compose dashboard, date range picker
-- [ ] Browser test: charts render, hover states, empty state
+### 3.4 — Admin Panel ✅
+- [x] `ingestApi.js` — upload, list, delete documents
+- [x] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
+- [x] `IngestionStatus.jsx` — document table with status badges
+- [x] `ModelSelector.jsx` — display current models (read-only)
+- [x] `AdminPage.jsx` — compose admin components, admin-only check
+- [x] Browser test: upload flow, status polling, delete ✅
 
-### 3.6 — Layout & Polish
-- [ ] `Sidebar.jsx` — nav links, active state, collapsible on mobile
-- [ ] `Header.jsx` — tenant name, avatar, dark mode toggle, logout
-- [ ] `ErrorBoundary.jsx` — catch render errors, friendly fallback
-- [ ] `LoadingSpinner.jsx` — reusable with size variants
-- [ ] Dark mode: CSS class on `<html>`, localStorage persistence
-- [ ] Micro-animations: message fade-in, sidebar slide, button hover, page transitions
-- [ ] Browser test: dark mode toggle, responsive breakpoints, navigation
+### 3.5 — Analytics Dashboard ✅
+- [x] `analyticsApi.js` — daily stats, top intents, satisfaction
+- [x] `ConversationChart.jsx` — line chart (CSS/SVG, no heavy lib)
+- [x] `TopicCloud.jsx` — sized intent tags
+- [x] `SatisfactionGauge.jsx` — percentage ring
+- [x] `AnalyticsPage.jsx` — compose dashboard, date range picker
+- [x] Browser test: charts render, hover states, empty state ✅
+
+### 3.6 — Layout & Polish ✅
+- [x] `Sidebar.jsx` — nav links, active state, collapsible on mobile
+- [x] `Header.jsx` — tenant name, avatar, dark mode toggle, logout
+- [x] `ErrorBoundary.jsx` — catch render errors, friendly fallback
+- [x] `LoadingSpinner.jsx` — reusable with size variants
+- [x] Dark mode: CSS class on `<html>`, localStorage persistence
+- [x] Micro-animations: message fade-in, sidebar slide, button hover, page transitions
+- [x] Browser test: dark mode toggle, responsive breakpoints, navigation ✅
 
 ---
 

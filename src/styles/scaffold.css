@@ -1,0 +1,163 @@
+/* ============================================================
+   Scaffold Page — Temporary landing page for Phase 3.1
+   Will be removed once ChatPage is implemented in Phase 3.3
+   ============================================================ */
+
+.scaffold-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sf-space-6);
+  background: var(--sf-color-bg-secondary);
+}
+
+.scaffold-container {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sf-space-8);
+}
+
+/* Logo */
+.scaffold-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sf-space-3);
+  text-align: center;
+}
+
+.scaffold-logo-icon {
+  filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--sf-color-primary-500) 30%, transparent));
+  transition: transform var(--sf-transition-spring);
+}
+
+.scaffold-logo-icon:hover {
+  transform: scale(1.08) rotate(-2deg);
+}
+
+.scaffold-title {
+  font-size: var(--sf-text-4xl);
+  font-weight: var(--sf-font-bold);
+  background: var(--sf-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: var(--sf-tracking-tight);
+}
+
+.scaffold-subtitle {
+  font-size: var(--sf-text-lg);
+  color: var(--sf-color-text-secondary);
+  font-weight: var(--sf-font-normal);
+}
+
+/* Status Card */
+.scaffold-status-card {
+  width: 100%;
+  padding: var(--sf-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-5);
+}
+
+.scaffold-status-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-success-500);
+}
+
+.scaffold-status-dot {
+  width: var(--sf-space-2);
+  height: var(--sf-space-2);
+  border-radius: var(--sf-radius-full);
+  background-color: var(--sf-color-success-500);
+  box-shadow: 0 0 8px var(--sf-color-success-500);
+  animation: sf-pulse 2s ease-in-out infinite;
+}
+
+.scaffold-status-text {
+  text-transform: uppercase;
+  letter-spacing: var(--sf-tracking-wide);
+  font-size: var(--sf-text-xs);
+}
+
+/* Checklist */
+.scaffold-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2-5);
+}
+
+.scaffold-check-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2-5);
+  font-size: var(--sf-text-sm);
+  padding: var(--sf-space-1-5) 0;
+}
+
+.scaffold-check-done {
+  color: var(--sf-color-success-500);
+}
+
+.scaffold-check-done span {
+  color: var(--sf-color-text-primary);
+}
+
+.scaffold-check-pending {
+  color: var(--sf-color-neutral-300);
+}
+
+.scaffold-check-pending span {
+  color: var(--sf-color-text-tertiary);
+}
+
+/* Design System Preview */
+.scaffold-preview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-4);
+}
+
+.scaffold-preview-title {
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-semibold);
+  color: var(--sf-color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--sf-tracking-wide);
+}
+
+.scaffold-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-2);
+}
+
+.scaffold-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-2);
+}
+
+/* Footer */
+.scaffold-footer {
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+  text-align: center;
+}
+
+.scaffold-footer code {
+  background-color: var(--sf-color-bg-tertiary);
+  padding: var(--sf-space-0-5) var(--sf-space-1-5);
+  border-radius: var(--sf-radius-sm);
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-primary-600);
+}
