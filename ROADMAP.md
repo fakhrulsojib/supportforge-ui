@@ -82,7 +82,7 @@
 | Phase | Name | Priority | Status |
 |---|---|---|---|
 | 8 | Feedback Review Queue | High | ✅ |
-| 12 | Tenant Provisioning UI | High | 🔲 |
+| 12 | Tenant Provisioning UI + Failed Queries UI | High | 🔲 |
 | 17 | User Management UI | Medium | 🔲 |
 | 19 | Moderation Dashboard UI | Medium | 🔲 |
 | 20 | A/B Testing & Tenant Config | Low | 🔲 |

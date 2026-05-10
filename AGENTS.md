@@ -17,7 +17,7 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 | Phase 0 | `phase-0/repository-bootstrap` | Repo setup, docs, env config |
 | Phase 3 | `phase-3/frontend-implementation` | Vite scaffold, auth, chat UI, admin panel, analytics, layout & polish |
 | Phase 8 | `phase-8/feedback-review-queue` | Review Queue page for negative feedback, escalations, flagged messages |
-| Phase 12 | `phase-12/tenant-provisioning-ui` | Superadmin frontend for tenant management |
+| Phase 12 | `phase-12/tenant-provisioning-ui` | Superadmin tenant management + Failed Queries tab in Review Queue |
 | Phase 17 | `phase-17/user-management-ui` | User management + approval frontend |
 | Phase 19 | `phase-19/moderation-dashboard-ui` | Moderation dashboard frontend |
 | Phase 20 | `phase-20/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
