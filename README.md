@@ -84,6 +84,7 @@ supportforge-ui/
 │   │   ├── ingestApi.js
 │   │   ├── tenantApi.js
 │   │   ├── analyticsApi.js
+│   │   ├── reviewApi.js
 │   │   └── authApi.js
 │   ├── hooks/                     # Custom React hooks
 │   │   ├── useWebSocket.js
@@ -97,7 +98,7 @@ supportforge-ui/
 │   │   ├── AdminPage.jsx
 │   │   ├── AnalyticsPage.jsx
 │   │   ├── LoginPage.jsx
-│   │   └── SettingsPage.jsx
+│   │   └── ReviewPage.jsx
 │   ├── components/                # Presentational components
 │   │   ├── chat/
 │   │   ├── admin/
@@ -128,7 +129,7 @@ supportforge-ui/
 | Chat | `/chat` | All authenticated users |
 | Admin | `/admin` | Admin only |
 | Analytics | `/analytics` | Admin + Agent |
-| Settings | `/settings` | Admin only |
+| Review Queue | `/review` | Admin only |
 
 ## Backend API
 

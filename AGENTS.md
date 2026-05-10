@@ -300,7 +300,7 @@ src/
 ### Layout Shell
 
 The application uses a layout shell (`AppLayout`) that wraps all authenticated pages:
-- `Sidebar` — app-level navigation (Chat, Admin, Analytics) with role-based filtering
+- `Sidebar` — app-level navigation (Chat, Admin, Analytics, Review Queue) with role-based filtering
 - `Header` — page title, tenant badge, dark mode toggle, user avatar with logout dropdown
 - `ErrorBoundary` — catches render errors with friendly fallback UI
 - Dark mode is toggled via CSS class on `<html>` and persisted in `localStorage` (`sf-theme` key)
@@ -314,26 +314,37 @@ The application uses a layout shell (`AppLayout`) that wraps all authenticated p
 
 ### Test User Credentials
 
-When a live backend is available, register one test user for browser testing authenticated state:
+When a live backend is available, use these test users for browser testing:
+
+**Viewer test user** (chat only):
 
 ```
-Email: test@supportforge.dev
-Password: Test1234!@#
-Tenant ID: 44aff2a2-4869-467c-b707-6a697bfefe29
-Tenant Slug: demo-tenant
-Role: viewer (default registration role)
+Email: viewer@acme.dev
+Password: SEE_SEED_SCRIPTS
+Tenant ID: SEE_SEED_SCRIPTS
+Tenant Slug: acme-corp
+Role: viewer
 ```
 
-**Admin test user** (full access — Chat, Admin, Analytics):
+**Admin test user** (full access — Chat, Admin, Analytics, Review Queue):
 
 ```
-Email: admin@supportforge.dev
-Password: Admin1234!@#
-Tenant ID: 44aff2a2-4869-467c-b707-6a697bfefe29
+Email: admin@acme.dev
+Password: SEE_SEED_SCRIPTS
+Tenant ID: SEE_SEED_SCRIPTS
 Role: admin
 ```
 
-> **Convention:** All browser test tasks that require logged-in state should use these credentials. Use the **admin** credentials when testing Admin/Analytics pages. The Tenant ID field requires the UUID, not the slug. The test users must be registered via the backend API before browser testing.
+**Superadmin test user** (platform management, cross-tenant):
+
+```
+Email: admin@platform.dev
+Password: SEE_SEED_SCRIPTS
+Tenant ID: SEE_SEED_SCRIPTS
+Role: superadmin
+```
+
+> **Convention:** All browser test tasks that require logged-in state should use these credentials. Use the **admin** credentials when testing Admin/Analytics/Review Queue pages. Use the **superadmin** credentials when testing platform tenant management. The Tenant ID field requires the UUID, not the slug. The test users are created via `scripts/seed_demo.py` and `scripts/create_superadmin.py`.
 
 ---
 
