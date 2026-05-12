@@ -77,7 +77,7 @@ export default function ChatPage() {
       setMessages((prev) => [
         ...prev,
         {
-          id: `assistant-${Date.now()}`,
+          id: doneData?.message_id || `assistant-${Date.now()}`,
           role: 'assistant',
           content: text,
           thinking: thinkingText || '',
