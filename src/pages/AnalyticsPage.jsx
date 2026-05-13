@@ -12,10 +12,8 @@
  * - No tokens or sensitive data logged to console
  * - Errors displayed inline, no stack traces
  *
- * Backend endpoints implemented in Phase 13 (Analytics Backend API).
- * The API layer defines the expected contract. This page handles API
- * errors gracefully and displays empty-state UI when endpoints return
- * 404 or are unavailable.
+ * The API layer handles errors gracefully and displays empty-state UI
+ * when endpoints return 404 or are unavailable.
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -30,6 +28,8 @@ import '../styles/analytics.css'
 
 /** Date range options for the picker. */
 const RANGE_OPTIONS = [
+  { label: '1d', days: 1 },
+  { label: '3d', days: 3 },
   { label: '7d', days: 7 },
   { label: '14d', days: 14 },
   { label: '30d', days: 30 },
