@@ -116,9 +116,13 @@ export default function ChatPage() {
     try {
       const data = await getConversation(conversationId)
       setMessages(data.messages || [])
-      // Track owner email for read-only admin view
-      if (data.user_id && data.user_id !== user?.id) {
-        setViewingUserEmail(data.user_email || '')
+      // Mark read-only only when viewing another user's conversation
+      // (admin clicking into a conversation from Review Queue)
+      const isOwnConversation =
+        !data.user_id ||
+        data.user_id === user?.userId
+      if (!isOwnConversation && data.user_email) {
+        setViewingUserEmail(data.user_email)
       }
     } catch (err) {
       setLoadError(extractErrorMessage(err))
