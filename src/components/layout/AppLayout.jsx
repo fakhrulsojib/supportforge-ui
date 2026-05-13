@@ -50,7 +50,7 @@ const NAV_ITEMS = [
   { roles: null },                  // Chat — visible to all
   { roles: ['admin', 'agent'] },    // Admin
   { roles: ['admin', 'agent'] },    // Analytics
-  { roles: ['admin'] },             // Review Queue
+  { roles: ['admin', 'superadmin'] },    // Review Queue
   { roles: ['superadmin'] },        // Platform Tenants
 ]
 

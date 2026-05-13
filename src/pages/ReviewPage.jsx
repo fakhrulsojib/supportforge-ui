@@ -90,7 +90,7 @@ function formatReason(reason) {
 export default function ReviewPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
 
   const [activeTab, setActiveTab] = useState('negative')
   const [items, setItems] = useState([])
@@ -816,7 +816,7 @@ export default function ReviewPage() {
 
       {/* Reason Filter (only on failed queries tab) */}
       {activeTab === 'failed_queries' && (
-        <div className="review-filters" style={{ marginBottom: 'var(--sf-space-4)' }}>
+        <div className="review-filters review-fq-filters">
           <div className="review-filter-group">
             <span className="review-filter-label">Reason</span>
             <select

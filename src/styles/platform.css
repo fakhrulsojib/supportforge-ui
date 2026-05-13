@@ -4,6 +4,13 @@
    All colors via var(--sf-color-*), spacing via var(--sf-space-*)
    ============================================================ */
 
+/* ── Header Actions ────────────────────────────────────────── */
+
+.platform-header-actions {
+  display: flex;
+  gap: var(--sf-space-3);
+}
+
 /* ── Platform Table ─────────────────────────────────────────── */
 
 .platform-table-wrap {

@@ -225,7 +225,7 @@ export default function PlatformTenantsPage() {
             Manage tenant provisioning, status transitions, and configurations
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--sf-space-3)' }}>
+        <div className="platform-header-actions">
           <button
             type="button"
             className="sf-btn sf-btn-primary"

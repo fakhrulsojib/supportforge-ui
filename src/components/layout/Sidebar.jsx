@@ -46,7 +46,7 @@ const NAV_ITEMS = [
   {
     path: '/review',
     label: 'Review Queue',
-    roles: ['admin'],
+    roles: ['admin', 'superadmin'],
     icon: 'review',
     hasBadge: true,
   },
@@ -137,7 +137,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
   const [badgeCount, setBadgeCount] = useState(0)
   const [tenantCount, setTenantCount] = useState(0)
   const fetchBadge = useCallback(async () => {
-    if (userRole === 'admin') {
+    if (userRole === 'admin' || userRole === 'superadmin') {
       try {
         const data = await getReviewStats()
         setBadgeCount(

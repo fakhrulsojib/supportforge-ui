@@ -538,6 +538,12 @@
   font-style: italic;
 }
 
+/* ── Failed Query Filter Wrapper ────────────────────────────── */
+
+.review-fq-filters {
+  margin-bottom: var(--sf-space-4);
+}
+
 /* ── Failed Query Reason Badges ─────────────────────────────── */
 
 .review-reason-badge {
