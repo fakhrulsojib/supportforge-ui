@@ -12,15 +12,24 @@ import { useMemo } from 'react'
 const COLOR_VARIANT_COUNT = 10
 
 /**
- * Map an intent name from snake_case to Title Case for display.
+ * Map an intent name from a raw filename to a clean Title Case label.
+ * Strips leading number prefixes (01-, 02-), file extensions (.md, .pdf),
+ * converts hyphens/underscores to spaces, and Title Cases the result.
  * @param {string} name
  * @returns {string}
  */
 function formatIntentName(name) {
   if (!name) return ''
   return name
-    .replace(/_/g, ' ')
+    // Strip common file extensions
+    .replace(/\.(md|pdf|csv|txt|docx?)$/i, '')
+    // Strip leading number prefix like "01-" or "02_"
+    .replace(/^\d+[-_]\s*/, '')
+    // Convert hyphens and underscores to spaces
+    .replace(/[-_]/g, ' ')
+    // Title case each word
     .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim()
 }
 
 /**
@@ -84,8 +93,8 @@ export default function TopicCloud({ intents = [], isLoading = false }) {
           role="listitem"
           title={`${formatIntentName(intent.name)}: ${intent.count} occurrences`}
         >
-          {formatIntentName(intent.name)}
-          <span className="topic-tag-count">({intent.count})</span>
+          <span className="topic-tag-name">{formatIntentName(intent.name)}</span>
+          <span className="topic-tag-count">{intent.count}</span>
         </span>
       ))}
     </div>
