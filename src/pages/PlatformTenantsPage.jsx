@@ -216,6 +216,7 @@ export default function PlatformTenantsPage() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
+    <>
     <div className="admin-page" id="platform-page">
       {/* Header */}
       <div className="admin-header">
@@ -327,6 +328,7 @@ export default function PlatformTenantsPage() {
             <table className="platform-table" id="platform-table">
               <thead>
                 <tr>
+                  <th>Tenant ID</th>
                   <th>Name</th>
                   <th>Slug</th>
                   <th>Status</th>
@@ -337,6 +339,9 @@ export default function PlatformTenantsPage() {
               <tbody>
                 {tenants.map((tenant) => (
                   <tr key={tenant.id}>
+                    <td data-label="Tenant ID">
+                      <span className="platform-slug">{tenant.id}</span>
+                    </td>
                     <td data-label="Name">
                       <span className="platform-tenant-name">{tenant.name}</span>
                     </td>
@@ -447,148 +452,150 @@ export default function PlatformTenantsPage() {
           </div>
         </>
       )}
+    </div>
 
-      {/* Create Tenant Modal */}
-      {showCreateModal && (
-        <>
-          <div
-            className="platform-modal-overlay"
-            onClick={() => setShowCreateModal(false)}
-            role="presentation"
-          />
-          <div className="platform-modal" role="dialog" aria-labelledby="platform-modal-title" id="platform-create-modal">
-            <h3 className="platform-modal-title" id="platform-modal-title">Create New Tenant</h3>
-            <form onSubmit={handleCreate}>
-              <div className="platform-modal-field">
-                <label className="platform-modal-label" htmlFor="platform-create-name">
-                  Tenant Name
-                </label>
-                <input
-                  type="text"
-                  className="sf-input"
-                  id="platform-create-name"
-                  value={createName}
-                  onChange={(e) => setCreateName(e.target.value)}
-                  placeholder="e.g. NovaMart"
-                  required
-                  maxLength={255}
-                  autoFocus
-                />
-              </div>
-              <div className="platform-modal-field">
-                <label className="platform-modal-label" htmlFor="platform-create-slug">
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  className="sf-input"
-                  id="platform-create-slug"
-                  value={createSlug}
-                  onChange={(e) => setCreateSlug(e.target.value)}
-                  placeholder="e.g. novamart"
-                  required
-                  pattern="^[a-z0-9]+(-[a-z0-9]+)*$"
-                  title="Lowercase letters, numbers, and hyphens only"
-                  minLength={2}
-                  maxLength={63}
-                />
-                <span className="platform-modal-hint">
-                  Lowercase letters, numbers, and hyphens only
-                </span>
-              </div>
-              <div className="platform-modal-field">
-                <label className="platform-modal-label" htmlFor="platform-create-config">
-                  Configuration (JSON, optional)
-                </label>
-                <textarea
-                  className="platform-modal-textarea"
-                  id="platform-create-config"
-                  value={createConfig}
-                  onChange={(e) => setCreateConfig(e.target.value)}
-                  placeholder='{"key": "value"}'
-                  rows={3}
-                />
-              </div>
-              {createError && (
-                <div className="platform-modal-error" role="alert">
-                  {createError}
-                </div>
-              )}
-              <div className="platform-modal-actions">
-                <button
-                  type="button"
-                  className="sf-btn sf-btn-secondary"
-                  onClick={() => setShowCreateModal(false)}
-                  disabled={creating}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="sf-btn sf-btn-primary"
-                  disabled={creating || !createName.trim() || !createSlug.trim()}
-                  id="platform-create-submit"
-                >
-                  {creating ? 'Creating…' : 'Create Tenant'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </>
-      )}
-
-      {/* Confirmation Dialog */}
-      {confirmAction && (
-        <>
-          <div
-            className="platform-modal-overlay"
-            onClick={() => setConfirmAction(null)}
-            role="presentation"
-          />
-          <div className="platform-confirm" role="alertdialog" aria-labelledby="platform-confirm-title" id="platform-confirm-dialog">
-            <svg className="platform-confirm-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+    {/* Create Tenant Modal — rendered outside page container for correct viewport centering */}
+    {showCreateModal && (
+      <>
+        <div
+          className="platform-modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+          role="presentation"
+        />
+        <div className="platform-modal" role="dialog" aria-labelledby="platform-modal-title" id="platform-create-modal">
+          <h3 className="platform-modal-title" id="platform-modal-title">Create New Tenant</h3>
+          <form onSubmit={handleCreate}>
+            <div className="platform-modal-field">
+              <label className="platform-modal-label" htmlFor="platform-create-name">
+                Tenant Name
+              </label>
+              <input
+                type="text"
+                className="sf-input"
+                id="platform-create-name"
+                value={createName}
+                onChange={(e) => setCreateName(e.target.value)}
+                placeholder="e.g. NovaMart"
+                required
+                maxLength={255}
+                autoFocus
               />
-            </svg>
-            <h3 className="platform-confirm-title" id="platform-confirm-title">
-              {confirmAction.newStatus === 'suspended' ? 'Suspend Tenant?' : 'Archive Tenant?'}
-            </h3>
-            <p className="platform-confirm-text">
-              {confirmAction.newStatus === 'suspended'
-                ? `Suspending "${confirmAction.tenantName}" will prevent all users from accessing the platform. This can be reversed later.`
-                : `Archiving "${confirmAction.tenantName}" is permanent and cannot be undone. All users will lose access.`}
-            </p>
-            <div className="platform-confirm-actions">
+            </div>
+            <div className="platform-modal-field">
+              <label className="platform-modal-label" htmlFor="platform-create-slug">
+                Slug
+              </label>
+              <input
+                type="text"
+                className="sf-input"
+                id="platform-create-slug"
+                value={createSlug}
+                onChange={(e) => setCreateSlug(e.target.value)}
+                placeholder="e.g. novamart"
+                required
+                pattern="^[a-z0-9]+(-[a-z0-9]+)*$"
+                title="Lowercase letters, numbers, and hyphens only"
+                minLength={2}
+                maxLength={63}
+              />
+              <span className="platform-modal-hint">
+                Lowercase letters, numbers, and hyphens only
+              </span>
+            </div>
+            <div className="platform-modal-field">
+              <label className="platform-modal-label" htmlFor="platform-create-config">
+                Configuration (JSON, optional)
+              </label>
+              <textarea
+                className="platform-modal-textarea"
+                id="platform-create-config"
+                value={createConfig}
+                onChange={(e) => setCreateConfig(e.target.value)}
+                placeholder='{"key": "value"}'
+                rows={3}
+              />
+            </div>
+            {createError && (
+              <div className="platform-modal-error" role="alert">
+                {createError}
+              </div>
+            )}
+            <div className="platform-modal-actions">
               <button
                 type="button"
                 className="sf-btn sf-btn-secondary"
-                onClick={() => setConfirmAction(null)}
-                disabled={confirming}
+                onClick={() => setShowCreateModal(false)}
+                disabled={creating}
               >
                 Cancel
               </button>
               <button
-                type="button"
-                className={`sf-btn ${confirmAction.newStatus === 'archived' ? 'sf-btn-danger' : 'sf-btn-primary'}`}
-                onClick={handleConfirm}
-                disabled={confirming}
-                id="platform-confirm-submit"
+                type="submit"
+                className="sf-btn sf-btn-primary"
+                disabled={creating || !createName.trim() || !createSlug.trim()}
+                id="platform-create-submit"
               >
-                {confirming
-                  ? 'Processing…'
-                  : confirmAction.newStatus === 'suspended'
-                    ? 'Suspend'
-                    : 'Archive'}
+                {creating ? 'Creating…' : 'Create Tenant'}
               </button>
             </div>
+          </form>
+        </div>
+      </>
+    )}
+
+    {/* Confirmation Dialog */}
+    {confirmAction && (
+      <>
+        <div
+          className="platform-modal-overlay"
+          onClick={() => setConfirmAction(null)}
+          role="presentation"
+        />
+        <div className="platform-confirm" role="alertdialog" aria-labelledby="platform-confirm-title" id="platform-confirm-dialog">
+          <svg className="platform-confirm-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <h3 className="platform-confirm-title" id="platform-confirm-title">
+            {confirmAction.newStatus === 'suspended' ? 'Suspend Tenant?' : 'Archive Tenant?'}
+          </h3>
+          <p className="platform-confirm-text">
+            {confirmAction.newStatus === 'suspended'
+              ? `Suspending "${confirmAction.tenantName}" will prevent all users from accessing the platform. This can be reversed later.`
+              : `Archiving "${confirmAction.tenantName}" is permanent and cannot be undone. All users will lose access.`}
+          </p>
+          <div className="platform-confirm-actions">
+            <button
+              type="button"
+              className="sf-btn sf-btn-secondary"
+              onClick={() => setConfirmAction(null)}
+              disabled={confirming}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={`sf-btn ${confirmAction.newStatus === 'archived' ? 'sf-btn-danger' : 'sf-btn-primary'}`}
+              onClick={handleConfirm}
+              disabled={confirming}
+              id="platform-confirm-submit"
+            >
+              {confirming
+                ? 'Processing…'
+                : confirmAction.newStatus === 'suspended'
+                  ? 'Suspend'
+                  : 'Archive'}
+            </button>
           </div>
-        </>
-      )}
-    </div>
+        </div>
+      </>
+    )}
+  </>
   )
 }
+

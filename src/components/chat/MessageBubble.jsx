@@ -209,8 +209,14 @@ export default function MessageBubble({
         )}
 
         <div className="chat-bubble-content">
-          {renderMarkdown(content)}
-          {isStreaming && <span className="chat-cursor" aria-hidden="true" />}
+          {isStreaming && !content && thinking ? (
+            <span className="chat-thinking-placeholder">Thinking...</span>
+          ) : (
+            <>
+              {renderMarkdown(content)}
+              {isStreaming && <span className="chat-cursor" aria-hidden="true" />}
+            </>
+          )}
         </div>
 
         {/* Sources — assistant only */}

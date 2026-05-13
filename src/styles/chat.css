@@ -378,6 +378,19 @@
   animation: sf-pulse 1s ease-in-out infinite;
 }
 
+/* "Thinking..." label shown while model reasons before output */
+.chat-thinking-placeholder {
+  font-size: var(--sf-text-sm);
+  font-style: italic;
+  color: var(--sf-color-text-tertiary);
+  animation: sf-thinking-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes sf-thinking-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 /* Code rendering */
 .chat-code-block {
   margin: var(--sf-space-2) 0;
