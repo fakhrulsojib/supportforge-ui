@@ -456,12 +456,11 @@ export default function PlatformTenantsPage() {
 
     {/* Create Tenant Modal — rendered outside page container for correct viewport centering */}
     {showCreateModal && (
-      <>
-        <div
-          className="platform-modal-overlay"
-          onClick={() => setShowCreateModal(false)}
-          role="presentation"
-        />
+      <div
+        className="platform-modal-overlay"
+        onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false) }}
+        role="presentation"
+      >
         <div className="platform-modal" role="dialog" aria-labelledby="platform-modal-title" id="platform-create-modal">
           <h3 className="platform-modal-title" id="platform-modal-title">Create New Tenant</h3>
           <form onSubmit={handleCreate}>
@@ -540,17 +539,16 @@ export default function PlatformTenantsPage() {
             </div>
           </form>
         </div>
-      </>
+      </div>
     )}
 
     {/* Confirmation Dialog */}
     {confirmAction && (
-      <>
-        <div
+      <div
           className="platform-modal-overlay"
-          onClick={() => setConfirmAction(null)}
+          onClick={(e) => { if (e.target === e.currentTarget) setConfirmAction(null) }}
           role="presentation"
-        />
+        >
         <div className="platform-confirm" role="alertdialog" aria-labelledby="platform-confirm-title" id="platform-confirm-dialog">
           <svg className="platform-confirm-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
@@ -593,7 +591,7 @@ export default function PlatformTenantsPage() {
             </button>
           </div>
         </div>
-      </>
+      </div>
     )}
   </>
   )

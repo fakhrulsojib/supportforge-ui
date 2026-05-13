@@ -166,22 +166,25 @@
   inset: 0;
   background-color: var(--sf-color-bg-overlay);
   z-index: var(--sf-z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sf-space-4);
   animation: sf-fade-in var(--sf-transition-fast) ease forwards;
 }
 
 .platform-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   z-index: var(--sf-z-modal);
   background-color: var(--sf-color-surface-card);
   border: 1px solid var(--sf-color-border-secondary);
   border-radius: var(--sf-radius-xl);
   box-shadow: var(--sf-shadow-xl);
   padding: var(--sf-space-8);
-  width: 90%;
+  width: 100%;
   max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   animation: sf-scale-in var(--sf-transition-spring) forwards;
 }
 
@@ -254,17 +257,14 @@
 /* ── Confirmation Dialog ───────────────────────────────────── */
 
 .platform-confirm {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   z-index: var(--sf-z-modal);
   background-color: var(--sf-color-surface-card);
   border: 1px solid var(--sf-color-border-secondary);
   border-radius: var(--sf-radius-xl);
   box-shadow: var(--sf-shadow-xl);
   padding: var(--sf-space-6) var(--sf-space-8);
-  width: 90%;
+  width: 100%;
   max-width: 400px;
   text-align: center;
   animation: sf-scale-in var(--sf-transition-spring) forwards;
