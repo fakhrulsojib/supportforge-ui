@@ -7,6 +7,7 @@ import ChatPage from './pages/ChatPage'
 import AdminPage from './pages/AdminPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import ReviewPage from './pages/ReviewPage'
+import PlatformTenantsPage from './pages/PlatformTenantsPage'
 
 /**
  * SupportForge — Root Application Component
@@ -66,6 +67,16 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <ReviewPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/platform/tenants"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <PlatformTenantsPage />
                 </AppLayout>
               </ProtectedRoute>
             }
