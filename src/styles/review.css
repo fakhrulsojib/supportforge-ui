@@ -676,6 +676,42 @@
   background: var(--sf-gradient-primary);
 }
 
+/* ── Detail Meta Value ──────────────────────────────────────── */
+
+.review-detail-meta-value {
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-text-primary);
+}
+
+/* ── Detail Mark Resolved Button ────────────────────────────── */
+
+.review-detail-mark-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  padding: var(--sf-space-2) var(--sf-space-4);
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-semibold);
+  border: 1px solid var(--sf-color-success-500);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-color-success-50);
+  color: var(--sf-color-success-700);
+  cursor: pointer;
+  transition: all var(--sf-transition-fast);
+}
+
+.review-detail-mark-btn:hover:not(:disabled) {
+  background-color: var(--sf-color-success-100);
+  transform: translateY(-1px);
+  box-shadow: var(--sf-shadow-sm);
+}
+
+.review-detail-mark-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Resolved Status ────────────────────────────────────────── */
 
 .review-resolved-yes {

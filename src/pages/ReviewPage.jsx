@@ -548,14 +548,14 @@ export default function ReviewPage() {
       )}
 
       {/* Table: Negative / Flagged */}
-      {!loading && items.length > 0 && activeTab !== 'escalations' && (
+      {!loading && items.length > 0 && activeTab !== 'escalations' && activeTab !== 'failed_queries' && (
         <>
           <p className="review-hint">Click a row to expand details</p>
           <div className="review-table-wrap">
             <table className="review-table" id="review-table">
               <thead>
                 <tr>
-                  <th style={{ width: '28px' }}></th>
+                  <th className="review-cell-chevron"></th>
                   <th>User</th>
                   <th>Question</th>
                   <th>AI Answer</th>
@@ -681,7 +681,7 @@ export default function ReviewPage() {
             <table className="review-table" id="review-table-escalations">
               <thead>
                 <tr>
-                  <th style={{ width: '28px' }}></th>
+                  <th className="review-cell-chevron"></th>
                   <th>User</th>
                   <th>First Message</th>
                   <th>Trigger</th>
@@ -861,7 +861,7 @@ export default function ReviewPage() {
                   return [
                     <tr
                       key={item.id}
-                      className={`review-row ${isExpanded ? 'review-row-expanded' : ''}`}
+                      className={`review-row-clickable ${isExpanded ? 'review-row-expanded' : ''}`}
                       onClick={() => toggleExpand(item.id)}
                     >
                       <td className="review-cell-chevron" data-label="">
