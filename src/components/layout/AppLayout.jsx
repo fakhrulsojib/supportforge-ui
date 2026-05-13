@@ -47,9 +47,11 @@ function getInitialCollapsed() {
  */
 /** Navigation items — must stay in sync with Sidebar.jsx NAV_ITEMS. */
 const NAV_ITEMS = [
-  { roles: null },          // Chat — visible to all
-  { roles: ['admin', 'agent'] }, // Admin
-  { roles: ['admin', 'agent'] }, // Analytics
+  { roles: null },                  // Chat — visible to all
+  { roles: ['admin', 'agent'] },    // Admin
+  { roles: ['admin', 'agent'] },    // Analytics
+  { roles: ['admin'] },             // Review Queue
+  { roles: ['superadmin'] },        // Platform Tenants
 ]
 
 export default function AppLayout({ children }) {
