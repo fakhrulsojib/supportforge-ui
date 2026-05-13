@@ -4,10 +4,9 @@
  * All requests go through the centralised Axios client (src/api/client.js).
  * Auth tokens are injected automatically by the request interceptor.
  *
- * NOTE: The backend analytics endpoints (Phase 4) are not yet implemented.
- * These functions define the expected API contract. The AnalyticsPage
- * handles API errors gracefully and shows empty-state UI when the
- * backend returns 404 or is unavailable.
+ * Backend endpoints implemented in Phase 13 (Analytics Backend API).
+ * The AnalyticsPage handles API errors gracefully and shows empty-state
+ * UI when the backend returns 404 or is unavailable.
  */
 
 import client from './client'

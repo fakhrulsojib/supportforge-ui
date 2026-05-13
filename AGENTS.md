@@ -18,10 +18,11 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 | Phase 3 | `phase-3/frontend-implementation` | Vite scaffold, auth, chat UI, admin panel, analytics, layout & polish |
 | Phase 8 | `phase-8/feedback-review-queue` | Review Queue page for negative feedback, escalations, flagged messages |
 | Phase 12 | `phase-12/tenant-provisioning-ui` | Superadmin tenant management + Failed Queries tab in Review Queue |
-| Phase 17 | `phase-17/user-management-ui` | User management + approval frontend |
-| Phase 19 | `phase-19/moderation-dashboard-ui` | Moderation dashboard frontend |
-| Phase 20 | `phase-20/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
-| Phase 22 | `phase-22/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
+| Phase 13 | `phase-13/analytics-backend` | Remove stale "not implemented" comments from analytics UI code |
+| Phase 18 | `phase-18/user-management-ui` | User management + approval frontend |
+| Phase 20 | `phase-20/moderation-dashboard-ui` | Moderation dashboard frontend |
+| Phase 21 | `phase-21/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
+| Phase 23 | `phase-23/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
 
 ### Branch Rules
 
@@ -37,7 +38,7 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 
 ### Cross-Repo Phases
 
-Some phases (8, 20, 22) span both `supportforge-api` and `supportforge-ui`. When working on a cross-repo phase:
+Some phases (8, 13, 21, 23) span both `supportforge-api` and `supportforge-ui`. When working on a cross-repo phase:
 1. The **backend portion** follows `supportforge-api/AGENTS.md`'s pipeline (Steps 1–9)
 2. The **frontend portion** follows this file's pipeline (Steps 1–8)
 3. Execute backend tasks first, then frontend tasks (frontend depends on API endpoints)

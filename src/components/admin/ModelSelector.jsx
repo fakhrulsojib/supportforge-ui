@@ -2,7 +2,7 @@
  * ModelSelector — read-only display of current LLM model configuration.
  *
  * Shows the chat and embedding model names from environment variables.
- * This is a display-only component — editing is Phase 4.1 (A/B Testing).
+ * This is a display-only component — editing is Phase 21 (A/B Testing).
  *
  * Security:
  * - No sensitive data displayed (model names are not secrets)

@@ -75,7 +75,7 @@
 
 ---
 
-## Upcoming Phases (8–22) 🔲
+## Upcoming Phases (8–23) 🔲
 
 > See `supportforge_plan.md` for detailed task lists and gotchas.
 
@@ -83,8 +83,9 @@
 |---|---|---|---|
 | 8 | Feedback Review Queue | High | ✅ |
 | 12 | Tenant Provisioning UI + Failed Queries UI | High | 🔲 |
-| 17 | User Management UI | Medium | 🔲 |
-| 19 | Moderation Dashboard UI | Medium | 🔲 |
-| 20 | A/B Testing & Tenant Config | Low | 🔲 |
-| 22 | Deployment, Docs & E2E | Low | 🔲 |
+| 13 | Analytics Backend API (comment cleanup) | High | 🔲 |
+| 18 | User Management UI | Medium | 🔲 |
+| 20 | Moderation Dashboard UI | Medium | 🔲 |
+| 21 | A/B Testing & Tenant Config | Low | 🔲 |
+| 23 | Deployment, Docs & E2E | Low | 🔲 |
 
