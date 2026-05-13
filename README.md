@@ -17,6 +17,8 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 - **Source Citations** — Collapsible cards showing retrieved knowledge base chunks
 - **Admin Panel** — Drag-and-drop document upload with ingestion status tracking
 - **Analytics Dashboard** — Conversation trends, intent clouds, satisfaction gauges
+- **Review Queue** — Negative feedback, escalations, flagged messages, and failed queries
+- **Platform Tenants** — Superadmin-only tenant provisioning with lifecycle management
 - **Dark Mode** — System-aware + manual toggle, persisted in localStorage
 - **Responsive** — Optimized for 375px, 768px, and 1440px+ viewports
 - **Multi-Tenant** — Tenant-scoped data with role-based UI rendering
@@ -85,6 +87,8 @@ supportforge-ui/
 │   │   ├── tenantApi.js
 │   │   ├── analyticsApi.js
 │   │   ├── reviewApi.js
+│   │   ├── platformApi.js
+│   │   ├── failedQueryApi.js
 │   │   └── authApi.js
 │   ├── hooks/                     # Custom React hooks
 │   │   ├── useWebSocket.js
@@ -98,7 +102,8 @@ supportforge-ui/
 │   │   ├── AdminPage.jsx
 │   │   ├── AnalyticsPage.jsx
 │   │   ├── LoginPage.jsx
-│   │   └── ReviewPage.jsx
+│   │   ├── ReviewPage.jsx
+│   │   └── PlatformTenantsPage.jsx
 │   ├── components/                # Presentational components
 │   │   ├── chat/
 │   │   ├── admin/
@@ -110,6 +115,8 @@ supportforge-ui/
 │   │   ├── theme.css
 │   │   ├── chat.css
 │   │   ├── admin.css
+│   │   ├── review.css
+│   │   ├── platform.css
 │   │   └── analytics.css
 │   └── utils/
 │       ├── constants.js
@@ -130,6 +137,7 @@ supportforge-ui/
 | Admin | `/admin` | Admin only |
 | Analytics | `/analytics` | Admin + Agent |
 | Review Queue | `/review` | Admin only |
+| Platform Tenants | `/platform/tenants` | Superadmin only |
 
 ## Backend API
 

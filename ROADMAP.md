@@ -75,6 +75,29 @@
 
 ---
 
+## Phase 12 — Tenant Provisioning UI + Failed Queries UI ✅
+
+> **Branch:** `phase-12/tenant-provisioning-ui`
+
+### 12.1 — Tenant Provisioning Page (Superadmin)
+- [x] Create `src/api/platformApi.js` — `listTenants`, `createTenant`, `updateTenantStatus`
+- [x] Create `src/pages/PlatformTenantsPage.jsx` — superadmin-only page with tenant table, create modal, status transitions, confirmation dialogs
+- [x] Create `src/styles/platform.css` — table, status badges, modal, confirm dialog, responsive
+- [x] Add "Platform" nav section to `Sidebar.jsx` (superadmin-only, with tenant count badge)
+- [x] Fix `AppLayout.jsx` NAV_ITEMS for superadmin sidebar visibility
+- [x] Add `/platform/tenants` route to `App.jsx`
+
+### 12.2 — Failed Queries Tab (Admin)
+- [x] Create `src/api/failedQueryApi.js` — `getFailedQueries`, `resolveFailedQuery`, `getFailedQueryStats`
+- [x] Add 4th tab "Failed Queries" to `ReviewPage.jsx` with table, expandable details, resolve action
+- [x] Add failed query stats summary card to Review Queue header
+- [x] Add failed query styles to `review.css` — reason badges, stats card, score bar, responsive
+- [x] Fix sidebar badge to include `unresolved_failed_queries` count
+- [x] Add `PLATFORM` and `FAILED_QUERIES` route constants to `constants.js`
+- [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
+
+---
+
 ## Upcoming Phases (8–23) 🔲
 
 > See `supportforge_plan.md` for detailed task lists and gotchas.
@@ -82,7 +105,7 @@
 | Phase | Name | Priority | Status |
 |---|---|---|---|
 | 8 | Feedback Review Queue | High | ✅ |
-| 12 | Tenant Provisioning UI + Failed Queries UI | High | 🔲 |
+| 12 | Tenant Provisioning UI + Failed Queries UI | High | ✅ |
 | 13 | Analytics Backend API (comment cleanup) | High | 🔲 |
 | 18 | User Management UI | Medium | 🔲 |
 | 20 | Moderation Dashboard UI | Medium | 🔲 |
