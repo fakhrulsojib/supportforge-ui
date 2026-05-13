@@ -4,9 +4,10 @@
  * All requests go through the centralised Axios client (src/api/client.js).
  * Auth tokens are injected automatically by the request interceptor.
  *
- * Backend endpoints implemented in Phase 13 (Analytics Backend API).
- * The AnalyticsPage handles API errors gracefully and shows empty-state
- * UI when the backend returns 404 or is unavailable.
+ * Backend endpoints:
+ * - GET /api/v1/analytics/daily-stats — daily conversation/message counts
+ * - GET /api/v1/analytics/top-intents — top topics by frequency
+ * - GET /api/v1/analytics/satisfaction — feedback satisfaction rate
  */
 
 import client from './client'

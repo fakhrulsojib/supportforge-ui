@@ -12,10 +12,8 @@
  * - No tokens or sensitive data logged to console
  * - Errors displayed inline, no stack traces
  *
- * Backend endpoints implemented in Phase 13 (Analytics Backend API).
- * The API layer defines the expected contract. This page handles API
- * errors gracefully and displays empty-state UI when endpoints return
- * 404 or are unavailable.
+ * The API layer handles errors gracefully and displays empty-state UI
+ * when endpoints return 404 or are unavailable.
  */
 
 import { useState, useEffect, useCallback } from 'react'
