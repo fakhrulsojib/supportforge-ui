@@ -1,7 +1,7 @@
 /**
  * ReviewPage — Admin-only feedback review queue.
  *
- * Tabs: Negative Feedback | Escalations | Flagged Messages
+ * Tabs: Negative Feedback | Escalations | Flagged Messages | Failed Queries
  * Each tab shows a paginated, filterable table with "Mark Reviewed" actions.
  * Rows are expandable to reveal full Q&A, sources, and reviewer info.
  *
@@ -21,12 +21,18 @@ import {
   markReviewed,
   getReviewStats,
 } from '../api/reviewApi'
+import {
+  getFailedQueries,
+  resolveFailedQuery,
+  getFailedQueryStats,
+} from '../api/failedQueryApi'
 import '../styles/review.css'
 
 const TABS = [
   { key: 'negative', label: 'Negative Feedback' },
   { key: 'escalations', label: 'Escalations' },
   { key: 'flagged', label: 'Flagged Messages' },
+  { key: 'failed_queries', label: 'Failed Queries' },
 ]
 
 const PAGE_SIZE = 20
@@ -71,10 +77,20 @@ function formatTrigger(trigger) {
     .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
+/**
+ * Format a failure reason value for display.
+ * @param {string} reason
+ * @returns {string}
+ */
+function formatReason(reason) {
+  if (!reason) return '—'
+  return reason.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 export default function ReviewPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
 
   const [activeTab, setActiveTab] = useState('negative')
   const [items, setItems] = useState([])
@@ -87,6 +103,11 @@ export default function ReviewPage() {
   const [markingIds, setMarkingIds] = useState(new Set())
   const [expandedId, setExpandedId] = useState(null)
 
+  // Failed Queries specific state
+  const [reasonFilter, setReasonFilter] = useState('all')
+  const [failedQueryStats, setFailedQueryStats] = useState(null)
+  const [resolvingIds, setResolvingIds] = useState(new Set())
+
   // ── Fetch Stats ──────────────────────────────────────────────
 
   const fetchStats = useCallback(async () => {
@@ -95,6 +116,15 @@ export default function ReviewPage() {
       setStats(data)
     } catch {
       // stats badge is non-critical
+    }
+  }, [])
+
+  const fetchFQStats = useCallback(async () => {
+    try {
+      const data = await getFailedQueryStats()
+      setFailedQueryStats(data)
+    } catch {
+      // stats card is non-critical
     }
   }, [])
 
@@ -114,6 +144,13 @@ export default function ReviewPage() {
         data = await getNegativeFeedback({ reviewed, limit: PAGE_SIZE, offset })
       } else if (activeTab === 'escalations') {
         data = await getEscalations({ limit: PAGE_SIZE, offset })
+      } else if (activeTab === 'failed_queries') {
+        const resolvedParam =
+          reviewedFilter === 'all' ? undefined :
+          reviewedFilter === 'reviewed' ? true : false
+        const params = { limit: PAGE_SIZE, offset, resolved: resolvedParam }
+        if (reasonFilter !== 'all') params.failure_reason = reasonFilter
+        data = await getFailedQueries(params)
       } else {
         data = await getFlaggedMessages({ reviewed, limit: PAGE_SIZE, offset })
       }
@@ -126,19 +163,21 @@ export default function ReviewPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeTab, reviewedFilter, offset])
+  }, [activeTab, reviewedFilter, reasonFilter, offset])
 
   useEffect(() => {
     if (isAdmin) {
       fetchData()
       fetchStats()
+      fetchFQStats()
     }
-  }, [isAdmin, fetchData, fetchStats])
+  }, [isAdmin, fetchData, fetchStats, fetchFQStats])
 
   // Reset offset and collapse when switching tabs or filters
   useEffect(() => {
     setOffset(0)
     setExpandedId(null)
+    setReasonFilter('all')
   }, [activeTab, reviewedFilter])
 
   // ── Mark Reviewed ────────────────────────────────────────────
@@ -155,6 +194,24 @@ export default function ReviewPage() {
       setMarkingIds((prev) => {
         const next = new Set(prev)
         next.delete(messageId)
+        return next
+      })
+    }
+  }
+
+  // ── Resolve Failed Query ────────────────────────────────────
+
+  async function handleResolve(queryId) {
+    setResolvingIds((prev) => new Set(prev).add(queryId))
+    try {
+      await resolveFailedQuery(queryId)
+      await Promise.all([fetchData(), fetchStats(), fetchFQStats()])
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Failed to resolve query')
+    } finally {
+      setResolvingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(queryId)
         return next
       })
     }
@@ -197,6 +254,7 @@ export default function ReviewPage() {
       negative: stats.unreviewed_negative,
       escalations: stats.open_escalations,
       flagged: stats.unreviewed_flagged,
+      failed_queries: stats.unresolved_failed_queries,
     }
     const count = counts[tabKey]
     if (!count) return null
@@ -490,14 +548,14 @@ export default function ReviewPage() {
       )}
 
       {/* Table: Negative / Flagged */}
-      {!loading && items.length > 0 && activeTab !== 'escalations' && (
+      {!loading && items.length > 0 && activeTab !== 'escalations' && activeTab !== 'failed_queries' && (
         <>
           <p className="review-hint">Click a row to expand details</p>
           <div className="review-table-wrap">
             <table className="review-table" id="review-table">
               <thead>
                 <tr>
-                  <th style={{ width: '28px' }}></th>
+                  <th className="review-cell-chevron"></th>
                   <th>User</th>
                   <th>Question</th>
                   <th>AI Answer</th>
@@ -623,7 +681,7 @@ export default function ReviewPage() {
             <table className="review-table" id="review-table-escalations">
               <thead>
                 <tr>
-                  <th style={{ width: '28px' }}></th>
+                  <th className="review-cell-chevron"></th>
                   <th>User</th>
                   <th>First Message</th>
                   <th>Trigger</th>
@@ -707,6 +765,249 @@ export default function ReviewPage() {
                 disabled={!canNext}
                 onClick={() => setOffset((o) => o + PAGE_SIZE)}
                 id="review-esc-page-next"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Failed Queries Tab ─────────────────────────────────── */}
+
+      {/* Stats Card */}
+      {activeTab === 'failed_queries' && failedQueryStats && (
+        <div className="review-stats-card" id="review-fq-stats-card">
+          <div className="review-stats-block">
+            <span className="review-stats-value">{failedQueryStats.total_unresolved ?? 0}</span>
+            <span className="review-stats-label">Unresolved</span>
+          </div>
+          <div className="review-stats-block">
+            <span className="review-stats-label">By Reason</span>
+            <div className="review-stats-breakdown">
+              {Object.entries(failedQueryStats.reason_breakdown || {}).map(([reason, count]) => (
+                <span key={reason} className="review-stats-breakdown-item">
+                  <span className={`review-reason-badge review-reason-${reason}`}>
+                    {formatReason(reason)}
+                  </span>
+                  <strong>{count}</strong>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="review-stats-block">
+            <span className="review-stats-label">Top Queries</span>
+            <div className="review-top-queries">
+              {(failedQueryStats.top_queries || []).slice(0, 3).map((q, i) => (
+                <div key={i} className="review-top-query-item">
+                  <span className="review-top-query-text" title={q.query_text}>
+                    {truncate(q.query_text, 40)}
+                  </span>
+                  <span className="review-top-query-count">×{q.count}</span>
+                </div>
+              ))}
+              {(!failedQueryStats.top_queries || failedQueryStats.top_queries.length === 0) && (
+                <span className="review-cell-time">No repeated queries</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reason Filter (only on failed queries tab) */}
+      {activeTab === 'failed_queries' && (
+        <div className="review-filters review-fq-filters">
+          <div className="review-filter-group">
+            <span className="review-filter-label">Reason</span>
+            <select
+              className="review-filter-select"
+              value={reasonFilter}
+              onChange={(e) => { setReasonFilter(e.target.value); setOffset(0) }}
+              id="review-filter-reason"
+            >
+              <option value="all">All Reasons</option>
+              <option value="no_docs">No Documents</option>
+              <option value="low_relevance">Low Relevance</option>
+              <option value="llm_error">LLM Error</option>
+              <option value="timeout">Timeout</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Failed Queries Table */}
+      {!loading && items.length > 0 && activeTab === 'failed_queries' && (
+        <>
+          <p className="review-hint">Click a row to expand details</p>
+          <div className="review-table-wrap">
+            <table className="review-table" id="review-table-failed-queries">
+              <thead>
+                <tr>
+                  <th className="review-cell-chevron" />
+                  <th>Query</th>
+                  <th>Reason</th>
+                  <th>Docs</th>
+                  <th>Score</th>
+                  <th>Trigger</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => {
+                  const isExpanded = expandedId === item.id
+                  const isResolving = resolvingIds.has(item.id)
+                  return [
+                    <tr
+                      key={item.id}
+                      className={`review-row-clickable ${isExpanded ? 'review-row-expanded' : ''}`}
+                      onClick={() => toggleExpand(item.id)}
+                    >
+                      <td className="review-cell-chevron" data-label="">
+                        <span className={`review-chevron ${isExpanded ? 'review-chevron-open' : ''}`}>▸</span>
+                      </td>
+                      <td className="review-cell-question" data-label="Query" title={item.query_text}>
+                        {truncate(item.query_text, 50)}
+                      </td>
+                      <td data-label="Reason">
+                        <span className={`review-reason-badge review-reason-${item.failure_reason}`}>
+                          {formatReason(item.failure_reason)}
+                        </span>
+                      </td>
+                      <td data-label="Docs">{item.retrieved_doc_count ?? '—'}</td>
+                      <td data-label="Score">
+                        {item.max_relevance_score != null ? (
+                          <>
+                            <span className="review-score-bar">
+                              <span
+                                className="review-score-bar-fill"
+                                style={{ width: `${Math.min(item.max_relevance_score * 100, 100)}%` }}
+                              />
+                            </span>
+                            {(item.max_relevance_score * 100).toFixed(0)}%
+                          </>
+                        ) : '—'}
+                      </td>
+                      <td data-label="Trigger">{formatTrigger(item.escalation_trigger)}</td>
+                      <td data-label="Date" className="review-cell-time">{formatDate(item.created_at)}</td>
+                      <td data-label="Status">
+                        {item.resolved_at ? (
+                          <span className="review-resolved-yes">✓ Resolved</span>
+                        ) : (
+                          <span className="review-resolved-no">⏳ Open</span>
+                        )}
+                      </td>
+                      <td data-label="Action" onClick={(e) => e.stopPropagation()}>
+                        {item.resolved_at ? (
+                          <span className="review-cell-time">Done</span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="review-mark-btn"
+                            disabled={isResolving}
+                            onClick={() => handleResolve(item.id)}
+                            id={`review-fq-mark-${item.id}`}
+                          >
+                            {isResolving ? 'Resolving…' : 'Mark Resolved'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>,
+                    isExpanded && (
+                      <tr key={`${item.id}-detail`} className="review-detail-row">
+                        <td colSpan={9} className="review-detail-cell">
+                          <div className="review-detail-panel">
+                            <div className="review-detail-section">
+                              <div className="review-detail-label">Full Query</div>
+                              <div className="review-detail-text">{item.query_text || '—'}</div>
+                            </div>
+                            <div className="review-detail-meta-grid">
+                              <div className="review-detail-meta-item">
+                                <span className="review-detail-meta-label">Failure Reason</span>
+                                <span className={`review-reason-badge review-reason-${item.failure_reason}`}>
+                                  {formatReason(item.failure_reason)}
+                                </span>
+                              </div>
+                              <div className="review-detail-meta-item">
+                                <span className="review-detail-meta-label">Doc Count</span>
+                                <span className="review-detail-meta-value">{item.retrieved_doc_count ?? '—'}</span>
+                              </div>
+                              <div className="review-detail-meta-item">
+                                <span className="review-detail-meta-label">Max Score</span>
+                                <span className="review-detail-meta-value">
+                                  {item.max_relevance_score != null
+                                    ? `${(item.max_relevance_score * 100).toFixed(1)}%`
+                                    : '—'}
+                                </span>
+                              </div>
+                              <div className="review-detail-meta-item">
+                                <span className="review-detail-meta-label">Escalation Trigger</span>
+                                <span className="review-detail-meta-value">{formatTrigger(item.escalation_trigger)}</span>
+                              </div>
+                              {item.resolved_at && (
+                                <div className="review-detail-meta-item">
+                                  <span className="review-detail-meta-label">Resolved</span>
+                                  <span className="review-detail-meta-value">{formatDate(item.resolved_at)}</span>
+                                </div>
+                              )}
+                            </div>
+                            {item.conversation_id && (
+                              <div className="review-detail-section">
+                                <button
+                                  type="button"
+                                  className="sf-btn sf-btn-secondary"
+                                  onClick={() => navigate(`/chat?conversation=${item.conversation_id}`)}
+                                  id={`review-fq-conv-${item.id}`}
+                                >
+                                  View Conversation →
+                                </button>
+                              </div>
+                            )}
+                            {!item.resolved_at && (
+                              <div className="review-detail-section">
+                                <button
+                                  type="button"
+                                  className="review-detail-mark-btn"
+                                  disabled={isResolving}
+                                  onClick={() => handleResolve(item.id)}
+                                  id={`review-fq-detail-mark-${item.id}`}
+                                >
+                                  {isResolving ? 'Resolving…' : '✓ Mark as Resolved'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ),
+                  ]
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="review-pagination">
+            <span className="review-pagination-info">
+              Showing {pageStart}–{pageEnd} of {total}
+            </span>
+            <div className="review-pagination-controls">
+              <button
+                type="button"
+                className="review-pagination-btn"
+                disabled={!canPrev}
+                onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+                id="review-fq-page-prev"
+              >
+                ← Previous
+              </button>
+              <button
+                type="button"
+                className="review-pagination-btn"
+                disabled={!canNext}
+                onClick={() => setOffset((o) => o + PAGE_SIZE)}
+                id="review-fq-page-next"
               >
                 Next →
               </button>

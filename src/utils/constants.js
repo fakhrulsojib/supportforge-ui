@@ -36,6 +36,13 @@ export const API_ROUTES = {
     FEEDBACK_BASE: '/api/v1/admin/feedback',
     STATS: '/api/v1/admin/feedback/stats',
   },
+  PLATFORM: {
+    TENANTS: '/api/v1/platform/tenants',
+  },
+  FAILED_QUERIES: {
+    LIST: '/api/v1/admin/failed-queries',
+    STATS: '/api/v1/admin/failed-queries/stats',
+  },
   HEALTH: '/health',
 }
 

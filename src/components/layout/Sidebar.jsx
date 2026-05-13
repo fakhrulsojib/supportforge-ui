@@ -17,6 +17,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { APP_NAME } from '../../utils/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { getReviewStats } from '../../api/reviewApi'
+import { listTenants } from '../../api/platformApi'
 import '../../styles/review.css'
 
 /**
@@ -45,9 +46,22 @@ const NAV_ITEMS = [
   {
     path: '/review',
     label: 'Review Queue',
-    roles: ['admin'],
+    roles: ['admin', 'superadmin'],
     icon: 'review',
     hasBadge: true,
+  },
+]
+
+/**
+ * Platform navigation items (superadmin-only).
+ * @type {Array<{path: string, label: string, icon: string, roles: string[]}>}
+ */
+const PLATFORM_ITEMS = [
+  {
+    path: '/platform/tenants',
+    label: 'Tenants',
+    roles: ['superadmin'],
+    icon: 'tenants',
   },
 ]
 
@@ -96,6 +110,14 @@ function NavIcon({ name }) {
           <path d="M7 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )
+    case 'tenants':
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M3 8h14" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M8 8v8" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      )
     default:
       return null
   }
@@ -113,17 +135,28 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
 
   // Fetch unreviewed count for badge
   const [badgeCount, setBadgeCount] = useState(0)
+  const [tenantCount, setTenantCount] = useState(0)
   const fetchBadge = useCallback(async () => {
-    if (userRole !== 'admin') return
-    try {
-      const data = await getReviewStats()
-      setBadgeCount(
-        (data.unreviewed_negative || 0) +
-        (data.unreviewed_flagged || 0) +
-        (data.open_escalations || 0),
-      )
-    } catch {
-      // badge is non-critical
+    if (userRole === 'admin' || userRole === 'superadmin') {
+      try {
+        const data = await getReviewStats()
+        setBadgeCount(
+          (data.unreviewed_negative || 0) +
+          (data.unreviewed_flagged || 0) +
+          (data.open_escalations || 0) +
+          (data.unresolved_failed_queries || 0),
+        )
+      } catch {
+        // badge is non-critical
+      }
+    }
+    if (userRole === 'superadmin') {
+      try {
+        const platformData = await listTenants({ limit: 1, offset: 0 })
+        setTenantCount(platformData.total || 0)
+      } catch {
+        // badge is non-critical
+      }
     }
   }, [userRole])
 
@@ -133,6 +166,11 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
 
   /** Filter nav items by user role. */
   const visibleItems = NAV_ITEMS.filter(
+    (item) => !item.roles || item.roles.includes(userRole),
+  )
+
+  /** Filter platform items by user role. */
+  const visiblePlatformItems = PLATFORM_ITEMS.filter(
     (item) => !item.roles || item.roles.includes(userRole),
   )
 
@@ -198,6 +236,32 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
             </button>
           ))}
         </div>
+
+        {/* Platform Section (superadmin only) */}
+        {visiblePlatformItems.length > 0 && (
+          <div className="sidebar-nav-section">
+            <div className="sidebar-nav-label">Platform</div>
+            {visiblePlatformItems.map((item) => (
+              <button
+                key={item.path}
+                type="button"
+                className={`sidebar-link ${isActive(item.path) ? 'sidebar-link-active' : ''}`}
+                onClick={() => handleNavigate(item.path)}
+                aria-current={isActive(item.path) ? 'page' : undefined}
+                title={isCollapsed ? item.label : undefined}
+                id={`sidebar-nav-${item.icon}`}
+              >
+                <span className="sidebar-link-icon">
+                  <NavIcon name={item.icon} />
+                </span>
+                <span className="sidebar-link-text">{item.label}</span>
+                {tenantCount > 0 && (
+                  <span className="review-tab-badge">{tenantCount}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* Footer with collapse toggle */}
