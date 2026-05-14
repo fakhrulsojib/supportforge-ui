@@ -20,7 +20,7 @@ import { getTenantConfig, updateTenantConfig } from '../../api/tenantApi'
 import { extractErrorMessage } from '../../api/client'
 
 /** Default temperature when tenant has no config. */
-const DEFAULT_TEMPERATURE = 0.7
+const DEFAULT_TEMPERATURE = 0.2
 
 export default function TemperatureSlider() {
   const { user } = useAuth()
