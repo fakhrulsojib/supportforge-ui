@@ -106,10 +106,29 @@ export default function AdminPage() {
 
   // ── Event Handlers ──────────────────────────────────────────
 
-  /** Handle successful upload — refresh the document list. */
-  const handleUploadSuccess = useCallback(() => {
-    loadDocuments()
-  }, [loadDocuments])
+  /** Handle successful upload — optimistically add to list, then refresh. */
+  const handleUploadSuccess = useCallback(
+    (result) => {
+      // Build a placeholder document from the upload response so it
+      // appears in the Knowledge Base table immediately with "pending" status.
+      // The polling loop (every 5s for pending/processing) will replace it
+      // with the real record from the server once the background task starts.
+      const ext = (result.filename || '').split('.').pop()?.toLowerCase() || ''
+      const placeholder = {
+        id: result.document_id,
+        filename: result.filename,
+        file_type: ext,
+        chunk_count: 0,
+        status: result.status || 'pending',
+        created_at: new Date().toISOString(),
+      }
+      setDocuments((prev) => [placeholder, ...prev])
+
+      // Also fire a background refresh to pick up the full server record
+      loadDocuments()
+    },
+    [loadDocuments],
+  )
 
   /** Handle document deletion. */
   const handleDelete = useCallback(
