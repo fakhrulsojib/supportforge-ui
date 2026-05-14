@@ -18,7 +18,7 @@
  * - Cleans up interval on unmount
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { listDocuments, deleteDocument } from '../api/ingestApi'
@@ -42,7 +42,6 @@ export default function AdminPage() {
   const [documents, setDocuments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
-  const pollTimerRef = useRef(null)
 
   // ── RBAC Guard ──────────────────────────────────────────────
   // Viewer role cannot access admin panel
@@ -55,7 +54,16 @@ export default function AdminPage() {
   const loadDocuments = useCallback(async () => {
     try {
       const data = await listDocuments()
-      setDocuments(data.documents || [])
+      const serverDocs = data.documents || []
+      // Merge: keep any optimistic placeholders that the server doesn't
+      // know about yet (upload committed but list query hasn't caught up).
+      setDocuments((prev) => {
+        const serverIds = new Set(serverDocs.map((d) => d.id))
+        const optimistic = prev.filter(
+          (d) => !serverIds.has(d.id) && POLLING_STATUSES.includes(d.status),
+        )
+        return [...optimistic, ...serverDocs]
+      })
       setError(null)
     } catch (err) {
       setError(extractErrorMessage(err))
@@ -65,36 +73,21 @@ export default function AdminPage() {
   }, [])
 
   /** Check if any documents need status polling. */
-  const needsPolling = useCallback(() => {
-    return documents.some((doc) => POLLING_STATUSES.includes(doc.status))
-  }, [documents])
+  const needsPolling = documents.some((doc) =>
+    POLLING_STATUSES.includes(doc.status),
+  )
 
   /** Start or stop polling based on document statuses. */
   useEffect(() => {
     if (!hasAccess) return
+    if (!needsPolling) return
 
-    if (needsPolling()) {
-      // Start polling if not already running
-      if (!pollTimerRef.current) {
-        pollTimerRef.current = setInterval(() => {
-          loadDocuments()
-        }, POLL_INTERVAL_MS)
-      }
-    } else {
-      // Stop polling when no documents need it
-      if (pollTimerRef.current) {
-        clearInterval(pollTimerRef.current)
-        pollTimerRef.current = null
-      }
-    }
+    // Poll immediately once, then every POLL_INTERVAL_MS
+    const timer = setInterval(() => {
+      loadDocuments()
+    }, POLL_INTERVAL_MS)
 
-    // Cleanup on unmount
-    return () => {
-      if (pollTimerRef.current) {
-        clearInterval(pollTimerRef.current)
-        pollTimerRef.current = null
-      }
-    }
+    return () => clearInterval(timer)
   }, [needsPolling, loadDocuments, hasAccess])
 
   /** Initial load on mount. */
@@ -106,29 +99,23 @@ export default function AdminPage() {
 
   // ── Event Handlers ──────────────────────────────────────────
 
-  /** Handle successful upload — optimistically add to list, then refresh. */
-  const handleUploadSuccess = useCallback(
-    (result) => {
-      // Build a placeholder document from the upload response so it
-      // appears in the Knowledge Base table immediately with "pending" status.
-      // The polling loop (every 5s for pending/processing) will replace it
-      // with the real record from the server once the background task starts.
-      const ext = (result.filename || '').split('.').pop()?.toLowerCase() || ''
-      const placeholder = {
-        id: result.document_id,
-        filename: result.filename,
-        file_type: ext,
-        chunk_count: 0,
-        status: result.status || 'pending',
-        created_at: new Date().toISOString(),
-      }
-      setDocuments((prev) => [placeholder, ...prev])
-
-      // Also fire a background refresh to pick up the full server record
-      loadDocuments()
-    },
-    [loadDocuments],
-  )
+  /** Handle successful upload — optimistically add to list. */
+  const handleUploadSuccess = useCallback((result) => {
+    // Build a placeholder document from the upload response so it
+    // appears in the Knowledge Base table immediately with "pending" status.
+    // The polling loop (every 5s for pending/processing) will kick in
+    // automatically and replace it with the full server record.
+    const ext = (result.filename || '').split('.').pop()?.toLowerCase() || ''
+    const placeholder = {
+      id: result.document_id,
+      filename: result.filename,
+      file_type: ext,
+      chunk_count: 0,
+      status: result.status || 'pending',
+      created_at: new Date().toISOString(),
+    }
+    setDocuments((prev) => [placeholder, ...prev])
+  }, [])
 
   /** Handle document deletion. */
   const handleDelete = useCallback(
