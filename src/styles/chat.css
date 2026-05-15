@@ -714,6 +714,29 @@
   border-radius: var(--sf-radius-md);
 }
 
+.chat-stop-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-color-error-500);
+  color: var(--sf-color-text-inverse);
+  border: none;
+  cursor: pointer;
+  transition: all var(--sf-transition-fast);
+  animation: sf-stop-pulse 2s ease-in-out infinite;
+}
+
+.chat-stop-btn:hover {
+  background-color: var(--sf-color-error-600);
+  transform: scale(1.05);
+}
+
+@keyframes sf-stop-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsla(0, 72%, 51%, 0.4); }
+  50% { box-shadow: 0 0 0 4px hsla(0, 72%, 51%, 0); }
+}
+
 /* ── Responsive ───────────────────────────────────────────── */
 
 /* Tablet and below */

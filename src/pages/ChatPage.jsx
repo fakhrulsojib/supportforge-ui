@@ -35,6 +35,7 @@ export default function ChatPage() {
     error: wsError,
     lastConversationId,
     sendMessage: wsSendMessage,
+    stopStreaming,
     connect,
     disconnect,
     setOnMessageComplete,
@@ -72,6 +73,9 @@ export default function ChatPage() {
         conversationIdRef.current = convId
         setActiveConversationId(convId)
       }
+
+      // Skip adding empty messages (e.g. user stopped before any tokens arrived)
+      if (!text && !thinkingText) return
 
       // Add completed assistant message to message list
       setMessages((prev) => [
@@ -279,6 +283,7 @@ export default function ChatPage() {
         <ChatWindow
           messages={messages}
           onSendMessage={handleSendMessage}
+          onStopStreaming={stopStreaming}
           isStreaming={isStreaming}
           streamingText={streamingText}
           streamingThinking={streamingThinking}

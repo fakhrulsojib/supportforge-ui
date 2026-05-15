@@ -232,6 +232,18 @@ export function useWebSocket() {
     wsRef.current.send(JSON.stringify(payload))
   }, [])
 
+  /**
+   * Send a stop command to abort the current LLM stream.
+   * The backend will break the generation loop and send a done frame.
+   */
+  const stopStreaming = useCallback(() => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
+    if (!isStreaming) return
+
+    wsRef.current.send(JSON.stringify({ type: 'stop' }))
+    setIsStreaming(false)
+  }, [isStreaming])
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -254,6 +266,7 @@ export function useWebSocket() {
     error,
     lastConversationId,
     sendMessage,
+    stopStreaming,
     connect,
     disconnect,
     setOnMessageComplete,

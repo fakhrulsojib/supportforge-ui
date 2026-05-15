@@ -28,6 +28,7 @@ import StreamingIndicator from './StreamingIndicator'
 export default function ChatWindow({
   messages,
   onSendMessage,
+  onStopStreaming,
   isStreaming,
   streamingText,
   streamingThinking,
@@ -68,10 +69,16 @@ export default function ChatWindow({
     }
   }
 
+  function handleStop() {
+    if (onStopStreaming) onStopStreaming()
+  }
+
   function handleKeyDown(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSend()
+      if (!isStreaming) {
+        handleSend()
+      }
     }
   }
 
@@ -174,23 +181,37 @@ export default function ChatWindow({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={isConnected ? 'Type your message…' : 'Connecting…'}
-              disabled={!isConnected || isStreaming}
+              disabled={!isConnected}
               rows={1}
               aria-label="Chat message input"
               id="chat-message-input"
             />
-            <button
-              type="button"
-              className="chat-send-btn sf-btn sf-btn-primary sf-btn-icon"
-              onClick={handleSend}
-              disabled={!inputValue.trim() || isStreaming || !isConnected}
-              aria-label="Send message"
-              id="chat-send-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                <path d="M2 9l7-7v5h7v4h-7v5L2 9z" fill="currentColor" transform="rotate(-90 9 9)" />
-              </svg>
-            </button>
+            {isStreaming ? (
+              <button
+                type="button"
+                className="chat-stop-btn sf-btn sf-btn-icon"
+                onClick={handleStop}
+                aria-label="Stop generation"
+                id="chat-stop-btn"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <rect x="4" y="4" width="10" height="10" rx="2" fill="currentColor" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="chat-send-btn sf-btn sf-btn-primary sf-btn-icon"
+                onClick={handleSend}
+                disabled={!inputValue.trim() || !isConnected}
+                aria-label="Send message"
+                id="chat-send-btn"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <path d="M2 9l7-7v5h7v4h-7v5L2 9z" fill="currentColor" transform="rotate(-90 9 9)" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       )}
