@@ -205,6 +205,79 @@
   font-weight: var(--sf-font-medium);
 }
 
+/* ── Model Select Dropdown ───────────────────────────────────── */
+
+.admin-model-select {
+  font-size: var(--sf-text-sm);
+  font-weight: var(--sf-font-semibold);
+  font-family: var(--sf-font-family-mono);
+  color: var(--sf-color-text-primary);
+  background-color: var(--sf-color-bg-secondary);
+  border: 1px solid var(--sf-color-border-primary);
+  border-radius: var(--sf-radius-md);
+  padding: var(--sf-space-1-5) var(--sf-space-8) var(--sf-space-1-5) var(--sf-space-3);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%236366f1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sf-space-2) center;
+  min-width: 160px;
+  transition: border-color var(--sf-transition-fast),
+              box-shadow var(--sf-transition-fast);
+}
+
+.admin-model-select:hover:not(:disabled) {
+  border-color: var(--sf-color-primary-400);
+}
+
+.admin-model-select:focus {
+  outline: none;
+  border-color: var(--sf-color-primary-500);
+  box-shadow: 0 0 0 3px hsla(252, 80%, 60%, 0.15);
+}
+
+.admin-model-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-model-loading {
+  color: var(--sf-color-text-tertiary);
+  font-style: italic;
+  font-weight: var(--sf-font-normal);
+}
+
+.admin-model-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  margin-top: var(--sf-space-1);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+}
+
+.admin-model-switching {
+  color: var(--sf-color-primary-500);
+}
+
+.admin-model-success {
+  color: var(--sf-color-success-700);
+}
+
+.admin-model-error {
+  color: var(--sf-color-error-600);
+}
+
+.admin-model-hint {
+  display: block;
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+  font-style: italic;
+  margin-top: var(--sf-space-1);
+}
+
 /* ── Temperature Slider Card ─────────────────────────────────── */
 
 .admin-temp-card {
