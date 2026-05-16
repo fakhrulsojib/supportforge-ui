@@ -35,6 +35,8 @@ export const API_ROUTES = {
     FLAGGED: '/api/v1/admin/flagged',
     FEEDBACK_BASE: '/api/v1/admin/feedback',
     STATS: '/api/v1/admin/feedback/stats',
+    MODELS: '/api/v1/admin/models',
+    MODELS_ACTIVE: '/api/v1/admin/models/active',
   },
   PLATFORM: {
     TENANTS: '/api/v1/platform/tenants',

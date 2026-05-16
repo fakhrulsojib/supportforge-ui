@@ -1,21 +1,86 @@
 /**
- * ModelSelector — read-only display of current LLM model configuration.
+ * ModelSelector — interactive chat model switcher + read-only embedding display.
  *
- * Shows the chat and embedding model names from environment variables.
- * This is a display-only component — editing is Phase 21 (A/B Testing).
+ * Admins can switch between available chat models via a dropdown.
+ * The embedding model is display-only (not switchable).
+ *
+ * On mount, fetches the model list from the API. Model changes are
+ * applied immediately via PUT and take effect for all subsequent chats.
  *
  * Security:
+ * - Admin-only (parent AdminPage enforces RBAC)
  * - No sensitive data displayed (model names are not secrets)
- * - No API calls — reads from environment constants only
+ * - All API calls through the shared client (JWT auth)
  */
 
-import { CHAT_MODEL, EMBEDDING_MODEL } from '../../utils/constants'
+import { useState, useEffect, useCallback } from 'react'
+import { listModels, setActiveModel } from '../../api/modelsApi'
+import { extractErrorMessage } from '../../api/client'
+import { EMBEDDING_MODEL } from '../../utils/constants'
 
 export default function ModelSelector() {
+  const [providers, setProviders] = useState([])
+  const [activeModel, setActiveModelState] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSwitching, setIsSwitching] = useState(false)
+  const [error, setError] = useState(null)
+  const [successMsg, setSuccessMsg] = useState('')
+
+  /** Fetch available models on mount. */
+  const loadModels = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const data = await listModels()
+      setProviders(data.providers || [])
+      setActiveModelState(data.active_model || null)
+      setError(null)
+    } catch (err) {
+      setError(extractErrorMessage(err))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadModels()
+  }, [loadModels])
+
+  /** Handle model selection change. */
+  const handleModelChange = useCallback(async (e) => {
+    const selectedId = e.target.value
+    if (!selectedId || !activeModel) return
+    if (selectedId === activeModel.model_id) return
+
+    try {
+      setIsSwitching(true)
+      setError(null)
+      setSuccessMsg('')
+
+      const result = await setActiveModel(activeModel.provider, selectedId)
+      setActiveModelState({
+        provider: result.provider,
+        model_id: result.model_id,
+      })
+      setSuccessMsg(`Switched to ${result.model_id}`)
+
+      // Clear success message after 3s
+      setTimeout(() => setSuccessMsg(''), 3000)
+    } catch (err) {
+      setError(extractErrorMessage(err))
+    } finally {
+      setIsSwitching(false)
+    }
+  }, [activeModel])
+
+  // Flatten all models from all providers for the dropdown
+  const allChatModels = providers.flatMap((p) =>
+    p.models.map((m) => ({ ...m, provider: p.id, providerName: p.name }))
+  )
+
   return (
     <div>
       <div className="admin-model-grid">
-        {/* Chat Model Card */}
+        {/* Chat Model Card — Interactive */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-chat" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -30,11 +95,49 @@ export default function ModelSelector() {
           </div>
           <div className="admin-model-info">
             <span className="admin-model-label">Chat Model</span>
-            <span className="admin-model-name">{CHAT_MODEL}</span>
+            {isLoading ? (
+              <span className="admin-model-name admin-model-loading">Loading…</span>
+            ) : (
+              <select
+                className="admin-model-select"
+                id="admin-model-select"
+                value={activeModel?.model_id || ''}
+                onChange={handleModelChange}
+                disabled={isSwitching || allChatModels.length === 0}
+                aria-label="Select chat model"
+              >
+                {allChatModels.length === 0 && (
+                  <option value="">No models available</option>
+                )}
+                {allChatModels.map((m) => (
+                  <option key={`${m.provider}-${m.id}`} value={m.id}>
+                    {m.name} ({m.size_gb} GB)
+                  </option>
+                ))}
+              </select>
+            )}
+            {isSwitching && (
+              <span className="admin-model-status admin-model-switching">
+                Switching…
+              </span>
+            )}
+            {successMsg && (
+              <span className="admin-model-status admin-model-success">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8.5l3.5 3.5 6.5-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {successMsg}
+              </span>
+            )}
+            {error && (
+              <span className="admin-model-status admin-model-error">
+                {error}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Embedding Model Card */}
+        {/* Embedding Model Card — Read-only */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-embed" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
