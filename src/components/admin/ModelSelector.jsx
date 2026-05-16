@@ -13,7 +13,7 @@
  * - All API calls through the shared client (JWT auth)
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { listModels, setActiveModel } from '../../api/modelsApi'
 import { extractErrorMessage } from '../../api/client'
 import { EMBEDDING_MODEL } from '../../utils/constants'
@@ -25,6 +25,10 @@ export default function ModelSelector() {
   const [isSwitching, setIsSwitching] = useState(false)
   const [error, setError] = useState(null)
   const [successMsg, setSuccessMsg] = useState('')
+  const successTimerRef = useRef(null)
+
+  // Cleanup timer on unmount to prevent state updates on unmounted component
+  useEffect(() => () => clearTimeout(successTimerRef.current), [])
 
   /** Fetch available models on mount. */
   const loadModels = useCallback(async () => {
@@ -55,6 +59,7 @@ export default function ModelSelector() {
       setIsSwitching(true)
       setError(null)
       setSuccessMsg('')
+      clearTimeout(successTimerRef.current)
 
       const result = await setActiveModel(activeModel.provider, selectedId)
       setActiveModelState({
@@ -63,8 +68,8 @@ export default function ModelSelector() {
       })
       setSuccessMsg(`Switched to ${result.model_id}`)
 
-      // Clear success message after 3s
-      setTimeout(() => setSuccessMsg(''), 3000)
+      // Clear success message after 3s (safe: ref cleaned up on unmount)
+      successTimerRef.current = setTimeout(() => setSuccessMsg(''), 3000)
     } catch (err) {
       setError(extractErrorMessage(err))
     } finally {
