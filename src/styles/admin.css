@@ -270,6 +270,14 @@
   color: var(--sf-color-error-600);
 }
 
+.admin-model-hint {
+  display: block;
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-text-tertiary);
+  font-style: italic;
+  margin-top: var(--sf-space-1);
+}
+
 /* ── Temperature Slider Card ─────────────────────────────────── */
 
 .admin-temp-card {

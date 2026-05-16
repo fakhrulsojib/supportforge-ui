@@ -1,34 +1,46 @@
 /**
- * ModelSelector — interactive chat model switcher + read-only embedding display.
+ * ModelSelector — interactive chat model & embedding model switcher.
  *
- * Admins can switch between available chat models via a dropdown.
- * The embedding model is display-only (not switchable).
+ * Admins can switch between available chat and embedding models via
+ * dropdowns. Both selections persist per-tenant in the database.
  *
  * On mount, fetches the model list from the API. Model changes are
- * applied immediately via PUT and take effect for all subsequent chats.
+ * applied immediately via PUT and take effect for subsequent requests.
+ *
+ * Embedding model change shows a warning: future ingestions will use
+ * the newly selected model; existing embeddings are NOT re-processed.
  *
  * Security:
  * - Admin-only (parent AdminPage enforces RBAC)
- * - No sensitive data displayed (model names are not secrets)
  * - All API calls through the shared client (JWT auth)
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { listModels, setActiveModel } from '../../api/modelsApi'
 import { extractErrorMessage } from '../../api/client'
-import { EMBEDDING_MODEL } from '../../utils/constants'
 
 export default function ModelSelector() {
   const [providers, setProviders] = useState([])
   const [activeModel, setActiveModelState] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSwitching, setIsSwitching] = useState(false)
-  const [error, setError] = useState(null)
-  const [successMsg, setSuccessMsg] = useState('')
-  const successTimerRef = useRef(null)
 
-  // Cleanup timer on unmount to prevent state updates on unmounted component
-  useEffect(() => () => clearTimeout(successTimerRef.current), [])
+  // Chat model state
+  const [isSwitchingChat, setIsSwitchingChat] = useState(false)
+  const [chatSuccess, setChatSuccess] = useState('')
+  const [chatError, setChatError] = useState(null)
+  const chatTimerRef = useRef(null)
+
+  // Embedding model state
+  const [isSwitchingEmbed, setIsSwitchingEmbed] = useState(false)
+  const [embedSuccess, setEmbedSuccess] = useState('')
+  const [embedError, setEmbedError] = useState(null)
+  const embedTimerRef = useRef(null)
+
+  // Cleanup timers on unmount
+  useEffect(() => () => {
+    clearTimeout(chatTimerRef.current)
+    clearTimeout(embedTimerRef.current)
+  }, [])
 
   /** Fetch available models on mount. */
   const loadModels = useCallback(async () => {
@@ -37,9 +49,10 @@ export default function ModelSelector() {
       const data = await listModels()
       setProviders(data.providers || [])
       setActiveModelState(data.active_model || null)
-      setError(null)
+      setChatError(null)
+      setEmbedError(null)
     } catch (err) {
-      setError(extractErrorMessage(err))
+      setChatError(extractErrorMessage(err))
     } finally {
       setIsLoading(false)
     }
@@ -49,37 +62,70 @@ export default function ModelSelector() {
     loadModels()
   }, [loadModels])
 
-  /** Handle model selection change. */
-  const handleModelChange = useCallback(async (e) => {
+  /** Handle chat model selection change. */
+  const handleChatModelChange = useCallback(async (e) => {
     const selectedId = e.target.value
     if (!selectedId || !activeModel) return
     if (selectedId === activeModel.model_id) return
 
     try {
-      setIsSwitching(true)
-      setError(null)
-      setSuccessMsg('')
-      clearTimeout(successTimerRef.current)
+      setIsSwitchingChat(true)
+      setChatError(null)
+      setChatSuccess('')
+      clearTimeout(chatTimerRef.current)
 
-      const result = await setActiveModel(activeModel.provider, selectedId)
-      setActiveModelState({
-        provider: result.provider,
+      const result = await setActiveModel(activeModel.provider, selectedId, 'chat')
+      setActiveModelState(prev => ({
+        ...prev,
         model_id: result.model_id,
-      })
-      setSuccessMsg(`Switched to ${result.model_id}`)
-
-      // Clear success message after 3s (safe: ref cleaned up on unmount)
-      successTimerRef.current = setTimeout(() => setSuccessMsg(''), 3000)
+      }))
+      setChatSuccess(`Switched to ${result.model_id}`)
+      chatTimerRef.current = setTimeout(() => setChatSuccess(''), 3000)
     } catch (err) {
-      setError(extractErrorMessage(err))
+      setChatError(extractErrorMessage(err))
     } finally {
-      setIsSwitching(false)
+      setIsSwitchingChat(false)
     }
   }, [activeModel])
 
-  // Flatten all models from all providers for the dropdown
+  /** Handle embedding model selection change. */
+  const handleEmbedModelChange = useCallback(async (e) => {
+    const selectedId = e.target.value
+    if (!selectedId || !activeModel) return
+    if (selectedId === activeModel.embedding_model_id) return
+
+    try {
+      setIsSwitchingEmbed(true)
+      setEmbedError(null)
+      setEmbedSuccess('')
+      clearTimeout(embedTimerRef.current)
+
+      const result = await setActiveModel(activeModel.provider, selectedId, 'embedding')
+      setActiveModelState(prev => ({
+        ...prev,
+        embedding_model_id: result.model_id,
+      }))
+      setEmbedSuccess(`Switched to ${result.model_id}`)
+      embedTimerRef.current = setTimeout(() => setEmbedSuccess(''), 3000)
+    } catch (err) {
+      setEmbedError(extractErrorMessage(err))
+    } finally {
+      setIsSwitchingEmbed(false)
+    }
+  }, [activeModel])
+
+  // Flatten models from all providers
   const allChatModels = providers.flatMap((p) =>
     p.models.map((m) => ({ ...m, provider: p.id, providerName: p.name }))
+  )
+  const allEmbedModels = providers.flatMap((p) =>
+    (p.embedding_models || []).map((m) => ({ ...m, provider: p.id, providerName: p.name }))
+  )
+
+  const SuccessIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8.5l3.5 3.5 6.5-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 
   return (
@@ -105,10 +151,10 @@ export default function ModelSelector() {
             ) : (
               <select
                 className="admin-model-select"
-                id="admin-model-select"
+                id="admin-chat-model-select"
                 value={activeModel?.model_id || ''}
-                onChange={handleModelChange}
-                disabled={isSwitching || allChatModels.length === 0}
+                onChange={handleChatModelChange}
+                disabled={isSwitchingChat || allChatModels.length === 0}
                 aria-label="Select chat model"
               >
                 {allChatModels.length === 0 && (
@@ -121,28 +167,21 @@ export default function ModelSelector() {
                 ))}
               </select>
             )}
-            {isSwitching && (
-              <span className="admin-model-status admin-model-switching">
-                Switching…
-              </span>
+            {isSwitchingChat && (
+              <span className="admin-model-status admin-model-switching">Switching…</span>
             )}
-            {successMsg && (
+            {chatSuccess && (
               <span className="admin-model-status admin-model-success">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8.5l3.5 3.5 6.5-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {successMsg}
+                <SuccessIcon />{chatSuccess}
               </span>
             )}
-            {error && (
-              <span className="admin-model-status admin-model-error">
-                {error}
-              </span>
+            {chatError && (
+              <span className="admin-model-status admin-model-error">{chatError}</span>
             )}
           </div>
         </div>
 
-        {/* Embedding Model Card — Read-only */}
+        {/* Embedding Model Card — Interactive */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-embed" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -157,7 +196,43 @@ export default function ModelSelector() {
           </div>
           <div className="admin-model-info">
             <span className="admin-model-label">Embedding Model</span>
-            <span className="admin-model-name">{EMBEDDING_MODEL}</span>
+            {isLoading ? (
+              <span className="admin-model-name admin-model-loading">Loading…</span>
+            ) : (
+              <>
+                <select
+                  className="admin-model-select"
+                  id="admin-embed-model-select"
+                  value={activeModel?.embedding_model_id || ''}
+                  onChange={handleEmbedModelChange}
+                  disabled={isSwitchingEmbed || allEmbedModels.length === 0}
+                  aria-label="Select embedding model"
+                >
+                  {allEmbedModels.length === 0 && (
+                    <option value="">No models available</option>
+                  )}
+                  {allEmbedModels.map((m) => (
+                    <option key={`${m.provider}-${m.id}`} value={m.id}>
+                      {m.name} ({m.size_gb} GB)
+                    </option>
+                  ))}
+                </select>
+                <span className="admin-model-hint">
+                  Only future ingestions will use the newly selected model
+                </span>
+              </>
+            )}
+            {isSwitchingEmbed && (
+              <span className="admin-model-status admin-model-switching">Switching…</span>
+            )}
+            {embedSuccess && (
+              <span className="admin-model-status admin-model-success">
+                <SuccessIcon />{embedSuccess}
+              </span>
+            )}
+            {embedError && (
+              <span className="admin-model-status admin-model-error">{embedError}</span>
+            )}
           </div>
         </div>
       </div>

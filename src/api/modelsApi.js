@@ -18,15 +18,17 @@ export async function listModels() {
 }
 
 /**
- * Set the active chat model.
+ * Set the active model for a given type (chat or embedding).
  * @param {string} provider - Provider identifier (e.g. 'ollama')
  * @param {string} modelId - Model identifier (e.g. 'gemma3:4b')
- * @returns {Promise<{provider: string, model_id: string, status: string}>}
+ * @param {'chat'|'embedding'} [modelType='chat'] - Type of model to set
+ * @returns {Promise<{provider: string, model_id: string, model_type: string, status: string}>}
  */
-export async function setActiveModel(provider, modelId) {
+export async function setActiveModel(provider, modelId, modelType = 'chat') {
   const { data } = await client.put(API_ROUTES.ADMIN.MODELS_ACTIVE, {
     provider,
     model_id: modelId,
+    model_type: modelType,
   })
   return data
 }
