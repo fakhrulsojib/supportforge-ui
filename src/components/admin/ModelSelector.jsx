@@ -5,7 +5,7 @@
  * - Switch between Ollama and Gemini providers for chat
  * - Select models from each provider's catalog
  * - Enter/update a Gemini API key (securely stored encrypted server-side)
- * - Switch embedding models (Ollama only for now)
+ * - Switch embedding models (Ollama or Gemini with separate API key)
  *
  * On mount, fetches the model list from the API. Model changes are
  * applied immediately via PUT and take effect for subsequent requests.
@@ -40,10 +40,16 @@ export default function ModelSelector() {
   const [embedError, setEmbedError] = useState(null)
   const embedTimerRef = useRef(null)
 
-  // Gemini state
+  // Gemini chat state
   const [apiKeyInput, setApiKeyInput] = useState('')
   const [showApiKey, setShowApiKey] = useState(false)
   const [pendingGeminiModel, setPendingGeminiModel] = useState(null)
+
+  // Gemini embedding state (separate key from chat)
+  const [embedApiKeyInput, setEmbedApiKeyInput] = useState('')
+  const [showEmbedApiKey, setShowEmbedApiKey] = useState(false)
+  const [pendingGeminiEmbedModel, setPendingGeminiEmbedModel] = useState(null)
+  const [selectedEmbedProvider, setSelectedEmbedProvider] = useState('ollama')
 
   // Cleanup timers on unmount
   useEffect(() => () => {
@@ -61,6 +67,9 @@ export default function ModelSelector() {
       // Sync provider tab with server state
       if (data.active_model?.provider) {
         setSelectedProvider(data.active_model.provider)
+      }
+      if (data.active_model?.embedding_provider) {
+        setSelectedEmbedProvider(data.active_model.embedding_provider)
       }
       setChatError(null)
       setEmbedError(null)
@@ -171,8 +180,16 @@ export default function ModelSelector() {
   /** Handle embedding model selection change. */
   const handleEmbedModelChange = useCallback(async (e) => {
     const selectedId = e.target.value
-    if (!selectedId || !activeModel) return
-    if (selectedId === activeModel.embedding_model_id) return
+    if (!selectedId) return
+
+    // For Gemini: just update local state — user must click Save & Activate
+    if (selectedEmbedProvider === 'gemini') {
+      setPendingGeminiEmbedModel(selectedId)
+      return
+    }
+
+    // For Ollama: auto-save on select
+    if (selectedId === activeModel?.embedding_model_id) return
 
     try {
       setIsSwitchingEmbed(true)
@@ -184,6 +201,7 @@ export default function ModelSelector() {
       setActiveModelState(prev => ({
         ...prev,
         embedding_model_id: result.model_id,
+        embedding_provider: 'ollama',
       }))
       setEmbedSuccess(`Switched to ${result.model_id}`)
       embedTimerRef.current = setTimeout(() => setEmbedSuccess(''), 3000)
@@ -192,13 +210,53 @@ export default function ModelSelector() {
     } finally {
       setIsSwitchingEmbed(false)
     }
-  }, [activeModel])
+  }, [activeModel, selectedEmbedProvider])
+
+  /** Save Gemini embedding config: API key + selected model together. */
+  const handleSaveGeminiEmbed = useCallback(async () => {
+    const embedModels = getProviderModels('gemini', 'embedding')
+    const modelToSave = pendingGeminiEmbedModel
+      || (activeModel?.embedding_provider === 'gemini' ? activeModel.embedding_model_id : null)
+      || embedModels[0]?.id
+      || 'gemini-embedding-2'
+
+    const hasKeyChange = embedApiKeyInput.trim().length > 0
+    const hasModelChange = modelToSave !== activeModel?.embedding_model_id || activeModel?.embedding_provider !== 'gemini'
+    if (!hasKeyChange && !hasModelChange) return
+
+    if (!hasKeyChange && !activeModel?.has_embedding_api_key) {
+      setEmbedError('Please enter your Gemini embedding API key')
+      return
+    }
+
+    try {
+      setIsSwitchingEmbed(true)
+      setEmbedError(null)
+      setEmbedSuccess('')
+      clearTimeout(embedTimerRef.current)
+
+      const result = await setActiveModel('gemini', modelToSave, 'embedding', embedApiKeyInput || null)
+      setActiveModelState(prev => ({
+        ...prev,
+        embedding_model_id: result.model_id,
+        embedding_provider: 'gemini',
+        has_embedding_api_key: true,
+      }))
+      setEmbedApiKeyInput('')
+      setPendingGeminiEmbedModel(null)
+      setEmbedSuccess(`Saved — now using ${result.model_id}`)
+      embedTimerRef.current = setTimeout(() => setEmbedSuccess(''), 3000)
+    } catch (err) {
+      setEmbedError(extractErrorMessage(err))
+    } finally {
+      setIsSwitchingEmbed(false)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embedApiKeyInput, activeModel, pendingGeminiEmbedModel])
 
   // Get models for selected provider
   const chatModels = getProviderModels(selectedProvider, 'chat')
-  const allEmbedModels = providers.flatMap((p) =>
-    (p.embedding_models || []).map((m) => ({ ...m, provider: p.id, providerName: p.name }))
-  )
+  const embedModels = getProviderModels(selectedEmbedProvider, 'embedding')
 
   const SuccessIcon = () => (
     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -359,7 +417,7 @@ export default function ModelSelector() {
           </div>
         </div>
 
-        {/* Embedding Model Card — Ollama Only */}
+        {/* Embedding Model Card */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-embed" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -374,6 +432,32 @@ export default function ModelSelector() {
           </div>
           <div className="admin-model-info">
             <span className="admin-model-label">Embedding Model</span>
+
+            {/* Embedding Provider Tabs */}
+            {!isLoading && providers.length > 1 && (
+              <div className="admin-provider-tabs">
+                {providers.map((p) => (
+                  <button
+                    key={`embed-${p.id}`}
+                    type="button"
+                    className={`admin-provider-tab${selectedEmbedProvider === p.id ? ' admin-provider-tab-active' : ''}`}
+                    onClick={() => {
+                      setSelectedEmbedProvider(p.id)
+                      setPendingGeminiEmbedModel(null)
+                      setEmbedError(null)
+                      setEmbedSuccess('')
+                    }}
+                    disabled={isSwitchingEmbed}
+                  >
+                    {p.name}
+                    {activeModel?.embedding_provider === p.id && (
+                      <span className="admin-provider-active-dot" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {isLoading ? (
               <span className="admin-model-name admin-model-loading">Loading…</span>
             ) : (
@@ -381,17 +465,24 @@ export default function ModelSelector() {
                 <select
                   className="admin-model-select"
                   id="admin-embed-model-select"
-                  value={activeModel?.embedding_model_id || ''}
+                  value={
+                    selectedEmbedProvider === 'gemini'
+                      ? (pendingGeminiEmbedModel || (activeModel?.embedding_provider === 'gemini' ? activeModel?.embedding_model_id : '') || '')
+                      : (activeModel?.embedding_model_id || '')
+                  }
                   onChange={handleEmbedModelChange}
-                  disabled={isSwitchingEmbed || allEmbedModels.length === 0}
+                  disabled={isSwitchingEmbed || embedModels.length === 0}
                   aria-label="Select embedding model"
                 >
-                  {allEmbedModels.length === 0 && (
+                  {embedModels.length === 0 && (
                     <option value="">No models available</option>
                   )}
-                  {allEmbedModels.map((m) => (
-                    <option key={`${m.provider}-${m.id}`} value={m.id}>
-                      {m.name} ({m.size_gb} GB)
+                  {selectedEmbedProvider !== activeModel?.embedding_provider && (
+                    <option value="">Select a model…</option>
+                  )}
+                  {embedModels.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}{m.size_gb > 0 ? ` (${m.size_gb} GB)` : ''}
                     </option>
                   ))}
                 </select>
@@ -400,6 +491,65 @@ export default function ModelSelector() {
                 </span>
               </>
             )}
+
+            {/* Gemini Embedding API Key Input */}
+            {selectedEmbedProvider === 'gemini' && !isLoading && (
+              <div className="admin-apikey-section">
+                <div className="admin-apikey-row">
+                  <div className="admin-apikey-input-wrap">
+                    <KeyIcon />
+                    <input
+                      type={showEmbedApiKey ? 'text' : 'password'}
+                      className="admin-apikey-input"
+                      id="admin-gemini-embed-api-key"
+                      placeholder={activeModel?.has_embedding_api_key
+                        ? `Key configured (${activeModel.embedding_api_key_preview || '****'})`
+                        : 'Enter your Gemini embedding API key…'
+                      }
+                      value={embedApiKeyInput}
+                      onChange={(e) => setEmbedApiKeyInput(e.target.value)}
+                      autoComplete="off"
+                      aria-label="Gemini embedding API key"
+                    />
+                    <button
+                      type="button"
+                      className="admin-apikey-toggle"
+                      onClick={() => setShowEmbedApiKey(v => !v)}
+                      aria-label={showEmbedApiKey ? 'Hide API key' : 'Show API key'}
+                    >
+                      {showEmbedApiKey ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" /></svg>
+                      )}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="sf-btn sf-btn-primary admin-apikey-save"
+                    onClick={handleSaveGeminiEmbed}
+                    disabled={
+                      isSwitchingEmbed || (
+                        !embedApiKeyInput.trim() &&
+                        !pendingGeminiEmbedModel &&
+                        activeModel?.embedding_provider === 'gemini'
+                      )
+                    }
+                  >
+                    {isSwitchingEmbed ? 'Saving…' : 'Save & Activate'}
+                  </button>
+                </div>
+                {activeModel?.has_embedding_api_key && (
+                  <span className="admin-apikey-status">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <circle cx="8" cy="8" r="6" fill="currentColor" />
+                    </svg>
+                    Key configured
+                  </span>
+                )}
+              </div>
+            )}
+
             {isSwitchingEmbed && (
               <span className="admin-model-status admin-model-switching">Switching…</span>
             )}
