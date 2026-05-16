@@ -5,141 +5,31 @@
  * Assistant messages: left-aligned with neutral background,
  *   source citations, and feedback buttons.
  *
- * Includes basic inline markdown rendering (bold, italic, code, code blocks).
+ * Uses react-markdown for rich formatting (bold, italic, lists,
+ * code blocks, inline code, etc.).
  */
 
 import { useRef, useEffect } from 'react'
+import Markdown from 'react-markdown'
 import SourceCitation from './SourceCitation'
 import FeedbackButtons from './FeedbackButtons'
 import { formatRelativeTime } from '../../utils/formatters'
 
 /**
- * Basic markdown-to-HTML renderer.
- * Handles: **bold**, *italic*, `inline code`, ```code blocks```, and line breaks.
- *
- * Security: Uses textContent-safe replacement — no raw HTML injection.
- *
- * @param {string} text
- * @returns {Array<JSX.Element>}
+ * Custom component overrides for react-markdown to apply our CSS classes.
  */
-function renderMarkdown(text) {
-  if (!text) return [<span key="empty" />]
-
-  // Split by code blocks first
-  const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g
-  const parts = []
-  let lastIndex = 0
-  let match
-
-  while ((match = codeBlockRegex.exec(text)) !== null) {
-    // Text before code block
-    if (match.index > lastIndex) {
-      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) })
-    }
-    parts.push({ type: 'code-block', lang: match[1], content: match[2].trimEnd() })
-    lastIndex = match.index + match[0].length
-  }
-
-  // Remaining text after last code block
-  if (lastIndex < text.length) {
-    parts.push({ type: 'text', content: text.slice(lastIndex) })
-  }
-
-  return parts.map((part, idx) => {
-    if (part.type === 'code-block') {
-      return (
-        <pre className="chat-code-block" key={idx}>
-          <code>{part.content}</code>
-        </pre>
-      )
-    }
-
-    // Render inline markdown for text parts
-    return <span key={idx}>{renderInlineMarkdown(part.content)}</span>
-  })
-}
-
-/**
- * Render inline markdown: bold, italic, inline code, line breaks.
- * @param {string} text
- * @returns {Array<JSX.Element|string>}
- */
-function renderInlineMarkdown(text) {
-  // Split by inline code first to avoid processing markdown inside code
-  const inlineCodeRegex = /`([^`]+)`/g
-  const segments = []
-  let lastIdx = 0
-  let codeMatch
-  let keyCounter = 0
-
-  while ((codeMatch = inlineCodeRegex.exec(text)) !== null) {
-    if (codeMatch.index > lastIdx) {
-      segments.push(...renderBoldItalic(text.slice(lastIdx, codeMatch.index), keyCounter))
-      keyCounter += 10
-    }
-    segments.push(
-      <code className="chat-inline-code" key={`code-${keyCounter}`}>{codeMatch[1]}</code>
-    )
-    keyCounter += 1
-    lastIdx = codeMatch.index + codeMatch[0].length
-  }
-
-  if (lastIdx < text.length) {
-    segments.push(...renderBoldItalic(text.slice(lastIdx), keyCounter))
-  }
-
-  return segments
-}
-
-/**
- * Render bold and italic within text, preserving line breaks.
- * @param {string} text
- * @param {number} baseKey
- * @returns {Array<JSX.Element|string>}
- */
-function renderBoldItalic(text, baseKey = 0) {
-  // Replace **bold** and *italic*
-  const combined = /(\*\*(.+?)\*\*)|(\*(.+?)\*)/g
-  const result = []
-  let last = 0
-  let m
-  let k = baseKey
-
-  while ((m = combined.exec(text)) !== null) {
-    if (m.index > last) {
-      result.push(...splitNewlines(text.slice(last, m.index), k))
-      k += 5
-    }
-    if (m[2]) {
-      result.push(<strong key={`b-${k}`}>{m[2]}</strong>)
-    } else if (m[4]) {
-      result.push(<em key={`i-${k}`}>{m[4]}</em>)
-    }
-    k += 1
-    last = m.index + m[0].length
-  }
-
-  if (last < text.length) {
-    result.push(...splitNewlines(text.slice(last), k))
-  }
-
-  return result
-}
-
-/**
- * Split text by newlines and insert <br /> elements.
- * @param {string} text
- * @param {number} baseKey
- * @returns {Array<JSX.Element|string>}
- */
-function splitNewlines(text, baseKey = 0) {
-  const lines = text.split('\n')
-  const result = []
-  lines.forEach((line, i) => {
-    if (i > 0) result.push(<br key={`br-${baseKey}-${i}`} />)
-    if (line) result.push(line)
-  })
-  return result
+const markdownComponents = {
+  // Lists
+  ul: ({ children }) => <ul className="chat-list">{children}</ul>,
+  ol: ({ children }) => <ol className="chat-list">{children}</ol>,
+  // Code blocks
+  pre: ({ children }) => <pre className="chat-code-block">{children}</pre>,
+  code: ({ inline, children, ...props }) =>
+    inline
+      ? <code className="chat-inline-code" {...props}>{children}</code>
+      : <code {...props}>{children}</code>,
+  // Paragraphs — avoid extra margins inside bubble
+  p: ({ children }) => <p className="chat-md-paragraph">{children}</p>,
 }
 
 /**
@@ -203,7 +93,7 @@ export default function MessageBubble({
               </svg>
             </summary>
             <div className="chat-thinking-content" ref={thinkingContentRef}>
-              {renderMarkdown(thinking)}
+              <Markdown components={markdownComponents}>{thinking}</Markdown>
             </div>
           </details>
         )}
@@ -213,7 +103,7 @@ export default function MessageBubble({
             <span className="chat-thinking-placeholder">Thinking...</span>
           ) : (
             <>
-              {renderMarkdown(content)}
+              <Markdown components={markdownComponents}>{content || ''}</Markdown>
               {isStreaming && <span className="chat-cursor" aria-hidden="true" />}
             </>
           )}

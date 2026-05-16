@@ -304,8 +304,14 @@
   line-height: var(--sf-leading-relaxed);
 }
 
-.chat-bubble-content p {
+.chat-bubble-content p,
+.chat-md-paragraph {
   color: inherit;
+  margin: 0 0 var(--sf-space-2) 0;
+}
+
+.chat-md-paragraph:last-child {
+  margin-bottom: 0;
 }
 
 /* ── Thinking Section (collapsible reasoning) ────────────── */
@@ -420,6 +426,29 @@
 
 .chat-bubble-user .chat-inline-code {
   background-color: hsla(0, 0%, 100%, 0.15);
+}
+
+/* Lists inside chat bubbles */
+.chat-list {
+  margin: var(--sf-space-2) 0;
+  padding-left: var(--sf-space-5);
+}
+
+.chat-list li {
+  margin-bottom: var(--sf-space-1);
+  line-height: var(--sf-leading-relaxed);
+}
+
+.chat-list li:last-child {
+  margin-bottom: 0;
+}
+
+ol.chat-list {
+  list-style-type: decimal;
+}
+
+ul.chat-list {
+  list-style-type: disc;
 }
 
 /* Bubble footer */
