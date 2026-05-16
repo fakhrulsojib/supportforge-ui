@@ -40,9 +40,10 @@ export default function ModelSelector() {
   const [embedError, setEmbedError] = useState(null)
   const embedTimerRef = useRef(null)
 
-  // Gemini API key state
+  // Gemini state
   const [apiKeyInput, setApiKeyInput] = useState('')
   const [showApiKey, setShowApiKey] = useState(false)
+  const [pendingGeminiModel, setPendingGeminiModel] = useState(null)
 
   // Cleanup timers on unmount
   useEffect(() => () => {
@@ -85,6 +86,14 @@ export default function ModelSelector() {
   const handleChatModelChange = useCallback(async (e) => {
     const selectedId = e.target.value
     if (!selectedId) return
+
+    // For Gemini: just update local state — user must click Save & Activate
+    if (selectedProvider === 'gemini') {
+      setPendingGeminiModel(selectedId)
+      return
+    }
+
+    // For Ollama: auto-save on select
     if (selectedId === activeModel?.model_id && selectedProvider === activeModel?.provider) return
 
     try {
@@ -93,19 +102,12 @@ export default function ModelSelector() {
       setChatSuccess('')
       clearTimeout(chatTimerRef.current)
 
-      // For Gemini, include API key if it's new or changed
-      const apiKey = selectedProvider === 'gemini'
-        ? (apiKeyInput || null)
-        : null
-
-      const result = await setActiveModel(selectedProvider, selectedId, 'chat', apiKey)
+      const result = await setActiveModel(selectedProvider, selectedId, 'chat', null)
       setActiveModelState(prev => ({
         ...prev,
         provider: selectedProvider,
         model_id: result.model_id,
-        has_api_key: selectedProvider === 'gemini' ? true : (prev?.has_api_key || false),
       }))
-      setApiKeyInput('') // Clear key input after successful save
       setChatSuccess(`Switched to ${result.model_id}`)
       chatTimerRef.current = setTimeout(() => setChatSuccess(''), 3000)
     } catch (err) {
@@ -113,7 +115,7 @@ export default function ModelSelector() {
     } finally {
       setIsSwitchingChat(false)
     }
-  }, [activeModel, selectedProvider, apiKeyInput])
+  }, [activeModel, selectedProvider])
 
   /** Handle provider tab switch. */
   const handleProviderSwitch = useCallback((providerId) => {
@@ -122,14 +124,24 @@ export default function ModelSelector() {
     setChatSuccess('')
   }, [])
 
-  /** Handle Gemini API key save (updates key + selects current model). */
-  const handleSaveApiKey = useCallback(async () => {
-    if (!apiKeyInput.trim()) return
-
+  /** Save Gemini config: API key + selected model together. */
+  const handleSaveGemini = useCallback(async () => {
     const chatModels = getProviderModels('gemini', 'chat')
-    const currentModel = activeModel?.provider === 'gemini'
-      ? activeModel.model_id
-      : (chatModels[0]?.id || 'gemini-2.5-flash')
+    const modelToSave = pendingGeminiModel
+      || (activeModel?.provider === 'gemini' ? activeModel.model_id : null)
+      || chatModels[0]?.id
+      || 'gemini-2.5-flash'
+
+    // Must have either a new key or an existing key + model change
+    const hasKeyChange = apiKeyInput.trim().length > 0
+    const hasModelChange = modelToSave !== activeModel?.model_id || activeModel?.provider !== 'gemini'
+    if (!hasKeyChange && !hasModelChange) return
+
+    // If switching to Gemini for the first time, key is required
+    if (!hasKeyChange && !activeModel?.has_api_key) {
+      setChatError('Please enter your Gemini API key')
+      return
+    }
 
     try {
       setIsSwitchingChat(true)
@@ -137,7 +149,7 @@ export default function ModelSelector() {
       setChatSuccess('')
       clearTimeout(chatTimerRef.current)
 
-      const result = await setActiveModel('gemini', currentModel, 'chat', apiKeyInput)
+      const result = await setActiveModel('gemini', modelToSave, 'chat', apiKeyInput || null)
       setActiveModelState(prev => ({
         ...prev,
         provider: 'gemini',
@@ -145,7 +157,8 @@ export default function ModelSelector() {
         has_api_key: true,
       }))
       setApiKeyInput('')
-      setChatSuccess('API key saved and model activated')
+      setPendingGeminiModel(null)
+      setChatSuccess(`Saved — now using ${result.model_id}`)
       chatTimerRef.current = setTimeout(() => setChatSuccess(''), 3000)
     } catch (err) {
       setChatError(extractErrorMessage(err))
@@ -153,7 +166,7 @@ export default function ModelSelector() {
       setIsSwitchingChat(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKeyInput, activeModel])
+  }, [apiKeyInput, activeModel, pendingGeminiModel])
 
   /** Handle embedding model selection change. */
   const handleEmbedModelChange = useCallback(async (e) => {
@@ -251,7 +264,11 @@ export default function ModelSelector() {
               <select
                 className="admin-model-select"
                 id="admin-chat-model-select"
-                value={selectedProvider === activeModel?.provider ? (activeModel?.model_id || '') : ''}
+                value={
+                  selectedProvider === 'gemini'
+                    ? (pendingGeminiModel || (activeModel?.provider === 'gemini' ? activeModel?.model_id : '') || '')
+                    : (selectedProvider === activeModel?.provider ? (activeModel?.model_id || '') : '')
+                }
                 onChange={handleChatModelChange}
                 disabled={isSwitchingChat || chatModels.length === 0}
                 aria-label="Select chat model"
@@ -305,10 +322,16 @@ export default function ModelSelector() {
                   <button
                     type="button"
                     className="sf-btn sf-btn-primary admin-apikey-save"
-                    onClick={handleSaveApiKey}
-                    disabled={!apiKeyInput.trim() || isSwitchingChat}
+                    onClick={handleSaveGemini}
+                    disabled={
+                      isSwitchingChat || (
+                        !apiKeyInput.trim() &&
+                        !pendingGeminiModel &&
+                        activeModel?.provider === 'gemini'
+                      )
+                    }
                   >
-                    {isSwitchingChat ? 'Saving…' : 'Save Key'}
+                    {isSwitchingChat ? 'Saving…' : 'Save & Activate'}
                   </button>
                 </div>
                 {activeModel?.has_api_key && (
