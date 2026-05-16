@@ -1,18 +1,19 @@
 /**
- * ModelSelector — interactive chat model & embedding model switcher.
+ * ModelSelector — multi-provider chat model & embedding model switcher.
  *
- * Admins can switch between available chat and embedding models via
- * dropdowns. Both selections persist per-tenant in the database.
+ * Admins can:
+ * - Switch between Ollama and Gemini providers for chat
+ * - Select models from each provider's catalog
+ * - Enter/update a Gemini API key (securely stored encrypted server-side)
+ * - Switch embedding models (Ollama only for now)
  *
  * On mount, fetches the model list from the API. Model changes are
  * applied immediately via PUT and take effect for subsequent requests.
  *
- * Embedding model change shows a warning: future ingestions will use
- * the newly selected model; existing embeddings are NOT re-processed.
- *
  * Security:
  * - Admin-only (parent AdminPage enforces RBAC)
- * - All API calls through the shared client (JWT auth)
+ * - Gemini API keys sent via HTTPS, encrypted at rest, never exposed
+ * - Key preview shows masked version (e.g. "AIza...****")
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -23,6 +24,9 @@ export default function ModelSelector() {
   const [providers, setProviders] = useState([])
   const [activeModel, setActiveModelState] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Provider tab state
+  const [selectedProvider, setSelectedProvider] = useState('ollama')
 
   // Chat model state
   const [isSwitchingChat, setIsSwitchingChat] = useState(false)
@@ -35,6 +39,10 @@ export default function ModelSelector() {
   const [embedSuccess, setEmbedSuccess] = useState('')
   const [embedError, setEmbedError] = useState(null)
   const embedTimerRef = useRef(null)
+
+  // Gemini API key state
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [showApiKey, setShowApiKey] = useState(false)
 
   // Cleanup timers on unmount
   useEffect(() => () => {
@@ -49,6 +57,10 @@ export default function ModelSelector() {
       const data = await listModels()
       setProviders(data.providers || [])
       setActiveModelState(data.active_model || null)
+      // Sync provider tab with server state
+      if (data.active_model?.provider) {
+        setSelectedProvider(data.active_model.provider)
+      }
       setChatError(null)
       setEmbedError(null)
     } catch (err) {
@@ -62,11 +74,18 @@ export default function ModelSelector() {
     loadModels()
   }, [loadModels])
 
+  /** Get models for a specific provider. */
+  const getProviderModels = (providerId, type = 'chat') => {
+    const provider = providers.find(p => p.id === providerId)
+    if (!provider) return []
+    return type === 'chat' ? (provider.models || []) : (provider.embedding_models || [])
+  }
+
   /** Handle chat model selection change. */
   const handleChatModelChange = useCallback(async (e) => {
     const selectedId = e.target.value
-    if (!selectedId || !activeModel) return
-    if (selectedId === activeModel.model_id) return
+    if (!selectedId) return
+    if (selectedId === activeModel?.model_id && selectedProvider === activeModel?.provider) return
 
     try {
       setIsSwitchingChat(true)
@@ -74,11 +93,19 @@ export default function ModelSelector() {
       setChatSuccess('')
       clearTimeout(chatTimerRef.current)
 
-      const result = await setActiveModel(activeModel.provider, selectedId, 'chat')
+      // For Gemini, include API key if it's new or changed
+      const apiKey = selectedProvider === 'gemini'
+        ? (apiKeyInput || null)
+        : null
+
+      const result = await setActiveModel(selectedProvider, selectedId, 'chat', apiKey)
       setActiveModelState(prev => ({
         ...prev,
+        provider: selectedProvider,
         model_id: result.model_id,
+        has_api_key: selectedProvider === 'gemini' ? true : (prev?.has_api_key || false),
       }))
+      setApiKeyInput('') // Clear key input after successful save
       setChatSuccess(`Switched to ${result.model_id}`)
       chatTimerRef.current = setTimeout(() => setChatSuccess(''), 3000)
     } catch (err) {
@@ -86,7 +113,47 @@ export default function ModelSelector() {
     } finally {
       setIsSwitchingChat(false)
     }
-  }, [activeModel])
+  }, [activeModel, selectedProvider, apiKeyInput])
+
+  /** Handle provider tab switch. */
+  const handleProviderSwitch = useCallback((providerId) => {
+    setSelectedProvider(providerId)
+    setChatError(null)
+    setChatSuccess('')
+  }, [])
+
+  /** Handle Gemini API key save (updates key + selects current model). */
+  const handleSaveApiKey = useCallback(async () => {
+    if (!apiKeyInput.trim()) return
+
+    const chatModels = getProviderModels('gemini', 'chat')
+    const currentModel = activeModel?.provider === 'gemini'
+      ? activeModel.model_id
+      : (chatModels[0]?.id || 'gemini-2.5-flash')
+
+    try {
+      setIsSwitchingChat(true)
+      setChatError(null)
+      setChatSuccess('')
+      clearTimeout(chatTimerRef.current)
+
+      const result = await setActiveModel('gemini', currentModel, 'chat', apiKeyInput)
+      setActiveModelState(prev => ({
+        ...prev,
+        provider: 'gemini',
+        model_id: result.model_id,
+        has_api_key: true,
+      }))
+      setApiKeyInput('')
+      setChatSuccess('API key saved and model activated')
+      chatTimerRef.current = setTimeout(() => setChatSuccess(''), 3000)
+    } catch (err) {
+      setChatError(extractErrorMessage(err))
+    } finally {
+      setIsSwitchingChat(false)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKeyInput, activeModel])
 
   /** Handle embedding model selection change. */
   const handleEmbedModelChange = useCallback(async (e) => {
@@ -100,7 +167,7 @@ export default function ModelSelector() {
       setEmbedSuccess('')
       clearTimeout(embedTimerRef.current)
 
-      const result = await setActiveModel(activeModel.provider, selectedId, 'embedding')
+      const result = await setActiveModel('ollama', selectedId, 'embedding')
       setActiveModelState(prev => ({
         ...prev,
         embedding_model_id: result.model_id,
@@ -114,10 +181,8 @@ export default function ModelSelector() {
     }
   }, [activeModel])
 
-  // Flatten models from all providers
-  const allChatModels = providers.flatMap((p) =>
-    p.models.map((m) => ({ ...m, provider: p.id, providerName: p.name }))
-  )
+  // Get models for selected provider
+  const chatModels = getProviderModels(selectedProvider, 'chat')
   const allEmbedModels = providers.flatMap((p) =>
     (p.embedding_models || []).map((m) => ({ ...m, provider: p.id, providerName: p.name }))
   )
@@ -128,10 +193,16 @@ export default function ModelSelector() {
     </svg>
   )
 
+  const KeyIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 010-7.778zM15.5 7.5l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+
   return (
     <div>
       <div className="admin-model-grid">
-        {/* Chat Model Card — Interactive */}
+        {/* Chat Model Card — Multi-Provider */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-chat" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -146,27 +217,111 @@ export default function ModelSelector() {
           </div>
           <div className="admin-model-info">
             <span className="admin-model-label">Chat Model</span>
+
+            {/* Provider Tabs */}
+            {!isLoading && (
+              <div className="admin-provider-tabs" role="tablist">
+                {providers.filter(p => p.models?.length > 0).map(p => (
+                  <button
+                    key={p.id}
+                    role="tab"
+                    aria-selected={selectedProvider === p.id}
+                    className={`admin-provider-tab${selectedProvider === p.id ? ' admin-provider-tab-active' : ''}`}
+                    onClick={() => handleProviderSwitch(p.id)}
+                    id={`provider-tab-${p.id}`}
+                  >
+                    {p.id === 'gemini' && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                    {p.name}
+                    {p.id === activeModel?.provider && (
+                      <span className="admin-provider-active-dot" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Model Selector */}
             {isLoading ? (
               <span className="admin-model-name admin-model-loading">Loading…</span>
             ) : (
               <select
                 className="admin-model-select"
                 id="admin-chat-model-select"
-                value={activeModel?.model_id || ''}
+                value={selectedProvider === activeModel?.provider ? (activeModel?.model_id || '') : ''}
                 onChange={handleChatModelChange}
-                disabled={isSwitchingChat || allChatModels.length === 0}
+                disabled={isSwitchingChat || chatModels.length === 0}
                 aria-label="Select chat model"
               >
-                {allChatModels.length === 0 && (
+                {chatModels.length === 0 && (
                   <option value="">No models available</option>
                 )}
-                {allChatModels.map((m) => (
-                  <option key={`${m.provider}-${m.id}`} value={m.id}>
-                    {m.name} ({m.size_gb} GB)
+                {selectedProvider !== activeModel?.provider && (
+                  <option value="">Select a model…</option>
+                )}
+                {chatModels.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}{m.size_gb > 0 ? ` (${m.size_gb} GB)` : ''}
                   </option>
                 ))}
               </select>
             )}
+
+            {/* Gemini API Key Input */}
+            {selectedProvider === 'gemini' && !isLoading && (
+              <div className="admin-apikey-section">
+                <div className="admin-apikey-row">
+                  <div className="admin-apikey-input-wrap">
+                    <KeyIcon />
+                    <input
+                      type={showApiKey ? 'text' : 'password'}
+                      className="admin-apikey-input"
+                      id="admin-gemini-api-key"
+                      placeholder={activeModel?.has_api_key
+                        ? `Key configured (${activeModel.api_key_preview || '****'})`
+                        : 'Enter your Gemini API key…'
+                      }
+                      value={apiKeyInput}
+                      onChange={(e) => setApiKeyInput(e.target.value)}
+                      autoComplete="off"
+                      aria-label="Gemini API key"
+                    />
+                    <button
+                      type="button"
+                      className="admin-apikey-toggle"
+                      onClick={() => setShowApiKey(v => !v)}
+                      aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                    >
+                      {showApiKey ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" /></svg>
+                      )}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="sf-btn sf-btn-primary admin-apikey-save"
+                    onClick={handleSaveApiKey}
+                    disabled={!apiKeyInput.trim() || isSwitchingChat}
+                  >
+                    {isSwitchingChat ? 'Saving…' : 'Save Key'}
+                  </button>
+                </div>
+                {activeModel?.has_api_key && (
+                  <span className="admin-apikey-status">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <circle cx="8" cy="8" r="6" fill="currentColor" />
+                    </svg>
+                    Key configured
+                  </span>
+                )}
+              </div>
+            )}
+
             {isSwitchingChat && (
               <span className="admin-model-status admin-model-switching">Switching…</span>
             )}
@@ -181,7 +336,7 @@ export default function ModelSelector() {
           </div>
         </div>
 
-        {/* Embedding Model Card — Interactive */}
+        {/* Embedding Model Card — Ollama Only */}
         <div className="sf-card admin-model-card">
           <div className="admin-model-icon admin-model-icon-embed" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -247,7 +402,11 @@ export default function ModelSelector() {
           <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer">
             Ollama
           </a>{' '}
-          (self-hosted)
+          (self-hosted) and{' '}
+          <a href="https://ai.google.dev" target="_blank" rel="noopener noreferrer">
+            Google Gemini
+          </a>{' '}
+          (cloud)
         </span>
       </div>
     </div>

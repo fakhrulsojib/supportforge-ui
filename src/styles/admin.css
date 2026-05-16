@@ -278,6 +278,147 @@
   margin-top: var(--sf-space-1);
 }
 
+/* ── Provider Tabs ──────────────────────────────────────────── */
+
+.admin-provider-tabs {
+  display: flex;
+  gap: var(--sf-space-1);
+  margin-bottom: var(--sf-space-2);
+  padding: 2px;
+  background: var(--sf-color-bg-secondary);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-color-border-secondary);
+}
+
+.admin-provider-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  padding: var(--sf-space-1) var(--sf-space-3);
+  font-size: var(--sf-text-xs);
+  font-weight: var(--sf-font-medium);
+  color: var(--sf-color-text-tertiary);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--sf-radius-md) - 2px);
+  cursor: pointer;
+  transition: all var(--sf-transition-fast) ease;
+  position: relative;
+}
+
+.admin-provider-tab:hover:not(.admin-provider-tab-active) {
+  color: var(--sf-color-text-secondary);
+  background: hsla(252, 80%, 60%, 0.05);
+}
+
+.admin-provider-tab-active {
+  color: var(--sf-color-primary-600);
+  background: var(--sf-color-bg-primary);
+  box-shadow: var(--sf-shadow-sm);
+  font-weight: var(--sf-font-semibold);
+}
+
+.admin-provider-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--sf-radius-full);
+  background: var(--sf-color-success-500);
+  display: inline-block;
+  animation: sf-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ── Gemini API Key Section ─────────────────────────────────── */
+
+.admin-apikey-section {
+  margin-top: var(--sf-space-2);
+  animation: sf-fade-in var(--sf-transition-fast) ease forwards;
+}
+
+.admin-apikey-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.admin-apikey-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  flex: 1;
+  background: var(--sf-color-bg-secondary);
+  border: 1px solid var(--sf-color-border-primary);
+  border-radius: var(--sf-radius-md);
+  padding: 0 var(--sf-space-3);
+  transition: border-color var(--sf-transition-fast),
+              box-shadow var(--sf-transition-fast);
+}
+
+.admin-apikey-input-wrap:focus-within {
+  border-color: var(--sf-color-primary-500);
+  box-shadow: 0 0 0 3px hsla(252, 80%, 60%, 0.15);
+}
+
+.admin-apikey-input-wrap svg {
+  color: var(--sf-color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.admin-apikey-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: var(--sf-text-sm);
+  font-family: var(--sf-font-family-mono);
+  color: var(--sf-color-text-primary);
+  padding: var(--sf-space-1-5) 0;
+  outline: none;
+  min-width: 0;
+}
+
+.admin-apikey-input::placeholder {
+  color: var(--sf-color-text-tertiary);
+  font-family: var(--sf-font-family-base);
+  font-style: italic;
+}
+
+.admin-apikey-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sf-space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--sf-color-text-tertiary);
+  border-radius: var(--sf-radius-sm);
+  transition: color var(--sf-transition-fast),
+              background var(--sf-transition-fast);
+}
+
+.admin-apikey-toggle:hover {
+  color: var(--sf-color-text-secondary);
+  background: hsla(0, 0%, 50%, 0.1);
+}
+
+.admin-apikey-save {
+  white-space: nowrap;
+  font-size: var(--sf-text-xs) !important;
+  padding: var(--sf-space-1-5) var(--sf-space-3) !important;
+}
+
+.admin-apikey-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  font-size: var(--sf-text-xs);
+  color: var(--sf-color-success-700);
+  margin-top: var(--sf-space-1);
+}
+
+.admin-apikey-status svg {
+  color: var(--sf-color-success-500);
+}
+
 /* ── Temperature Slider Card ─────────────────────────────────── */
 
 .admin-temp-card {
