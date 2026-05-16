@@ -3,8 +3,9 @@
  *
  * Features:
  * - Native HTML5 drag-and-drop (no library)
- * - Client-side file type and size validation
- * - Upload progress bar via Axios onUploadProgress
+ * - Multi-file selection and sequential upload
+ * - Client-side file type and size validation (all files validated before upload starts)
+ * - Upload progress bar via Axios onUploadProgress (weighted across files)
  * - Three visual states: idle, drag-active, uploading
  * - Accessible: role="button", tabIndex=0, keyboard activation
  *
@@ -92,29 +93,48 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
     }
   }, [])
 
-  /** Process a selected file */
-  const handleFile = useCallback(
-    async (file) => {
+  /** Process selected files sequentially */
+  const handleFiles = useCallback(
+    async (fileList) => {
       setError(null)
       setSuccess(null)
 
-      const validation = validateFile(file)
-      if (!validation.valid) {
-        showError(validation.error)
-        return
+      // Validate all files first
+      const validFiles = []
+      for (const file of fileList) {
+        const validation = validateFile(file)
+        if (!validation.valid) {
+          showError(validation.error)
+          return
+        }
+        validFiles.push(file)
       }
+
+      if (validFiles.length === 0) return
 
       setIsUploading(true)
       setUploadProgress(0)
 
+      let uploaded = 0
+      const results = []
       try {
-        const result = await uploadDocument(file, (progress) => {
-          setUploadProgress(progress)
-        })
-        showSuccess(`"${result.filename}" uploaded successfully!`)
-        if (onUploadSuccess) {
-          onUploadSuccess(result)
+        for (const file of validFiles) {
+          const result = await uploadDocument(file, (progress) => {
+            // Weighted progress across all files
+            const base = (uploaded / validFiles.length) * 100
+            const fileShare = progress / validFiles.length
+            setUploadProgress(Math.round(base + fileShare))
+          })
+          uploaded++
+          results.push(result)
+          if (onUploadSuccess) {
+            onUploadSuccess(result)
+          }
         }
+        const msg = validFiles.length === 1
+          ? `"${results[0].filename}" uploaded successfully!`
+          : `${validFiles.length} files uploaded successfully!`
+        showSuccess(msg)
       } catch (err) {
         showError(extractErrorMessage(err))
       } finally {
@@ -155,7 +175,7 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
 
     const files = e.dataTransfer?.files
     if (files && files.length > 0) {
-      handleFile(files[0])
+      handleFiles(Array.from(files))
     }
   }
 
@@ -175,7 +195,7 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
   function handleFileChange(e) {
     const files = e.target.files
     if (files && files.length > 0) {
-      handleFile(files[0])
+      handleFiles(Array.from(files))
     }
     // Reset so the same file can be re-selected
     e.target.value = ''
@@ -201,7 +221,7 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      aria-label="Upload a document. Drag and drop or click to browse."
+      aria-label="Upload documents. Drag and drop or click to browse. Multiple files supported."
     >
       <input
         ref={fileInputRef}
@@ -210,6 +230,7 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
         className="admin-upload-input"
         accept={UPLOAD.ALLOWED_EXTENSIONS.join(',')}
         onChange={handleFileChange}
+        multiple
         tabIndex={-1}
         aria-hidden="true"
       />
@@ -235,9 +256,9 @@ export default function DocumentUploader({ onUploadSuccess, disabled = false }) 
       {!isUploading && (
         <>
           <p className="admin-upload-title">
-            {isDragActive ? 'Drop your file here' : 'Drag & drop a document'}
+            {isDragActive ? 'Drop your files here' : 'Drag & drop documents'}
           </p>
-          <p className="admin-upload-subtitle">or click to browse</p>
+          <p className="admin-upload-subtitle">or click to browse (multiple files supported)</p>
           <div className="admin-upload-formats">
             {UPLOAD.ALLOWED_EXTENSIONS.map((ext) => (
               <span key={ext} className="admin-upload-format-tag">
