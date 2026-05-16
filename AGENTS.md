@@ -257,14 +257,16 @@ src/
 │   ├── ingestApi.js
 │   ├── tenantApi.js
 │   ├── analyticsApi.js
+│   ├── reviewApi.js
+│   ├── platformApi.js
+│   ├── failedQueryApi.js
+│   ├── modelsApi.js
 │   └── authApi.js
 ├── hooks/         # Custom React hooks
 │   ├── useWebSocket.js
-│   ├── useAuth.js
-│   └── useTenant.js
+│   └── useAuth.js
 ├── context/       # React Context providers
-│   ├── AuthContext.jsx
-│   └── TenantContext.jsx
+│   └── AuthContext.jsx
 ├── pages/         # Page-level components (route targets)
 ├── components/    # Presentational components
 │   ├── chat/
@@ -284,24 +286,25 @@ src/
 | Type | Location | Example |
 |---|---|---|
 | Shared/reusable UI | `components/shared/` | `LoadingSpinner.jsx`, `ErrorBoundary.jsx` |
-| Feature-specific | `components/{feature}/` | `chat/MessageBubble.jsx`, `admin/DocumentUploader.jsx` |
-| Page composition | `pages/` | `ChatPage.jsx`, `AdminPage.jsx` |
-| Layout shell | `components/layout/` | `Sidebar.jsx`, `Header.jsx`, `ProtectedRoute.jsx` |
+| Feature-specific | `components/{feature}/` | `chat/MessageBubble.jsx`, `admin/DocumentUploader.jsx`, `admin/TemperatureSlider.jsx` |
+| Page composition | `pages/` | `ChatPage.jsx`, `AdminPage.jsx`, `PlatformTenantsPage.jsx`, `ReviewPage.jsx` |
+| Layout shell | `components/layout/` | `Sidebar.jsx`, `Header.jsx`, `AppLayout.jsx`, `ProtectedRoute.jsx` |
 
 ### CSS Rules
 
 - All design tokens defined in `src/styles/index.css` as `--sf-*` custom properties
-- Feature styles go in `src/styles/{feature}.css`
+- Feature styles go in `src/styles/{feature}.css` (e.g. `chat.css`, `admin.css`, `review.css`, `platform.css`, `analytics.css`)
 - Dark mode variables in `src/styles/theme.css`
 - Layout shell in `src/styles/layout.css`
 - Shared component styles in `src/styles/shared.css`
+- Scaffold/skeleton styles in `src/styles/scaffold.css`
 - Never hardcode colors — always `var(--sf-color-*)`
 - Responsive breakpoints: 375px (mobile), 768px (tablet), 1440px (desktop)
 
 ### Layout Shell
 
 The application uses a layout shell (`AppLayout`) that wraps all authenticated pages:
-- `Sidebar` — app-level navigation (Chat, Admin, Analytics, Review Queue) with role-based filtering
+- `Sidebar` — app-level navigation (Chat, Admin, Analytics, Review Queue, Platform Tenants) with role-based filtering
 - `Header` — page title, tenant badge, dark mode toggle, user avatar with logout dropdown
 - `ErrorBoundary` — catches render errors with friendly fallback UI
 - Dark mode is toggled via CSS class on `<html>` and persisted in `localStorage` (`sf-theme` key)

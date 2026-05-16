@@ -15,7 +15,7 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 
 - **Real-Time Chat** — Token-by-token streaming via WebSocket with typing indicators
 - **Source Citations** — Collapsible cards showing retrieved knowledge base chunks
-- **Admin Panel** — Drag-and-drop document upload with ingestion status tracking
+- **Admin Panel** — Drag-and-drop document upload, ingestion status tracking, per-tenant model selection and temperature tuning
 - **Analytics Dashboard** — Conversation trends, intent clouds, satisfaction gauges
 - **Review Queue** — Negative feedback, escalations, flagged messages, and failed queries
 - **Platform Tenants** — Superadmin-only tenant provisioning with lifecycle management
@@ -89,14 +89,13 @@ supportforge-ui/
 │   │   ├── reviewApi.js
 │   │   ├── platformApi.js
 │   │   ├── failedQueryApi.js
+│   │   ├── modelsApi.js
 │   │   └── authApi.js
 │   ├── hooks/                     # Custom React hooks
 │   │   ├── useWebSocket.js
-│   │   ├── useAuth.js
-│   │   └── useTenant.js
+│   │   └── useAuth.js
 │   ├── context/                   # React Context providers
-│   │   ├── AuthContext.jsx
-│   │   └── TenantContext.jsx
+│   │   └── AuthContext.jsx
 │   ├── pages/                     # Page-level components
 │   │   ├── ChatPage.jsx
 │   │   ├── AdminPage.jsx
@@ -113,6 +112,10 @@ supportforge-ui/
 │   ├── styles/                    # CSS design system
 │   │   ├── index.css
 │   │   ├── theme.css
+│   │   ├── layout.css
+│   │   ├── shared.css
+│   │   ├── scaffold.css
+│   │   ├── auth.css
 │   │   ├── chat.css
 │   │   ├── admin.css
 │   │   ├── review.css
