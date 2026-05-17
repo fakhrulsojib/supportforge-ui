@@ -144,7 +144,7 @@ supportforge-ui/
 
 ## Backend API
 
-This frontend connects to the [supportforge-api](../supportforge-api/) backend. Make sure the API is running before starting the frontend.
+This frontend connects to the [supportforge-api](https://github.com/fakhrulsojib/supportforge-api) backend. Make sure the API is running before starting the frontend.
 
 Default API proxy: `http://localhost:8000` (configured in `vite.config.js`).
 
