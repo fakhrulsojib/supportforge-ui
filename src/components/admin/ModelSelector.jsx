@@ -70,6 +70,11 @@ export default function ModelSelector() {
       }
       if (data.active_model?.embedding_provider) {
         setSelectedEmbedProvider(data.active_model.embedding_provider)
+      } else {
+        // Default to first provider that has embedding models
+        const provs = data.providers || []
+        const withEmbeds = provs.find(p => p.embedding_models?.length > 0)
+        if (withEmbeds) setSelectedEmbedProvider(withEmbeds.id)
       }
       setChatError(null)
       setEmbedError(null)
@@ -290,7 +295,7 @@ export default function ModelSelector() {
             <span className="admin-model-label">Chat Model</span>
 
             {/* Provider Tabs */}
-            {!isLoading && (
+            {!isLoading && providers.filter(p => p.models?.length > 0).length > 0 && (
               <div className="admin-provider-tabs" role="tablist">
                 {providers.filter(p => p.models?.length > 0).map(p => (
                   <button
@@ -434,9 +439,9 @@ export default function ModelSelector() {
             <span className="admin-model-label">Embedding Model</span>
 
             {/* Embedding Provider Tabs */}
-            {!isLoading && providers.length > 1 && (
+            {!isLoading && providers.filter(p => p.embedding_models?.length > 0).length > 0 && (
               <div className="admin-provider-tabs">
-                {providers.map((p) => (
+                {providers.filter(p => p.embedding_models?.length > 0).map((p) => (
                   <button
                     key={`embed-${p.id}`}
                     type="button"
