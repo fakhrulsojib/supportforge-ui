@@ -318,37 +318,15 @@ The application uses a layout shell (`AppLayout`) that wraps all authenticated p
 
 ### Test User Credentials
 
-When a live backend is available, use these test users for browser testing:
+When a live backend is available, test users are created by the backend seed scripts. **Do not hardcode credentials here — retrieve them from the scripts at runtime.**
 
-**Viewer test user** (chat only):
+| Role | Email | Created by |
+|---|---|---|
+| Viewer (chat only) | `viewer@acme.dev` | `scripts/seed_demo.py` |
+| Admin (full tenant access) | `admin@acme.dev` | `scripts/seed_demo.py` |
+| Superadmin (platform management) | `admin@platform.dev` | `scripts/create_superadmin.py` |
 
-```
-Email: viewer@acme.dev
-Password: SEE_SEED_SCRIPTS
-Tenant ID: SEE_SEED_SCRIPTS
-Tenant Slug: acme-corp
-Role: viewer
-```
-
-**Admin test user** (full access — Chat, Admin, Analytics, Review Queue):
-
-```
-Email: admin@acme.dev
-Password: SEE_SEED_SCRIPTS
-Tenant ID: SEE_SEED_SCRIPTS
-Role: admin
-```
-
-**Superadmin test user** (platform management, cross-tenant):
-
-```
-Email: admin@platform.dev
-Password: SEE_SEED_SCRIPTS
-Tenant ID: SEE_SEED_SCRIPTS
-Role: superadmin
-```
-
-> **Convention:** All browser test tasks that require logged-in state should use these credentials. Use the **admin** credentials when testing Admin/Analytics/Review Queue pages. Use the **superadmin** credentials when testing platform tenant management. The Tenant ID field requires the UUID, not the slug. The test users are created via `scripts/seed_demo.py` and `scripts/create_superadmin.py`.
+> **Convention:** Passwords and Tenant IDs are defined in the backend seed scripts — check `supportforge-api/scripts/seed_demo.py` for the current values. Use the **admin** credentials when testing Admin/Analytics/Review Queue pages. Use the **superadmin** credentials when testing platform tenant management. The Tenant ID field requires the UUID, not the slug.
 
 ---
 
