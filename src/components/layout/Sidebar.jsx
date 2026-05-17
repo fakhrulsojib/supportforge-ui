@@ -162,6 +162,18 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
 
   useEffect(() => {
     fetchBadge()
+
+    // Listen for review actions from any page (mark reviewed, resolve, etc.)
+    const handler = () => fetchBadge()
+    window.addEventListener('sf:review-badge-update', handler)
+
+    // Poll every 60s to catch new items from other sessions/users
+    const interval = setInterval(fetchBadge, 60_000)
+
+    return () => {
+      window.removeEventListener('sf:review-badge-update', handler)
+      clearInterval(interval)
+    }
   }, [fetchBadge])
 
   /** Filter nav items by user role. */

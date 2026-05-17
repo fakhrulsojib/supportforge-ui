@@ -187,8 +187,9 @@ export default function ReviewPage() {
     setMarkingIds((prev) => new Set(prev).add(messageId))
     try {
       await markReviewed(messageId)
-      // Refresh data and stats
+      // Refresh data, stats, and sidebar badge
       await Promise.all([fetchData(), fetchStats()])
+      window.dispatchEvent(new CustomEvent('sf:review-badge-update'))
     } catch (err) {
       setError(err?.response?.data?.detail || 'Failed to mark as reviewed')
     } finally {
@@ -207,6 +208,7 @@ export default function ReviewPage() {
     try {
       await markEscalationReviewed(conversationId)
       await Promise.all([fetchData(), fetchStats()])
+      window.dispatchEvent(new CustomEvent('sf:review-badge-update'))
     } catch (err) {
       setError(err?.response?.data?.detail || 'Failed to mark escalation as reviewed')
     } finally {
@@ -225,6 +227,7 @@ export default function ReviewPage() {
     try {
       await resolveFailedQuery(queryId)
       await Promise.all([fetchData(), fetchStats(), fetchFQStats()])
+      window.dispatchEvent(new CustomEvent('sf:review-badge-update'))
     } catch (err) {
       setError(err?.response?.data?.detail || 'Failed to resolve query')
     } finally {
