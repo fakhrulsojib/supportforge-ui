@@ -29,6 +29,7 @@ export async function getNegativeFeedback(params = {}) {
  *
  * @param {Object} [params]
  * @param {string|null} [params.trigger] — Filter by escalation trigger type
+ * @param {boolean|null} [params.reviewed] — Filter: true=reviewed, false=unreviewed, null=all
  * @param {string|null} [params.start_date] — ISO date lower bound
  * @param {string|null} [params.end_date] — ISO date upper bound
  * @param {number} [params.limit=50] — Page size
@@ -65,6 +66,19 @@ export async function getFlaggedMessages(params = {}) {
 export async function markReviewed(messageId) {
   const response = await client.patch(
     `${API_ROUTES.ADMIN.FEEDBACK_BASE}/${messageId}/review`,
+  )
+  return response.data
+}
+
+/**
+ * Mark an escalated conversation as reviewed by the current admin.
+ *
+ * @param {string} conversationId — Conversation UUID to mark as reviewed
+ * @returns {Promise<{ conversation_id: string, reviewed_at: string, reviewed_by: string }>}
+ */
+export async function markEscalationReviewed(conversationId) {
+  const response = await client.patch(
+    `${API_ROUTES.ADMIN.ESCALATIONS}/${conversationId}/review`,
   )
   return response.data
 }

@@ -19,6 +19,7 @@ import {
   getEscalations,
   getFlaggedMessages,
   markReviewed,
+  markEscalationReviewed,
   getReviewStats,
 } from '../api/reviewApi'
 import {
@@ -143,7 +144,7 @@ export default function ReviewPage() {
       if (activeTab === 'negative') {
         data = await getNegativeFeedback({ reviewed, limit: PAGE_SIZE, offset })
       } else if (activeTab === 'escalations') {
-        data = await getEscalations({ limit: PAGE_SIZE, offset })
+        data = await getEscalations({ reviewed, limit: PAGE_SIZE, offset })
       } else if (activeTab === 'failed_queries') {
         const resolvedParam =
           reviewedFilter === 'all' ? undefined :
@@ -194,6 +195,24 @@ export default function ReviewPage() {
       setMarkingIds((prev) => {
         const next = new Set(prev)
         next.delete(messageId)
+        return next
+      })
+    }
+  }
+
+  // ── Mark Escalation Reviewed ────────────────────────────────
+
+  async function handleMarkEscalationReviewed(conversationId) {
+    setMarkingIds((prev) => new Set(prev).add(conversationId))
+    try {
+      await markEscalationReviewed(conversationId)
+      await Promise.all([fetchData(), fetchStats()])
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Failed to mark escalation as reviewed')
+    } finally {
+      setMarkingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(conversationId)
         return next
       })
     }
@@ -374,7 +393,7 @@ export default function ReviewPage() {
   function renderEscalationDetail(item) {
     return (
       <tr className="review-detail-row" key={`${item.conversation_id}-detail`}>
-        <td colSpan={7} className="review-detail-cell">
+        <td colSpan={8} className="review-detail-cell">
           <div className="review-detail-panel">
             {/* Full First Message */}
             <div className="review-detail-section">
@@ -405,7 +424,20 @@ export default function ReviewPage() {
               </div>
             </div>
 
-            {/* Conversation Link */}
+            {/* Reviewer Info */}
+            {item.reviewed_at && (
+              <div className="review-detail-section">
+                <h4 className="review-detail-label">Review Audit</h4>
+                <p className="review-detail-text review-detail-audit">
+                  ✓ Reviewed on {formatDate(item.reviewed_at)}
+                  {item.reviewed_by && (
+                    <span className="review-detail-reviewer"> by {item.reviewed_by.slice(0, 8)}…</span>
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Conversation Link + Mark Reviewed */}
             <div className="review-detail-actions">
               <button
                 type="button"
@@ -415,6 +447,17 @@ export default function ReviewPage() {
               >
                 💬 View Full Conversation
               </button>
+              {!item.reviewed_at && (
+                <button
+                  type="button"
+                  className="review-mark-btn review-mark-btn-lg"
+                  onClick={() => handleMarkEscalationReviewed(item.conversation_id)}
+                  disabled={markingIds.has(item.conversation_id)}
+                  id={`review-esc-detail-mark-${item.conversation_id}`}
+                >
+                  {markingIds.has(item.conversation_id) ? '…' : '✓ Mark Reviewed'}
+                </button>
+              )}
             </div>
           </div>
         </td>
@@ -484,23 +527,21 @@ export default function ReviewPage() {
       </div>
 
       {/* Filters */}
-      {activeTab !== 'escalations' && (
-        <div className="review-filters">
-          <div className="review-filter-group">
-            <span className="review-filter-label">Status</span>
-            <select
-              className="review-filter-select"
-              value={reviewedFilter}
-              onChange={(e) => setReviewedFilter(e.target.value)}
-              id="review-filter-status"
-            >
-              <option value="unreviewed">Unreviewed</option>
-              <option value="reviewed">Reviewed</option>
-              <option value="all">All</option>
-            </select>
-          </div>
+      <div className="review-filters">
+        <div className="review-filter-group">
+          <span className="review-filter-label">Status</span>
+          <select
+            className="review-filter-select"
+            value={reviewedFilter}
+            onChange={(e) => setReviewedFilter(e.target.value)}
+            id="review-filter-status"
+          >
+            <option value="unreviewed">Unreviewed</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="all">All</option>
+          </select>
         </div>
-      )}
+      </div>
 
       {/* Loading */}
       {loading && (
@@ -680,6 +721,7 @@ export default function ReviewPage() {
                   <th>Trigger</th>
                   <th>Status</th>
                   <th>Started</th>
+                  <th>Reviewed</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -720,14 +762,36 @@ export default function ReviewPage() {
                       <td data-label="Started">
                         <span className="review-cell-time">{formatDate(item.started_at)}</span>
                       </td>
+                      <td data-label="Reviewed">
+                        {item.reviewed_at ? (
+                          <span className="review-badge review-badge-reviewed">✓ Reviewed</span>
+                        ) : (
+                          <span className="review-badge review-badge-pending">⏳ Pending</span>
+                        )}
+                      </td>
                       <td data-label="Action">
-                        <button
-                          type="button"
-                          className="review-mark-btn"
-                          onClick={(e) => { e.stopPropagation(); navigate(`/chat?conversation=${item.conversation_id}`) }}
-                        >
-                          💬 View Chat
-                        </button>
+                        {item.reviewed_at ? (
+                          <button
+                            type="button"
+                            className="review-mark-btn review-mark-btn-done"
+                            disabled
+                          >
+                            ✓ Done
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="review-mark-btn"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleMarkEscalationReviewed(item.conversation_id)
+                            }}
+                            disabled={markingIds.has(item.conversation_id)}
+                            id={`review-esc-mark-${item.conversation_id}`}
+                          >
+                            {markingIds.has(item.conversation_id) ? '…' : '✓ Mark Reviewed'}
+                          </button>
+                        )}
                       </td>
                     </tr>,
                     isExpanded && renderEscalationDetail(item),
