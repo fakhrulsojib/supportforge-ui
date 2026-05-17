@@ -7,6 +7,12 @@
 ![CSS](https://img.shields.io/badge/CSS-Custom_Properties-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
+## 🎬 Demo
+
+[![SupportForge Demo](https://img.youtube.com/vi/CP3tsJpi1q4/maxresdefault.jpg)](https://youtu.be/CP3tsJpi1q4)
+
+> 3-minute walkthrough: live chat with RAG streaming, anti-hallucination guard, smart escalation, admin panel, and analytics dashboard.
+
 ## Overview
 
 The frontend for SupportForge — a multi-tenant AI customer support platform. Built with React + Vite, featuring real-time WebSocket chat with streaming responses, an admin panel for document management, and an analytics dashboard.
