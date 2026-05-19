@@ -22,6 +22,7 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 - **Dark Mode** — System-aware + manual toggle, persisted in localStorage
 - **Responsive** — Optimized for 375px, 768px, and 1440px+ viewports
 - **Multi-Tenant** — Tenant-scoped data with role-based UI rendering
+- **Voice Input** _(feature branch)_ — Push-to-talk microphone button with MediaRecorder, real-time state machine (idle → listening → processing → speaking → error)
 
 ## Tech Stack
 
@@ -90,9 +91,11 @@ supportforge-ui/
 │   │   ├── platformApi.js
 │   │   ├── failedQueryApi.js
 │   │   ├── modelsApi.js
+│   │   ├── voiceApi.js
 │   │   └── authApi.js
 │   ├── hooks/                     # Custom React hooks
 │   │   ├── useWebSocket.js
+│   │   ├── useVoice.js
 │   │   └── useAuth.js
 │   ├── context/                   # React Context providers
 │   │   └── AuthContext.jsx
