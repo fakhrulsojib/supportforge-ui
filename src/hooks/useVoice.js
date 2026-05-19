@@ -3,10 +3,13 @@
  *
  * Handles:
  * - Checking voice availability via API
- * - Recording audio via AudioWorklet (PCM Int16 mono)
- * - Sending audio for STT processing
+ * - Recording audio via MediaRecorder (webm/opus codec)
+ * - Sending recorded audio blob for STT processing
  * - Receiving TTS audio for playback
  * - Visual states (idle, listening, processing, speaking)
+ *
+ * Note: Codec conversion (webm → PCM Int16) is handled at the
+ * transport layer (Pipecat WebRTC) — not in this hook.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
