@@ -54,9 +54,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
   const mediaStreamRef = useRef(null)
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
-  const analyserRef = useRef(null)
   const audioContextRef = useRef(null)
-  const silenceTimerRef = useRef(null)
   const recordingStartRef = useRef(null)
   const vadFrameRef = useRef(null)
   const callStartRef = useRef(Date.now())
@@ -64,6 +62,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
   const isProcessingRef = useRef(false)
   const ttsAudioRef = useRef(null)
   const pendingTTSRef = useRef(null)
+  const responseTimeoutRef = useRef(null)
 
   // Call duration timer
   useEffect(() => {
@@ -109,7 +108,6 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
       analyser.smoothingTimeConstant = 0.3
       source.connect(analyser)
       audioContextRef.current = ctx
-      analyserRef.current = analyser
 
       // Start MediaRecorder
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -256,8 +254,18 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
         setLastTranscript(result.text.trim())
         console.info(LOG, 'Sending message:', result.text.trim())
         onSendMessage(result.text.trim())
-        // Now wait for AI response — the parent will pass lastAssistantMessage
+        // Wait for AI response — the parent will pass lastAssistantMessage.
+        // Set a timeout to recover if the response never arrives (e.g. WS disconnect).
         setCallState(CALL_STATE.SPEAKING)
+
+        responseTimeoutRef.current = setTimeout(() => {
+          console.warn(LOG, 'AI response timeout (30s) — re-listening')
+          isProcessingRef.current = false
+          if (isMountedRef.current) {
+            setCallState(CALL_STATE.LISTENING)
+            startListening()
+          }
+        }, 30_000)
       } else {
         console.info(LOG, 'Empty transcription, re-listening')
         isProcessingRef.current = false
@@ -271,6 +279,28 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
   }, [onSendMessage, startListening])
 
   /**
+   * Strip markdown formatting for natural TTS playback.
+   * Removes bold/italic markers, headers, links, code blocks, etc.
+   */
+  function stripMarkdown(text) {
+    return text
+      .replace(/```[\s\S]*?```/g, '')     // code blocks
+      .replace(/`([^`]+)`/g, '$1')        // inline code
+      .replace(/!\[.*?\]\(.*?\)/g, '')     // images
+      .replace(/\[([^\]]+)\]\(.*?\)/g, '$1') // links → keep text
+      .replace(/^#{1,6}\s+/gm, '')        // headers
+      .replace(/(\*\*|__)(.*?)\1/g, '$2')  // bold
+      .replace(/(\*|_)(.*?)\1/g, '$2')     // italic
+      .replace(/~~(.*?)~~/g, '$1')         // strikethrough
+      .replace(/^[\s]*[-*+]\s+/gm, '')    // unordered lists
+      .replace(/^[\s]*\d+\.\s+/gm, '')    // ordered lists
+      .replace(/^>\s+/gm, '')             // blockquotes
+      .replace(/---+/g, '')               // horizontal rules
+      .replace(/\n{3,}/g, '\n\n')         // excess newlines
+      .trim()
+  }
+
+  /**
    * TTS playback when AI response arrives.
    */
   useEffect(() => {
@@ -278,12 +308,32 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
     if (pendingTTSRef.current === lastAssistantMessage) return
     pendingTTSRef.current = lastAssistantMessage
 
-    console.info(LOG, 'Synthesizing TTS for:', lastAssistantMessage.substring(0, 60))
+    // Clear the response timeout — AI responded
+    if (responseTimeoutRef.current) {
+      clearTimeout(responseTimeoutRef.current)
+      responseTimeoutRef.current = null
+    }
+
+    // Strip markdown for natural speech
+    const spokenText = stripMarkdown(lastAssistantMessage)
+    if (!spokenText) {
+      console.warn(LOG, 'TTS text empty after markdown strip — re-listening')
+      isProcessingRef.current = false
+      pendingTTSRef.current = null
+      if (isMountedRef.current) startListening()
+      return
+    }
+
+    console.info(LOG, 'Synthesizing TTS for:', spokenText.substring(0, 60))
 
     const synthesizeAndPlay = async () => {
       try {
         // Use centralized API client (handles auth token injection)
-        const audioBlob = await synthesizeAudio(lastAssistantMessage)
+        const audioBlob = await synthesizeAudio(spokenText)
+
+        // Check if we were unmounted during the async call
+        if (!isMountedRef.current) return
+
         console.info(LOG, 'TTS audio received:', audioBlob.size, 'bytes')
 
         if (audioBlob.size < 100) {
@@ -338,12 +388,11 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
 
   // Cleanup on unmount
   useEffect(() => {
-    const silenceTimer = silenceTimerRef.current
     return () => {
       console.info(LOG, 'Unmounting — cleanup')
       isMountedRef.current = false
       if (vadFrameRef.current) cancelAnimationFrame(vadFrameRef.current)
-      if (silenceTimer) clearTimeout(silenceTimer)
+      if (responseTimeoutRef.current) clearTimeout(responseTimeoutRef.current)
 
       if (mediaRecorderRef.current?.state === 'recording') {
         mediaRecorderRef.current.stop()
@@ -367,6 +416,11 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
     if (ttsAudioRef.current) {
       ttsAudioRef.current.pause()
       ttsAudioRef.current = null
+    }
+    // Clear AI response timeout
+    if (responseTimeoutRef.current) {
+      clearTimeout(responseTimeoutRef.current)
+      responseTimeoutRef.current = null
     }
     stopRecording()
     onEndCall()
