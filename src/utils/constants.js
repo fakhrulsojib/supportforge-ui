@@ -50,6 +50,7 @@ export const API_ROUTES = {
     SESSIONS: '/api/v1/voice/sessions',
     TOGGLE: '/api/v1/voice/toggle',
     TRANSCRIBE: '/api/v1/voice/transcribe',
+    SYNTHESIZE: '/api/v1/voice/synthesize',
   },
   HEALTH: '/health',
 }

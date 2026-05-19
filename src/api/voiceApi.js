@@ -62,3 +62,20 @@ export async function transcribeAudio(audioBlob) {
   })
   return response.data
 }
+
+/**
+ * Synthesize text to speech audio.
+ *
+ * Uses the centralised client for auth token injection and auto-refresh.
+ *
+ * @param {string} text - Text to synthesize to speech.
+ * @returns {Promise<Blob>} WAV audio blob.
+ */
+export async function synthesizeAudio(text) {
+  const response = await client.post(
+    API_ROUTES.VOICE.SYNTHESIZE,
+    { text },
+    { responseType: 'blob' },
+  )
+  return response.data
+}

@@ -175,7 +175,7 @@ export default function ChatPage() {
   }
 
   /** Send a user message */
-  function handleSendMessage(text) {
+  const handleSendMessage = useCallback((text) => {
     // Add user message to the local state immediately
     setMessages((prev) => [
       ...prev,
@@ -189,7 +189,8 @@ export default function ChatPage() {
 
     // Send via WebSocket
     wsSendMessage(text, conversationIdRef.current)
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Update conversation ID when WebSocket reports a new one
   useEffect(() => {

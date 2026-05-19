@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { transcribeAudio } from '../../api/voiceApi'
+import { transcribeAudio, synthesizeAudio } from '../../api/voiceApi'
 import '../../styles/voice-call.css'
 
 const LOG = '[VoiceCall]'
@@ -282,26 +282,8 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
 
     const synthesizeAndPlay = async () => {
       try {
-        // Fetch audio from TTS endpoint
-        const token = localStorage.getItem('access_token')
-        const apiBase = import.meta.env.VITE_API_BASE_URL || ''
-        const resp = await fetch(`${apiBase}/api/v1/voice/synthesize`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({ text: lastAssistantMessage }),
-        })
-
-        if (!resp.ok || !isMountedRef.current) {
-          console.warn(LOG, 'TTS response not ok:', resp.status)
-          isProcessingRef.current = false
-          if (isMountedRef.current) startListening()
-          return
-        }
-
-        const audioBlob = await resp.blob()
+        // Use centralized API client (handles auth token injection)
+        const audioBlob = await synthesizeAudio(lastAssistantMessage)
         console.info(LOG, 'TTS audio received:', audioBlob.size, 'bytes')
 
         if (audioBlob.size < 100) {
