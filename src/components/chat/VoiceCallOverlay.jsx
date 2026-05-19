@@ -33,9 +33,10 @@ const STATUS_TEXT = {
 }
 
 // VAD config
-const SILENCE_THRESHOLD = 0.015 // Volume level below which = silence
-const SILENCE_DURATION_MS = 2500 // 2.5s of silence triggers send
-const MIN_RECORDING_MS = 800 // Don't send recordings shorter than this
+const SILENCE_THRESHOLD = 0.04  // RMS below which counts as silence (unused after speech — see SPEECH_THRESHOLD)
+const SPEECH_THRESHOLD = 0.15   // RMS above which counts as actual speech (ambient floor ~0.07-0.09)
+const SILENCE_DURATION_MS = 1800 // 1.8s of silence after speech triggers send
+const MIN_RECORDING_MS = 800    // Don't send recordings shorter than this
 
 /**
  * @param {{
@@ -159,6 +160,8 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
   const startVAD = useCallback((analyser) => {
     const dataArray = new Uint8Array(analyser.frequencyBinCount)
     let silenceStart = null
+    let speechDetected = false // Only start silence countdown after real speech
+    let lastLogTime = 0 // Throttle debug logs
 
     function checkVolume() {
       if (!isMountedRef.current) return
@@ -173,6 +176,20 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
       }
       const rms = Math.sqrt(sum / dataArray.length)
 
+      // Throttled debug log — every 500ms
+      const now = Date.now()
+      if (now - lastLogTime > 500) {
+        lastLogTime = now
+        const silenceMs = silenceStart ? now - silenceStart : 0
+        console.log(
+          LOG, 'VAD |',
+          'rms:', rms.toFixed(4),
+          '| speech:', speechDetected,
+          '| silenceMs:', silenceMs,
+          '| thresholds: silence<', SILENCE_THRESHOLD, 'speech>=', SPEECH_THRESHOLD,
+        )
+      }
+
       // Update volume bars for visualization
       const bars = Array.from({ length: 5 }, (_, i) => {
         const threshold = 0.02 + i * 0.04
@@ -180,13 +197,19 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
       })
       setVolumeBars(bars)
 
-      if (rms < SILENCE_THRESHOLD) {
+      // Track when the user actually starts speaking (above ambient)
+      if (rms >= SPEECH_THRESHOLD) {
+        speechDetected = true
+        silenceStart = null // Reset silence while speaking
+      } else if (speechDetected) {
+        // After speech: anything below SPEECH_THRESHOLD counts as silence
         if (!silenceStart) silenceStart = Date.now()
         const silenceDuration = Date.now() - silenceStart
 
         if (silenceDuration >= SILENCE_DURATION_MS) {
           console.info(LOG, 'Silence detected after', silenceDuration, 'ms — stopping recording')
           silenceStart = null
+          speechDetected = false
           // Call stopRecording directly via ref-stable pattern
           if (vadFrameRef.current) {
             cancelAnimationFrame(vadFrameRef.current)
@@ -205,6 +228,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
           return
         }
       } else {
+        // Noise between thresholds but no speech yet — ignore
         silenceStart = null
       }
 
@@ -319,7 +343,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
     if (!spokenText) {
       console.warn(LOG, 'TTS text empty after markdown strip — re-listening')
       isProcessingRef.current = false
-      pendingTTSRef.current = null
+      // Keep pendingTTSRef set (dedup guard) — don't null it
       if (isMountedRef.current) startListening()
       return
     }
@@ -352,7 +376,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
           URL.revokeObjectURL(audioUrl)
           ttsAudioRef.current = null
           isProcessingRef.current = false
-          pendingTTSRef.current = null
+          // Keep pendingTTSRef set (dedup guard) — don't null it
           if (isMountedRef.current) startListening()
         }
 
@@ -360,7 +384,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
           console.error(LOG, 'TTS playback error:', e)
           URL.revokeObjectURL(audioUrl)
           isProcessingRef.current = false
-          pendingTTSRef.current = null
+          // Keep pendingTTSRef set (dedup guard) — don't null it
           if (isMountedRef.current) startListening()
         }
 
@@ -370,7 +394,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
       } catch (err) {
         console.error(LOG, 'TTS failed:', err.message)
         isProcessingRef.current = false
-        pendingTTSRef.current = null
+        // Keep pendingTTSRef set (dedup guard) — don't null it
         if (isMountedRef.current) startListening()
       }
     }

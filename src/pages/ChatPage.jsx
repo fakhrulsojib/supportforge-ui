@@ -189,6 +189,12 @@ export default function ChatPage() {
 
     // Send via WebSocket
     wsSendMessage(text, conversationIdRef.current)
+
+    // Clear stale assistant message so a voice-call TTS cycle
+    // doesn't replay the previous response when SPEAKING activates.
+    if (isInCallRef.current) {
+      setLastAssistantMessage(null)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
