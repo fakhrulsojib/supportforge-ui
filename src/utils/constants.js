@@ -46,6 +46,7 @@ export const API_ROUTES = {
   },
   VOICE: {
     CONFIG: '/api/v1/voice/config',
+    SAVE_CONFIG: '/api/v1/voice/config',
     HEALTH: '/api/v1/voice/health',
     SESSIONS: '/api/v1/voice/sessions',
     TOGGLE: '/api/v1/voice/toggle',

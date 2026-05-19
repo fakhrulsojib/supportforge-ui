@@ -79,3 +79,19 @@ export async function synthesizeAudio(text) {
   )
   return response.data
 }
+
+/**
+ * Save voice provider configuration for the tenant (admin only).
+ *
+ * @param {Object} config - Voice config to save.
+ * @param {string} [config.stt_provider] - STT provider name ('whisper' | 'azure').
+ * @param {string} [config.tts_provider] - TTS provider name ('piper' | 'azure').
+ * @param {string} [config.api_key] - Cloud provider API key.
+ * @param {string} [config.azure_region] - Azure region (e.g. 'eastus').
+ * @param {string} [config.tts_voice] - TTS voice name.
+ * @returns {Promise<Object>} Updated voice config.
+ */
+export async function saveVoiceConfig(config) {
+  const response = await client.put(API_ROUTES.VOICE.SAVE_CONFIG, config)
+  return response.data
+}
