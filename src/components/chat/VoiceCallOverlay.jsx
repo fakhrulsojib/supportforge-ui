@@ -34,7 +34,7 @@ const STATUS_TEXT = {
 
 // VAD config
 const SILENCE_THRESHOLD = 0.015 // Volume level below which = silence
-const SILENCE_DURATION_MS = 1800 // 1.8s of silence triggers send
+const SILENCE_DURATION_MS = 2500 // 2.5s of silence triggers send
 const MIN_RECORDING_MS = 800 // Don't send recordings shorter than this
 
 /**
@@ -381,6 +381,10 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
 
   // Auto-start listening on mount
   useEffect(() => {
+    // Reset isMountedRef — required for React StrictMode which does
+    // mount → unmount → mount; the cleanup sets it to false and useRef
+    // returns the same object on remount, leaving it permanently false.
+    isMountedRef.current = true
     const timer = setTimeout(() => startListening(), 500)
     return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
