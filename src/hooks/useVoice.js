@@ -15,6 +15,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { getVoiceConfig } from '../api/voiceApi'
 
+const LOG_PREFIX = '[Voice]'
+
 /**
  * Voice session states.
  */
@@ -50,14 +52,20 @@ export function useVoice({ onTranscript, onError } = {}) {
     let cancelled = false
 
     async function checkVoice() {
+      console.info(LOG_PREFIX, 'Checking voice availability...')
+      console.info(LOG_PREFIX, 'Secure context:', window.isSecureContext)
+      console.info(LOG_PREFIX, 'MediaDevices available:', !!navigator.mediaDevices)
       try {
         const config = await getVoiceConfig()
+        console.info(LOG_PREFIX, 'Voice config received:', config)
         if (!cancelled) {
           setVoiceConfig(config)
           setIsVoiceAvailable(config.voice_enabled)
           setVoiceState(config.voice_enabled ? VOICE_STATE.IDLE : VOICE_STATE.DISABLED)
+          console.info(LOG_PREFIX, 'Voice state →', config.voice_enabled ? 'IDLE' : 'DISABLED')
         }
-      } catch {
+      } catch (err) {
+        console.warn(LOG_PREFIX, 'Voice config fetch failed:', err.message)
         if (!cancelled) {
           setIsVoiceAvailable(false)
           setVoiceState(VOICE_STATE.DISABLED)
@@ -73,7 +81,12 @@ export function useVoice({ onTranscript, onError } = {}) {
    * Start recording audio from the microphone.
    */
   const startListening = useCallback(async () => {
-    if (voiceState !== VOICE_STATE.IDLE) return
+    if (voiceState !== VOICE_STATE.IDLE) {
+      console.warn(LOG_PREFIX, 'startListening blocked — state is:', voiceState)
+      return
+    }
+
+    console.info(LOG_PREFIX, 'Starting microphone capture...')
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -85,43 +98,63 @@ export function useVoice({ onTranscript, onError } = {}) {
         },
       })
 
+      console.info(LOG_PREFIX, 'Microphone stream acquired:', {
+        tracks: stream.getAudioTracks().length,
+        settings: stream.getAudioTracks()[0]?.getSettings(),
+      })
+
       mediaStreamRef.current = stream
       audioChunksRef.current = []
 
-      const recorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : 'audio/webm',
-      })
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm'
+
+      console.info(LOG_PREFIX, 'MediaRecorder mimeType:', mimeType)
+
+      const recorder = new MediaRecorder(stream, { mimeType })
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data)
+          console.debug(LOG_PREFIX, 'Audio chunk received:', event.data.size, 'bytes, total chunks:', audioChunksRef.current.length)
         }
       }
 
       recorder.onstop = async () => {
+        console.info(LOG_PREFIX, 'Recording stopped, processing...')
         setVoiceState(VOICE_STATE.PROCESSING)
 
         // Create blob from chunks
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        const chunkCount = audioChunksRef.current.length
         audioChunksRef.current = []
+
+        console.info(LOG_PREFIX, 'Audio blob created:', {
+          size: audioBlob.size,
+          type: audioBlob.type,
+          chunks: chunkCount,
+        })
 
         // Stop all tracks
         if (mediaStreamRef.current) {
           mediaStreamRef.current.getTracks().forEach(track => track.stop())
           mediaStreamRef.current = null
+          console.debug(LOG_PREFIX, 'Media tracks stopped')
         }
 
         // Notify parent with audio blob for processing
         if (onTranscript) {
+          console.info(LOG_PREFIX, 'Sending audio blob to onTranscript callback')
           onTranscript(audioBlob)
         }
 
         setVoiceState(VOICE_STATE.IDLE)
+        console.info(LOG_PREFIX, 'Voice state → IDLE')
       }
 
-      recorder.onerror = () => {
+      recorder.onerror = (event) => {
+        console.error(LOG_PREFIX, 'MediaRecorder error:', event.error)
         setVoiceState(VOICE_STATE.ERROR)
         setErrorMessage('Recording failed')
         if (onError) onError('Recording failed')
@@ -131,7 +164,13 @@ export function useVoice({ onTranscript, onError } = {}) {
       recorder.start(250) // 250ms chunks
       setVoiceState(VOICE_STATE.LISTENING)
       setErrorMessage(null)
+      console.info(LOG_PREFIX, 'Voice state → LISTENING (recording at 250ms intervals)')
     } catch (err) {
+      console.error(LOG_PREFIX, 'getUserMedia failed:', {
+        name: err.name,
+        message: err.message,
+        isSecureContext: window.isSecureContext,
+      })
       setVoiceState(VOICE_STATE.ERROR)
       let msg = 'Failed to start recording'
       if (err.name === 'NotAllowedError') {
@@ -150,8 +189,10 @@ export function useVoice({ onTranscript, onError } = {}) {
    * Stop recording and trigger processing.
    */
   const stopListening = useCallback(() => {
+    console.info(LOG_PREFIX, 'stopListening called, recorder state:', mediaRecorderRef.current?.state)
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop()
+      console.info(LOG_PREFIX, 'MediaRecorder.stop() called')
     }
   }, [])
 
@@ -159,6 +200,7 @@ export function useVoice({ onTranscript, onError } = {}) {
    * Toggle voice recording on/off.
    */
   const toggleVoice = useCallback(() => {
+    console.info(LOG_PREFIX, 'toggleVoice called, current state:', voiceState)
     if (voiceState === VOICE_STATE.LISTENING) {
       stopListening()
     } else if (voiceState === VOICE_STATE.IDLE) {
@@ -170,6 +212,7 @@ export function useVoice({ onTranscript, onError } = {}) {
   useEffect(() => {
     return () => {
       if (mediaStreamRef.current) {
+        console.info(LOG_PREFIX, 'Cleanup: stopping media tracks on unmount')
         mediaStreamRef.current.getTracks().forEach(track => track.stop())
       }
     }
