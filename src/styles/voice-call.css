@@ -1,0 +1,268 @@
+/* ── Voice Call Overlay ──────────────────────────────────────── */
+
+.voice-call-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: voice-fade-in 0.3s ease;
+}
+
+@keyframes voice-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.voice-call-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 48px 40px 40px;
+  min-width: 340px;
+  max-width: 420px;
+  background: linear-gradient(145deg, hsl(240, 20%, 13%), hsl(240, 18%, 10%));
+  border: 1px solid hsl(240, 15%, 22%);
+  border-radius: 24px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+  animation: voice-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes voice-slide-up {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Animated Rings ─────────────────────────────────────────── */
+
+.voice-call-rings {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-call-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid hsl(249, 64%, 55%);
+  opacity: 0;
+}
+
+.voice-call-ring-1 {
+  width: 80px;
+  height: 80px;
+}
+
+.voice-call-ring-2 {
+  width: 110px;
+  height: 110px;
+}
+
+.voice-call-ring-3 {
+  width: 140px;
+  height: 140px;
+}
+
+/* Listening state — rings pulse outward */
+.voice-call-rings[data-state="listening"] .voice-call-ring {
+  animation: voice-ring-pulse 2s ease-out infinite;
+  border-color: hsl(160, 60%, 45%);
+}
+
+.voice-call-rings[data-state="listening"] .voice-call-ring-2 {
+  animation-delay: 0.3s;
+}
+
+.voice-call-rings[data-state="listening"] .voice-call-ring-3 {
+  animation-delay: 0.6s;
+}
+
+/* Processing state — rings spin */
+.voice-call-rings[data-state="processing"] .voice-call-ring {
+  animation: voice-ring-spin 1.2s linear infinite;
+  border-color: hsl(45, 80%, 55%);
+  border-top-color: transparent;
+  opacity: 0.6;
+}
+
+.voice-call-rings[data-state="processing"] .voice-call-ring-2 {
+  animation-direction: reverse;
+  animation-duration: 1.6s;
+}
+
+.voice-call-rings[data-state="processing"] .voice-call-ring-3 {
+  animation-duration: 2s;
+}
+
+/* Speaking state — rings breathe */
+.voice-call-rings[data-state="speaking"] .voice-call-ring {
+  animation: voice-ring-breathe 1.5s ease-in-out infinite;
+  border-color: hsl(249, 64%, 55%);
+}
+
+.voice-call-rings[data-state="speaking"] .voice-call-ring-2 {
+  animation-delay: 0.2s;
+}
+
+.voice-call-rings[data-state="speaking"] .voice-call-ring-3 {
+  animation-delay: 0.4s;
+}
+
+/* Connecting state */
+.voice-call-rings[data-state="connecting"] .voice-call-ring {
+  animation: voice-ring-pulse 1.5s ease-out infinite;
+  border-color: hsl(200, 60%, 50%);
+}
+
+@keyframes voice-ring-pulse {
+  0% { opacity: 0.8; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes voice-ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes voice-ring-breathe {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 0.7; transform: scale(1); }
+}
+
+/* ── Center Icon ────────────────────────────────────────────── */
+
+.voice-call-icon {
+  position: relative;
+  z-index: 1;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, hsl(249, 64%, 55%), hsl(254, 55%, 40%));
+  color: white;
+  box-shadow: 0 4px 20px hsla(249, 64%, 55%, 0.4);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.voice-call-icon[data-state="listening"] {
+  background: linear-gradient(135deg, hsl(160, 60%, 40%), hsl(160, 50%, 30%));
+  box-shadow: 0 4px 20px hsla(160, 60%, 45%, 0.4);
+}
+
+.voice-call-icon[data-state="processing"] {
+  background: linear-gradient(135deg, hsl(45, 80%, 45%), hsl(30, 70%, 35%));
+  box-shadow: 0 4px 20px hsla(45, 80%, 55%, 0.3);
+}
+
+.voice-call-icon[data-state="speaking"] {
+  background: linear-gradient(135deg, hsl(249, 64%, 55%), hsl(254, 55%, 40%));
+  box-shadow: 0 4px 20px hsla(249, 64%, 55%, 0.4);
+  animation: voice-icon-speak 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes voice-icon-speak {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* ── Status & Timer ─────────────────────────────────────────── */
+
+.voice-call-status {
+  font-size: 1rem;
+  font-weight: 500;
+  color: hsl(0, 0%, 80%);
+  text-align: center;
+  min-height: 1.5em;
+  transition: color 0.3s;
+}
+
+.voice-call-status[data-state="listening"] {
+  color: hsl(160, 60%, 55%);
+}
+
+.voice-call-status[data-state="processing"] {
+  color: hsl(45, 80%, 60%);
+}
+
+.voice-call-status[data-state="speaking"] {
+  color: hsl(249, 64%, 70%);
+}
+
+.voice-call-timer {
+  font-size: 0.8rem;
+  color: hsl(0, 0%, 50%);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.voice-call-transcript {
+  font-size: 0.82rem;
+  color: hsl(0, 0%, 60%);
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.4;
+  min-height: 2.8em;
+  opacity: 0.8;
+}
+
+.voice-call-transcript-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(0, 0%, 40%);
+  margin-bottom: 4px;
+}
+
+/* ── End Call Button ─────────────────────────────────────────── */
+
+.voice-call-end-btn {
+  margin-top: 8px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, hsl(0, 70%, 50%), hsl(0, 60%, 40%));
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px hsla(0, 70%, 50%, 0.3);
+}
+
+.voice-call-end-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px hsla(0, 70%, 50%, 0.5);
+}
+
+.voice-call-end-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Volume Meter ───────────────────────────────────────────── */
+
+.voice-call-volume {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 20px;
+}
+
+.voice-call-volume-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: hsl(160, 60%, 45%);
+  transition: height 0.08s ease;
+  min-height: 3px;
+}

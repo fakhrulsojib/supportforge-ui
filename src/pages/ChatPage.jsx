@@ -16,11 +16,12 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useWebSocket } from '../hooks/useWebSocket'
-import { useVoice } from '../hooks/useVoice'
 import { listConversations, getConversation } from '../api/chatApi'
+import { getVoiceConfig } from '../api/voiceApi'
 import { extractErrorMessage } from '../api/client'
 import { formatRelativeTime } from '../utils/formatters'
 import ChatWindow from '../components/chat/ChatWindow'
+import VoiceCallOverlay from '../components/chat/VoiceCallOverlay'
 import '../styles/chat.css'
 
 export default function ChatPage() {
@@ -54,20 +55,17 @@ export default function ChatPage() {
   // Track conversation ID for sending messages
   const conversationIdRef = useRef(null)
 
-  // Voice
-  const {
-    voiceState,
-    isVoiceAvailable,
-    errorMessage: voiceErrorMessage,
-    toggleVoice,
-  } = useVoice({
-    onTranscript: useCallback((audioBlob) => {
-      // For now, log the blob — the WebRTC transport layer will
-      // handle codec conversion and STT submission in the future.
-      // As a demo, we show the recording was captured successfully.
-      console.info('Voice recording captured:', audioBlob.size, 'bytes')
-    }, []),
-  })
+  // Voice call state
+  const [isInCall, setIsInCall] = useState(false)
+  const [isVoiceAvailable, setIsVoiceAvailable] = useState(false)
+  const [lastAssistantMessage, setLastAssistantMessage] = useState(null)
+
+  // Check voice availability on mount
+  useEffect(() => {
+    getVoiceConfig()
+      .then(config => setIsVoiceAvailable(config.voice_enabled))
+      .catch(() => setIsVoiceAvailable(false))
+  }, [])
 
   /** Connect WebSocket on mount */
   useEffect(() => {
@@ -106,6 +104,9 @@ export default function ChatPage() {
           created_at: new Date().toISOString(),
         },
       ])
+
+      // Track for voice call TTS playback
+      setLastAssistantMessage(text)
 
       // Refresh sidebar to include new conversation
       loadConversations()
@@ -308,12 +309,19 @@ export default function ChatPage() {
           error={wsError}
           readOnly={!!viewingUserEmail}
           readOnlyLabel={viewingUserEmail}
-          voiceState={voiceState}
           isVoiceAvailable={isVoiceAvailable}
-          onVoiceToggle={toggleVoice}
-          voiceErrorMessage={voiceErrorMessage}
+          onStartVoiceCall={() => setIsInCall(true)}
         />
       </main>
+
+      {/* Voice Call Overlay */}
+      {isInCall && (
+        <VoiceCallOverlay
+          onSendMessage={handleSendMessage}
+          onEndCall={() => setIsInCall(false)}
+          lastAssistantMessage={lastAssistantMessage}
+        />
+      )}
     </div>
   )
 }

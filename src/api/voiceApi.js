@@ -46,3 +46,19 @@ export async function toggleVoice() {
   const response = await client.put(API_ROUTES.VOICE.TOGGLE)
   return response.data
 }
+
+/**
+ * Send an audio blob to the backend for STT transcription.
+ *
+ * @param {Blob} audioBlob - The recorded audio blob (webm, wav, etc).
+ * @returns {Promise<{text: string, language?: string, error?: string}>}
+ */
+export async function transcribeAudio(audioBlob) {
+  const formData = new FormData()
+  formData.append('audio', audioBlob, 'recording.webm')
+
+  const response = await client.post(API_ROUTES.VOICE.TRANSCRIBE, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return response.data
+}
