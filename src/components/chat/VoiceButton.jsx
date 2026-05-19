@@ -41,13 +41,14 @@ export default function VoiceButton({ voiceState, isAvailable, onToggle, errorMe
     <div className="sf-voice-button-wrapper">
       <button
         id="voice-toggle-btn"
-        className={`sf-voice-button ${
-          isListening ? 'sf-voice-button--listening' : ''
-        } ${isProcessing ? 'sf-voice-button--processing' : ''} ${
-          isSpeaking ? 'sf-voice-button--speaking' : ''
-        } ${isError ? 'sf-voice-button--error' : ''} ${
-          isDisabled ? 'sf-voice-button--disabled' : ''
-        }`}
+        className={[
+          'sf-voice-button',
+          isListening && 'sf-voice-button--listening',
+          isProcessing && 'sf-voice-button--processing',
+          isSpeaking && 'sf-voice-button--speaking',
+          isError && 'sf-voice-button--error',
+          isDisabled && 'sf-voice-button--disabled',
+        ].filter(Boolean).join(' ')}
         onClick={onToggle}
         disabled={isDisabled || isProcessing || isSpeaking}
         aria-label={buttonLabel}
