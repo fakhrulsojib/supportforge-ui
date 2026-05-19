@@ -152,7 +152,7 @@ export default function ChatPage() {
       setLoadError(extractErrorMessage(err))
       setMessages([])
     }
-  }, [user?.id])
+  }, [user?.userId])
 
   /** Auto-load conversation from URL ?conversation=<id> (e.g. from Review Queue) */
   const [searchParams] = useSearchParams()
