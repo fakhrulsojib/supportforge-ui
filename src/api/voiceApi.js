@@ -36,3 +36,13 @@ export async function getVoiceSessions() {
   const response = await client.get(API_ROUTES.VOICE.SESSIONS)
   return response.data
 }
+
+/**
+ * Toggle voice enabled/disabled for the tenant (admin only).
+ *
+ * @returns {Promise<{voice_enabled: boolean, stt_provider: string|null, tts_provider: string|null, tts_voice: string, max_voice_sessions: number}>}
+ */
+export async function toggleVoice() {
+  const response = await client.put(API_ROUTES.VOICE.TOGGLE)
+  return response.data
+}

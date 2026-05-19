@@ -13,6 +13,7 @@
 import { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import StreamingIndicator from './StreamingIndicator'
+import VoiceButton from './VoiceButton'
 
 /**
  * @param {{
@@ -37,6 +38,10 @@ export default function ChatWindow({
   error,
   readOnly = false,
   readOnlyLabel = '',
+  voiceState,
+  isVoiceAvailable = false,
+  onVoiceToggle,
+  voiceErrorMessage,
 }) {
   const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef(null)
@@ -186,6 +191,14 @@ export default function ChatWindow({
               aria-label="Chat message input"
               id="chat-message-input"
             />
+            {isVoiceAvailable && (
+              <VoiceButton
+                voiceState={voiceState}
+                isAvailable={isVoiceAvailable}
+                onToggle={onVoiceToggle}
+                errorMessage={voiceErrorMessage}
+              />
+            )}
             {isStreaming ? (
               <button
                 type="button"

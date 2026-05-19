@@ -133,9 +133,14 @@ export function useVoice({ onTranscript, onError } = {}) {
       setErrorMessage(null)
     } catch (err) {
       setVoiceState(VOICE_STATE.ERROR)
-      const msg = err.name === 'NotAllowedError'
-        ? 'Microphone access denied'
-        : 'Failed to start recording'
+      let msg = 'Failed to start recording'
+      if (err.name === 'NotAllowedError') {
+        msg = 'Microphone access denied'
+      } else if (err.name === 'NotFoundError') {
+        msg = 'No microphone found'
+      } else if (!window.isSecureContext) {
+        msg = 'Microphone requires HTTPS (use localhost or enable HTTPS)'
+      }
       setErrorMessage(msg)
       if (onError) onError(msg)
     }

@@ -16,6 +16,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useWebSocket } from '../hooks/useWebSocket'
+import { useVoice } from '../hooks/useVoice'
 import { listConversations, getConversation } from '../api/chatApi'
 import { extractErrorMessage } from '../api/client'
 import { formatRelativeTime } from '../utils/formatters'
@@ -52,6 +53,21 @@ export default function ChatPage() {
 
   // Track conversation ID for sending messages
   const conversationIdRef = useRef(null)
+
+  // Voice
+  const {
+    voiceState,
+    isVoiceAvailable,
+    errorMessage: voiceErrorMessage,
+    toggleVoice,
+  } = useVoice({
+    onTranscript: useCallback((audioBlob) => {
+      // For now, log the blob — the WebRTC transport layer will
+      // handle codec conversion and STT submission in the future.
+      // As a demo, we show the recording was captured successfully.
+      console.info('Voice recording captured:', audioBlob.size, 'bytes')
+    }, []),
+  })
 
   /** Connect WebSocket on mount */
   useEffect(() => {
@@ -292,6 +308,10 @@ export default function ChatPage() {
           error={wsError}
           readOnly={!!viewingUserEmail}
           readOnlyLabel={viewingUserEmail}
+          voiceState={voiceState}
+          isVoiceAvailable={isVoiceAvailable}
+          onVoiceToggle={toggleVoice}
+          voiceErrorMessage={voiceErrorMessage}
         />
       </main>
     </div>

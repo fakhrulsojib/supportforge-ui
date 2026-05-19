@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { listModels, setActiveModel } from '../../api/modelsApi'
+import { getVoiceConfig, getVoiceHealth, toggleVoice } from '../../api/voiceApi'
 import { extractErrorMessage } from '../../api/client'
 
 export default function ModelSelector() {
@@ -39,6 +40,12 @@ export default function ModelSelector() {
   const [embedSuccess, setEmbedSuccess] = useState('')
   const [embedError, setEmbedError] = useState(null)
   const embedTimerRef = useRef(null)
+
+  // Voice state
+  const [voiceConfig, setVoiceConfig] = useState(null)
+  const [voiceHealth, setVoiceHealth] = useState(null)
+  const [isTogglingVoice, setIsTogglingVoice] = useState(false)
+  const [voiceError, setVoiceError] = useState(null)
 
   // Gemini chat state
   const [apiKeyInput, setApiKeyInput] = useState('')
@@ -87,7 +94,31 @@ export default function ModelSelector() {
 
   useEffect(() => {
     loadModels()
+    loadVoiceState()
   }, [loadModels])
+
+  /** Load voice config and health. */
+  async function loadVoiceState() {
+    try {
+      const [config, health] = await Promise.all([getVoiceConfig(), getVoiceHealth()])
+      setVoiceConfig(config)
+      setVoiceHealth(health)
+    } catch { /* voice not available */ }
+  }
+
+  /** Toggle voice on/off. */
+  const handleToggleVoice = useCallback(async () => {
+    try {
+      setIsTogglingVoice(true)
+      setVoiceError(null)
+      const result = await toggleVoice()
+      setVoiceConfig(result)
+    } catch (err) {
+      setVoiceError(extractErrorMessage(err))
+    } finally {
+      setIsTogglingVoice(false)
+    }
+  }, [])
 
   /** Get models for a specific provider. */
   const getProviderModels = (providerId, type = 'chat') => {
@@ -568,24 +599,58 @@ export default function ModelSelector() {
             )}
           </div>
         </div>
-      </div>
 
-      <div className="admin-model-footer">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.3" />
-          <path d="M8 5v3l2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span className="admin-model-footer-text">
-          Powered by{' '}
-          <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer">
-            Ollama
-          </a>{' '}
-          (self-hosted) and{' '}
-          <a href="https://ai.google.dev" target="_blank" rel="noopener noreferrer">
-            Google Gemini
-          </a>{' '}
-          (cloud)
-        </span>
+        {/* Voice Pipeline Card */}
+        {voiceHealth && (
+          <div className="sf-card admin-model-card">
+            <div className="admin-model-icon" style={{ background: 'linear-gradient(135deg, hsl(160,60%,25%), hsl(200,60%,30%))' }} aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <div className="admin-model-info">
+              <span className="admin-model-label">Voice Pipeline</span>
+
+              {/* Toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '8px 0' }}>
+                <button
+                  type="button"
+                  id="admin-voice-toggle"
+                  className={`sf-btn ${voiceConfig?.voice_enabled ? 'sf-btn-primary' : ''}`}
+                  style={{ minWidth: '120px' }}
+                  onClick={handleToggleVoice}
+                  disabled={isTogglingVoice || (!voiceHealth?.stt_available && !voiceConfig?.voice_enabled)}
+                >
+                  {isTogglingVoice ? 'Saving…' : voiceConfig?.voice_enabled ? '✓ Enabled' : 'Enable Voice'}
+                </button>
+                {!voiceHealth?.stt_available && !voiceHealth?.tts_available && (
+                  <span className="admin-model-hint">Voice providers not loaded on server</span>
+                )}
+              </div>
+
+              {/* Provider info */}
+              <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: 'var(--sf-color-text-secondary)' }}>
+                <span>
+                  STT: {voiceHealth?.stt_available
+                    ? <span style={{ color: 'var(--sf-color-success, #10b981)' }}>{voiceHealth.stt_provider}</span>
+                    : <span style={{ opacity: 0.5 }}>unavailable</span>}
+                </span>
+                <span>
+                  TTS: {voiceHealth?.tts_available
+                    ? <span style={{ color: 'var(--sf-color-success, #10b981)' }}>{voiceHealth.tts_provider}</span>
+                    : <span style={{ opacity: 0.5 }}>unavailable</span>}
+                </span>
+              </div>
+
+              {voiceError && (
+                <span className="admin-model-status admin-model-error">{voiceError}</span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
