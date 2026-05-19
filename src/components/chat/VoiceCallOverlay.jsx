@@ -189,7 +189,21 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
         if (silenceDuration >= SILENCE_DURATION_MS) {
           console.info(LOG, 'Silence detected after', silenceDuration, 'ms — stopping recording')
           silenceStart = null
-          stopRecording()
+          // Call stopRecording directly via ref-stable pattern
+          if (vadFrameRef.current) {
+            cancelAnimationFrame(vadFrameRef.current)
+            vadFrameRef.current = null
+          }
+          if (mediaRecorderRef.current?.state === 'recording') {
+            mediaRecorderRef.current.stop()
+          }
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(t => t.stop())
+            mediaStreamRef.current = null
+          }
+          if (audioContextRef.current?.state !== 'closed') {
+            audioContextRef.current?.close()
+          }
           return
         }
       } else {
@@ -254,7 +268,6 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
       isProcessingRef.current = false
       if (isMountedRef.current) startListening()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSendMessage, startListening])
 
   /**
@@ -343,11 +356,12 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
 
   // Cleanup on unmount
   useEffect(() => {
+    const silenceTimer = silenceTimerRef.current
     return () => {
       console.info(LOG, 'Unmounting — cleanup')
       isMountedRef.current = false
       if (vadFrameRef.current) cancelAnimationFrame(vadFrameRef.current)
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current)
+      if (silenceTimer) clearTimeout(silenceTimer)
 
       if (mediaRecorderRef.current?.state === 'recording') {
         mediaRecorderRef.current.stop()
