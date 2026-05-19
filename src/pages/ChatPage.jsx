@@ -57,6 +57,7 @@ export default function ChatPage() {
 
   // Voice call state
   const [isInCall, setIsInCall] = useState(false)
+  const isInCallRef = useRef(false)
   const [isVoiceAvailable, setIsVoiceAvailable] = useState(false)
   const [lastAssistantMessage, setLastAssistantMessage] = useState(null)
 
@@ -105,8 +106,10 @@ export default function ChatPage() {
         },
       ])
 
-      // Track for voice call TTS playback
-      setLastAssistantMessage(text)
+      // Track for voice call TTS playback (only when in a call)
+      if (isInCallRef.current) {
+        setLastAssistantMessage(text)
+      }
 
       // Refresh sidebar to include new conversation
       loadConversations()
@@ -310,7 +313,7 @@ export default function ChatPage() {
           readOnly={!!viewingUserEmail}
           readOnlyLabel={viewingUserEmail}
           isVoiceAvailable={isVoiceAvailable}
-          onStartVoiceCall={() => setIsInCall(true)}
+          onStartVoiceCall={() => { isInCallRef.current = true; setIsInCall(true) }}
         />
       </main>
 
@@ -318,7 +321,7 @@ export default function ChatPage() {
       {isInCall && (
         <VoiceCallOverlay
           onSendMessage={handleSendMessage}
-          onEndCall={() => setIsInCall(false)}
+          onEndCall={() => { isInCallRef.current = false; setIsInCall(false) }}
           lastAssistantMessage={lastAssistantMessage}
         />
       )}
