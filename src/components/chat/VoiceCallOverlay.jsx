@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Mic, MicOff, PhoneOff } from 'lucide-react'
 import { transcribeAudio, synthesizeAudio } from '../../api/voiceApi'
 import '../../styles/voice-call.css'
 
@@ -50,6 +51,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
   const [callDuration, setCallDuration] = useState(0)
   const [lastTranscript, setLastTranscript] = useState('')
   const [volumeBars, setVolumeBars] = useState([3, 3, 3, 3, 3])
+  const [isMuted, setIsMuted] = useState(false)
 
   // Refs for audio pipeline
   const mediaStreamRef = useRef(null)
@@ -438,6 +440,18 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
     }
   }, [])
 
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => {
+      const next = !prev
+      console.info(LOG, next ? 'Muted' : 'Unmuted')
+      // Mute/unmute all audio tracks on the active stream
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getAudioTracks().forEach(t => { t.enabled = !next })
+      }
+      return next
+    })
+  }, [])
+
   const handleEndCall = useCallback(() => {
     console.info(LOG, 'End call clicked')
     // Stop TTS if playing
@@ -464,13 +478,7 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
           <div className="voice-call-ring voice-call-ring-2" />
           <div className="voice-call-ring voice-call-ring-3" />
           <div className="voice-call-icon" data-state={callState}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
           </div>
         </div>
 
@@ -499,19 +507,28 @@ export default function VoiceCallOverlay({ onSendMessage, onEndCall, lastAssista
         {/* Timer */}
         <div className="voice-call-timer">{formatDuration(callDuration)}</div>
 
-        {/* End Call */}
-        <button
-          className="voice-call-end-btn"
-          onClick={handleEndCall}
-          aria-label="End voice call"
-          id="voice-call-end-btn"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M23 16.92c0 .35-.07.71-.22 1.04-.15.33-.37.64-.67.89a4.56 4.56 0 0 1-1.06.66c-.4.17-.84.25-1.3.25-.73 0-1.5-.17-2.3-.52a15.4 15.4 0 0 1-2.47-1.37 24.1 24.1 0 0 1-2.62-1.97 23.6 23.6 0 0 1-2.47-2.47 23.7 23.7 0 0 1-1.96-2.61A15.5 15.5 0 0 1 2.6 8.37c-.35-.8-.52-1.56-.52-2.29 0-.45.08-.88.24-1.28.16-.4.42-.77.79-1.09.44-.38.93-.57 1.44-.57.2 0 .39.04.57.12.18.08.34.2.47.37l1.63 2.3c.13.18.22.35.29.52.07.16.1.32.1.47 0 .2-.06.39-.17.58-.1.18-.26.37-.45.56l-.62.64c-.09.09-.13.2-.13.33 0 .07.01.13.03.19.03.07.05.12.07.17a10 10 0 0 0 1.25 1.74c.56.6 1.15 1.22 1.8 1.83.52.49 1.12.58 1.45.25l.6-.61c.2-.2.39-.36.57-.46.18-.11.37-.17.58-.17.15 0 .31.04.48.11.17.07.34.17.52.3l2.33 1.65c.17.12.3.27.37.45.07.17.11.34.11.55z"
-              fill="currentColor" />
-            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
+        {/* Call Controls */}
+        <div className="voice-call-controls">
+          <button
+            className={`voice-call-mute-btn${isMuted ? ' voice-call-mute-btn--active' : ''}`}
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+            id="voice-call-mute-btn"
+          >
+            {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+            <span className="voice-call-btn-label">{isMuted ? 'Unmute' : 'Mute'}</span>
+          </button>
+
+          <button
+            className="voice-call-end-btn"
+            onClick={handleEndCall}
+            aria-label="End voice call"
+            id="voice-call-end-btn"
+          >
+            <PhoneOff size={20} />
+            <span className="voice-call-btn-label">End</span>
+          </button>
+        </div>
 
       </div>
     </div>
