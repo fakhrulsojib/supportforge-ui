@@ -17,9 +17,11 @@ import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useWebSocket } from '../hooks/useWebSocket'
 import { listConversations, getConversation } from '../api/chatApi'
+import { getVoiceConfig } from '../api/voiceApi'
 import { extractErrorMessage } from '../api/client'
 import { formatRelativeTime } from '../utils/formatters'
 import ChatWindow from '../components/chat/ChatWindow'
+import VoiceCallOverlay from '../components/chat/VoiceCallOverlay'
 import '../styles/chat.css'
 
 export default function ChatPage() {
@@ -52,6 +54,19 @@ export default function ChatPage() {
 
   // Track conversation ID for sending messages
   const conversationIdRef = useRef(null)
+
+  // Voice call state
+  const [isInCall, setIsInCall] = useState(false)
+  const isInCallRef = useRef(false)
+  const [isVoiceAvailable, setIsVoiceAvailable] = useState(false)
+  const [lastAssistantMessage, setLastAssistantMessage] = useState(null)
+
+  // Check voice availability on mount
+  useEffect(() => {
+    getVoiceConfig()
+      .then(config => setIsVoiceAvailable(config.voice_enabled))
+      .catch(() => setIsVoiceAvailable(false))
+  }, [])
 
   /** Connect WebSocket on mount */
   useEffect(() => {
@@ -90,6 +105,11 @@ export default function ChatPage() {
           created_at: new Date().toISOString(),
         },
       ])
+
+      // Track for voice call TTS playback (only when in a call)
+      if (isInCallRef.current) {
+        setLastAssistantMessage(text)
+      }
 
       // Refresh sidebar to include new conversation
       loadConversations()
@@ -132,7 +152,7 @@ export default function ChatPage() {
       setLoadError(extractErrorMessage(err))
       setMessages([])
     }
-  }, [user?.id])
+  }, [user?.userId])
 
   /** Auto-load conversation from URL ?conversation=<id> (e.g. from Review Queue) */
   const [searchParams] = useSearchParams()
@@ -155,7 +175,7 @@ export default function ChatPage() {
   }
 
   /** Send a user message */
-  function handleSendMessage(text) {
+  const handleSendMessage = useCallback((text) => {
     // Add user message to the local state immediately
     setMessages((prev) => [
       ...prev,
@@ -169,7 +189,14 @@ export default function ChatPage() {
 
     // Send via WebSocket
     wsSendMessage(text, conversationIdRef.current)
-  }
+
+    // Clear stale assistant message so a voice-call TTS cycle
+    // doesn't replay the previous response when SPEAKING activates.
+    if (isInCallRef.current) {
+      setLastAssistantMessage(null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Update conversation ID when WebSocket reports a new one
   useEffect(() => {
@@ -292,8 +319,19 @@ export default function ChatPage() {
           error={wsError}
           readOnly={!!viewingUserEmail}
           readOnlyLabel={viewingUserEmail}
+          isVoiceAvailable={isVoiceAvailable}
+          onStartVoiceCall={() => { isInCallRef.current = true; setIsInCall(true) }}
         />
       </main>
+
+      {/* Voice Call Overlay */}
+      {isInCall && (
+        <VoiceCallOverlay
+          onSendMessage={handleSendMessage}
+          onEndCall={() => { isInCallRef.current = false; setIsInCall(false) }}
+          lastAssistantMessage={lastAssistantMessage}
+        />
+      )}
     </div>
   )
 }

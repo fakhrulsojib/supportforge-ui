@@ -37,6 +37,8 @@ export default function ChatWindow({
   error,
   readOnly = false,
   readOnlyLabel = '',
+  isVoiceAvailable = false,
+  onStartVoiceCall,
 }) {
   const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef(null)
@@ -186,6 +188,36 @@ export default function ChatWindow({
               aria-label="Chat message input"
               id="chat-message-input"
             />
+            {isVoiceAvailable && (
+              <button
+                type="button"
+                className="sf-btn sf-btn-icon chat-voice-call-btn"
+                onClick={onStartVoiceCall}
+                aria-label="Start voice call"
+                id="chat-voice-call-btn"
+                title="Start voice call"
+                style={{
+                  color: 'hsl(160, 60%, 55%)',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'background 0.2s, transform 0.15s',
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <line x1="12" y1="19" x2="12" y2="23"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
             {isStreaming ? (
               <button
                 type="button"

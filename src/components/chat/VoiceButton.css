@@ -1,0 +1,149 @@
+/* ── Voice Button ────────────────────────────────────────────── */
+
+.sf-voice-button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  position: relative;
+}
+
+.sf-voice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--sf-color-border);
+  background: var(--sf-color-surface);
+  color: var(--sf-color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sf-voice-button:hover:not(:disabled) {
+  border-color: var(--sf-color-primary);
+  color: var(--sf-color-primary);
+  transform: scale(1.05);
+}
+
+.sf-voice-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ── Disabled State ──────────────────────────────────────────── */
+
+.sf-voice-button--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Listening State ─────────────────────────────────────────── */
+
+.sf-voice-button--listening {
+  border-color: var(--sf-color-error, #ef4444);
+  color: var(--sf-color-error, #ef4444);
+  animation: sf-voice-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes sf-voice-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+
+/* ── Pulse Indicator ─────────────────────────────────────────── */
+
+.sf-voice-pulse {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sf-color-error, #ef4444);
+  animation: sf-pulse-blink 1s ease-in-out infinite;
+}
+
+@keyframes sf-pulse-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── Processing State ────────────────────────────────────────── */
+
+.sf-voice-button--processing {
+  border-color: var(--sf-color-primary);
+  color: var(--sf-color-primary);
+  cursor: wait;
+}
+
+.sf-voice-spinner {
+  width: 20px;
+  height: 20px;
+  animation: sf-voice-spin 1s linear infinite;
+}
+
+@keyframes sf-voice-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Speaking State ──────────────────────────────────────────── */
+
+.sf-voice-button--speaking {
+  border-color: var(--sf-color-success, #10b981);
+  color: var(--sf-color-success, #10b981);
+}
+
+.sf-voice-icon--speaking {
+  animation: sf-voice-speak-pulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes sf-voice-speak-pulse {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.1); }
+}
+
+/* ── Error State ─────────────────────────────────────────────── */
+
+.sf-voice-button--error {
+  border-color: var(--sf-color-error, #ef4444);
+  color: var(--sf-color-error, #ef4444);
+}
+
+.sf-voice-error-text {
+  font-size: 0.75rem;
+  color: var(--sf-color-error, #ef4444);
+  white-space: nowrap;
+}
+
+/* ── Icon Sizing ─────────────────────────────────────────────── */
+
+.sf-voice-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .sf-voice-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sf-voice-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sf-voice-error-text {
+    display: none;
+  }
+}

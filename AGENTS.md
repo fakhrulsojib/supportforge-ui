@@ -23,6 +23,7 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 | Phase 20 | `phase-20/moderation-dashboard-ui` | Moderation dashboard frontend |
 | Phase 21 | `phase-21/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
 | Phase 23 | `phase-23/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
+| Voice V1.6 | `feature/voice-v1` | VoiceButton, useVoice hook, voiceApi client |
 
 ### Branch Rules
 
@@ -261,9 +262,11 @@ src/
 │   ├── platformApi.js
 │   ├── failedQueryApi.js
 │   ├── modelsApi.js
+│   ├── voiceApi.js
 │   └── authApi.js
 ├── hooks/         # Custom React hooks
 │   ├── useWebSocket.js
+│   ├── useVoice.js
 │   └── useAuth.js
 ├── context/       # React Context providers
 │   └── AuthContext.jsx

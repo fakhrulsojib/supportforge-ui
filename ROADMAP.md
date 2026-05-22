@@ -98,6 +98,21 @@
 
 ---
 
+## Phase V1.6 — Voice Input UI 🔧
+
+> **Branch:** `feature/voice-v1`
+> **Status:** Feature branch — pending merge to `main`
+
+### V1.6 — Voice Button & Hook ✅
+- [x] Create `src/api/voiceApi.js` — `getVoiceConfig`, `getVoiceHealth`, `getVoiceSessions`
+- [x] Create `src/hooks/useVoice.js` — MediaRecorder hook with 5-state machine
+- [x] Create `src/components/chat/VoiceButton.jsx` — push-to-talk UI with ARIA labels
+- [x] Create `src/components/chat/VoiceButton.css` — glow animation, responsive, dark-mode-safe
+- [x] Add `VOICE` route constants to `src/utils/constants.js`
+- [x] Verify: `npm run lint` (0 warnings) + `npm run build` (0 errors)
+
+---
+
 ## Upcoming Phases (8–23) 🔲
 
 > See `supportforge_plan.md` for detailed task lists and gotchas.
@@ -107,6 +122,7 @@
 | 8 | Feedback Review Queue | High | ✅ |
 | 12 | Tenant Provisioning UI + Failed Queries UI | High | ✅ |
 | 13 | Analytics Backend API (comment cleanup) | High | ✅ |
+| V1.6 | Voice Input UI | High | 🔧 (`feature/voice-v1`) |
 | 18 | User Management UI | Medium | 🔲 |
 | 20 | Moderation Dashboard UI | Medium | 🔲 |
 | 21 | A/B Testing & Tenant Config | Low | 🔲 |
