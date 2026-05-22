@@ -24,6 +24,10 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 - **Multi-Tenant** — Tenant-scoped data with role-based UI rendering
 - **Voice Input** _(feature branch)_ — Push-to-talk microphone button with MediaRecorder, real-time state machine (idle → listening → processing → speaking → error)
 
+#### Voice Call Overlay
+
+![Voice Call Overlay — Agent speaking with Mute and End controls](docs/screenshots/voice-call-overlay.png)
+
 ## Tech Stack
 
 | Component | Technology |
