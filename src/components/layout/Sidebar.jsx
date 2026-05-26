@@ -2,10 +2,11 @@
  * Sidebar — main navigation panel with route-aware active states.
  *
  * Features:
- * - Navigation links: Chat, Admin, Analytics, Review Queue
+ * - Navigation links: Chat, Admin (expandable), Analytics, Review Queue
  * - Active state indicator (left accent bar + highlight)
  * - Collapsible (desktop) / slide-out (mobile)
  * - Role-based visibility: Admin/Analytics visible to admin/agent only
+ * - Admin group expands to: Knowledge Base + Settings
  *
  * Security:
  * - No tokens or sensitive data rendered or logged
@@ -19,9 +20,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { getReviewStats } from '../../api/reviewApi'
 import { listTenants } from '../../api/platformApi'
 import '../../styles/review.css'
+import '../../styles/settings.css'
 
 /**
  * Navigation items with role restrictions.
+ * Items with `group: true` render as expandable sections.
  * @type {Array<{path: string, label: string, icon: string, roles: string[]|null}>}
  */
 const NAV_ITEMS = [
@@ -36,6 +39,11 @@ const NAV_ITEMS = [
     label: 'Admin',
     roles: ['admin', 'agent'],
     icon: 'admin',
+    group: true,
+    children: [
+      { path: '/admin', label: 'Knowledge Base', roles: ['admin', 'agent'] },
+      { path: '/settings', label: 'Settings', roles: ['admin', 'superadmin'] },
+    ],
   },
   {
     path: '/analytics',
@@ -133,6 +141,11 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
 
   const userRole = user?.role || ''
 
+  // Admin group expand state — auto-expand when on admin sub-routes
+  const [adminGroupOpen, setAdminGroupOpen] = useState(
+    () => location.pathname.startsWith('/admin') || location.pathname.startsWith('/settings'),
+  )
+
   // Fetch unreviewed count for badge
   const [badgeCount, setBadgeCount] = useState(0)
   const [tenantCount, setTenantCount] = useState(0)
@@ -191,7 +204,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
     if (path === '/') {
       return location.pathname === '/' || location.pathname === '/chat'
     }
+    if (path === '/admin') {
+      return location.pathname === '/admin'
+    }
     return location.pathname.startsWith(path)
+  }
+
+  /** Check if any child of a group is active. */
+  function isGroupActive(item) {
+    if (!item.children) return false
+    return item.children.some((child) => isActive(child.path))
   }
 
   /** Navigate and close mobile sidebar. */
@@ -228,25 +250,77 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
       <nav className="sidebar-nav">
         <div className="sidebar-nav-section">
           <div className="sidebar-nav-label">Navigation</div>
-          {visibleItems.map((item) => (
-            <button
-              key={item.path}
-              type="button"
-              className={`sidebar-link ${isActive(item.path) ? 'sidebar-link-active' : ''}`}
-              onClick={() => handleNavigate(item.path)}
-              aria-current={isActive(item.path) ? 'page' : undefined}
-              title={isCollapsed ? item.label : undefined}
-              id={`sidebar-nav-${item.icon}`}
-            >
-              <span className="sidebar-link-icon">
-                <NavIcon name={item.icon} />
-              </span>
-              <span className="sidebar-link-text">{item.label}</span>
-              {item.hasBadge && badgeCount > 0 && (
-                <span className="review-tab-badge review-tab-badge-alert">{badgeCount}</span>
-              )}
-            </button>
-          ))}
+          {visibleItems.map((item) => {
+            // Expandable group (Admin)
+            if (item.group) {
+              const groupActive = isGroupActive(item)
+              const visibleChildren = (item.children || []).filter(
+                (child) => !child.roles || child.roles.includes(userRole),
+              )
+              if (visibleChildren.length === 0) return null
+
+              return (
+                <div key={item.path} className="sidebar-group">
+                  <button
+                    type="button"
+                    className={`sidebar-link ${groupActive ? 'sidebar-link-active' : ''}`}
+                    onClick={() => setAdminGroupOpen((prev) => !prev)}
+                    title={isCollapsed ? item.label : undefined}
+                    id={`sidebar-nav-${item.icon}`}
+                    aria-expanded={adminGroupOpen}
+                  >
+                    <span className="sidebar-link-icon">
+                      <NavIcon name={item.icon} />
+                    </span>
+                    <span className="sidebar-link-text">{item.label}</span>
+                    <span
+                      className={`sidebar-group-chevron ${adminGroupOpen ? 'sidebar-group-chevron-open' : ''}`}
+                      aria-hidden="true"
+                    >
+                      ›
+                    </span>
+                  </button>
+                  <div
+                    className={`sidebar-group-items ${adminGroupOpen ? 'sidebar-group-items-open' : ''}`}
+                  >
+                    {visibleChildren.map((child) => (
+                      <button
+                        key={child.path}
+                        type="button"
+                        className={`sidebar-sub-link ${isActive(child.path) ? 'sidebar-sub-link-active' : ''}`}
+                        onClick={() => handleNavigate(child.path)}
+                        aria-current={isActive(child.path) ? 'page' : undefined}
+                        id={`sidebar-sub-${child.path.replace(/\//g, '-')}`}
+                      >
+                        {child.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
+
+            // Regular nav link
+            return (
+              <button
+                key={item.path}
+                type="button"
+                className={`sidebar-link ${isActive(item.path) ? 'sidebar-link-active' : ''}`}
+                onClick={() => handleNavigate(item.path)}
+                aria-current={isActive(item.path) ? 'page' : undefined}
+                title={isCollapsed ? item.label : undefined}
+                id={`sidebar-nav-${item.icon}`}
+              >
+                <span className="sidebar-link-icon">
+                  <NavIcon name={item.icon} />
+                </span>
+                <span className="sidebar-link-text">{item.label}</span>
+                {item.hasBadge && badgeCount > 0 && (
+                  <span className="review-tab-badge review-tab-badge-alert">{badgeCount}</span>
+                )}
+              </button>
+            )
+          })}
         </div>
 
         {/* Platform Section (superadmin only) */}

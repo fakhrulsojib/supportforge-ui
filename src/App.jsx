@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import ReviewPage from './pages/ReviewPage'
 import PlatformTenantsPage from './pages/PlatformTenantsPage'
+import SettingsPage from './pages/SettingsPage'
 
 /**
  * SupportForge — Root Application Component
@@ -77,6 +78,16 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <PlatformTenantsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <SettingsPage />
                 </AppLayout>
               </ProtectedRoute>
             }

@@ -21,7 +21,8 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 
 - **Real-Time Chat** — Token-by-token streaming via WebSocket with typing indicators
 - **Source Citations** — Collapsible cards showing retrieved knowledge base chunks
-- **Admin Panel** — Drag-and-drop document upload, ingestion status tracking, per-tenant model selection and temperature tuning
+- **Admin Panel** — Drag-and-drop document upload, ingestion status tracking
+- **Tenant Settings** — Agent behavior, LLM provider config, tools, secrets, event hooks, widget customization, moderation rules
 - **Analytics Dashboard** — Conversation trends, intent clouds, satisfaction gauges
 - **Review Queue** — Negative feedback, escalations, flagged messages, and failed queries
 - **Platform Tenants** — Superadmin-only tenant provisioning with lifecycle management
@@ -102,6 +103,7 @@ supportforge-ui/
 │   │   ├── failedQueryApi.js
 │   │   ├── modelsApi.js
 │   │   ├── voiceApi.js
+│   │   ├── settingsApi.js
 │   │   └── authApi.js
 │   ├── hooks/                     # Custom React hooks
 │   │   ├── useWebSocket.js
@@ -115,16 +117,19 @@ supportforge-ui/
 │   │   ├── AnalyticsPage.jsx
 │   │   ├── LoginPage.jsx
 │   │   ├── ReviewPage.jsx
-│   │   └── PlatformTenantsPage.jsx
+│   │   ├── PlatformTenantsPage.jsx
+│   │   └── SettingsPage.jsx
 │   ├── components/                # Presentational components
 │   │   ├── chat/
 │   │   ├── admin/
+│   │   ├── settings/
 │   │   ├── analytics/
 │   │   ├── layout/
 │   │   └── shared/
 │   ├── styles/                    # CSS design system
 │   │   ├── index.css
 │   │   ├── theme.css
+│   │   ├── settings.css
 │   │   ├── layout.css
 │   │   ├── shared.css
 │   │   ├── scaffold.css
@@ -150,7 +155,8 @@ supportforge-ui/
 |---|---|---|
 | Login | `/login` | Public |
 | Chat | `/chat` | All authenticated users |
-| Admin | `/admin` | Admin only |
+| Knowledge Base | `/admin` | Admin only |
+| Settings | `/settings` | Admin only |
 | Analytics | `/analytics` | Admin + Agent |
 | Review Queue | `/review` | Admin only |
 | Platform Tenants | `/platform/tenants` | Superadmin only |

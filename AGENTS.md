@@ -21,7 +21,7 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 | Phase 13 | `phase-13/analytics-backend` | Remove stale "not implemented" comments from analytics UI code |
 | Phase 18 | `phase-18/user-management-ui` | User management + approval frontend |
 | Phase 20 | `phase-20/moderation-dashboard-ui` | Moderation dashboard frontend |
-| Phase 21 | `phase-21/ab-testing-config` | Settings page for tenant config (model, temperature, prompt variant) |
+| Phase 21 | `phase-21/ab-testing-config` | Settings page for tenant config (all tabs) |
 | Phase 23 | `phase-23/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
 | Voice V1.6 | `feature/voice-v1` | VoiceButton, useVoice hook, voiceApi client |
 
@@ -263,6 +263,7 @@ src/
 │   ├── failedQueryApi.js
 │   ├── modelsApi.js
 │   ├── voiceApi.js
+│   ├── settingsApi.js
 │   └── authApi.js
 ├── hooks/         # Custom React hooks
 │   ├── useWebSocket.js
@@ -274,12 +275,14 @@ src/
 ├── components/    # Presentational components
 │   ├── chat/
 │   ├── admin/
+│   ├── settings/
 │   ├── analytics/
 │   ├── layout/
 │   └── shared/
 ├── styles/        # CSS design system
 │   ├── index.css  # Design tokens (custom properties)
 │   ├── theme.css  # Dark/light mode
+│   ├── settings.css
 │   └── *.css      # Per-feature styles
 └── utils/         # Constants, formatters, helpers
 ```
@@ -289,14 +292,14 @@ src/
 | Type | Location | Example |
 |---|---|---|
 | Shared/reusable UI | `components/shared/` | `LoadingSpinner.jsx`, `ErrorBoundary.jsx` |
-| Feature-specific | `components/{feature}/` | `chat/MessageBubble.jsx`, `admin/DocumentUploader.jsx`, `admin/TemperatureSlider.jsx` |
-| Page composition | `pages/` | `ChatPage.jsx`, `AdminPage.jsx`, `PlatformTenantsPage.jsx`, `ReviewPage.jsx` |
+| Feature-specific | `components/{feature}/` | `chat/MessageBubble.jsx`, `admin/DocumentUploader.jsx`, `settings/AgentTab.jsx` |
+| Page composition | `pages/` | `ChatPage.jsx`, `AdminPage.jsx`, `PlatformTenantsPage.jsx`, `ReviewPage.jsx`, `SettingsPage.jsx` |
 | Layout shell | `components/layout/` | `Sidebar.jsx`, `Header.jsx`, `AppLayout.jsx`, `ProtectedRoute.jsx` |
 
 ### CSS Rules
 
 - All design tokens defined in `src/styles/index.css` as `--sf-*` custom properties
-- Feature styles go in `src/styles/{feature}.css` (e.g. `chat.css`, `admin.css`, `review.css`, `platform.css`, `analytics.css`)
+- Feature styles go in `src/styles/{feature}.css` (e.g. `chat.css`, `admin.css`, `settings.css`, `review.css`, `platform.css`, `analytics.css`)
 - Dark mode variables in `src/styles/theme.css`
 - Layout shell in `src/styles/layout.css`
 - Shared component styles in `src/styles/shared.css`
@@ -307,7 +310,7 @@ src/
 ### Layout Shell
 
 The application uses a layout shell (`AppLayout`) that wraps all authenticated pages:
-- `Sidebar` — app-level navigation (Chat, Admin, Analytics, Review Queue, Platform Tenants) with role-based filtering
+- `Sidebar` — app-level navigation (Chat, Admin [Knowledge Base, Settings], Analytics, Review Queue, Platform Tenants) with role-based filtering
 - `Header` — page title, tenant badge, dark mode toggle, user avatar with logout dropdown
 - `ErrorBoundary` — catches render errors with friendly fallback UI
 - Dark mode is toggled via CSS class on `<html>` and persisted in `localStorage` (`sf-theme` key)

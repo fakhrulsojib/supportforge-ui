@@ -52,8 +52,9 @@
 - [x] `ingestApi.js` — upload, list, delete documents
 - [x] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
 - [x] `IngestionStatus.jsx` — document table with status badges
-- [x] `ModelSelector.jsx` — display current models (read-only)
-- [x] `AdminPage.jsx` — compose admin components, admin-only check
+- [x] `ModelSelector.jsx` — display current models (moved to Settings → LLM Provider tab)
+- [x] `TemperatureSlider.jsx` — removed from AdminPage (moved to Settings)
+- [x] `AdminPage.jsx` — compose admin components, rename to Knowledge Base
 - [x] Browser test: upload flow, status polling, delete ✅
 
 ### 3.5 — Analytics Dashboard ✅
@@ -113,7 +114,21 @@
 
 ---
 
-## Upcoming Phases (8–23) 🔲
+## Phase 21 — Tenant Settings UI ✅
+
+> **Branch:** `phase-21/tenant-settings-ui`
+
+- [x] Create `src/api/settingsApi.js` — tenant config, secrets, test-hook functions
+- [x] Create `src/pages/SettingsPage.jsx` — 7-tab admin settings at `/settings`
+- [x] Create `src/components/settings/` — AgentTab, LLMProviderTab, ToolsTab, SecretsTab, EventHooksTab, WidgetTab, ModerationTab
+- [x] Create `src/styles/settings.css`
+- [x] Modify `Sidebar.jsx` — Admin nav expandable with Knowledge Base + Settings sub-items
+- [x] Modify `AdminPage.jsx` — Remove ModelSelector/TemperatureSlider, rename to Knowledge Base
+- [x] Add `/settings` route to `App.jsx`
+
+---
+
+## Upcoming Phases (18–23) 🔲
 
 > See `supportforge_plan.md` for detailed task lists and gotchas.
 
@@ -125,6 +140,6 @@
 | V1.6 | Voice Input UI | High | 🔧 (`feature/voice-v1`) |
 | 18 | User Management UI | Medium | 🔲 |
 | 20 | Moderation Dashboard UI | Medium | 🔲 |
-| 21 | A/B Testing & Tenant Config | Low | 🔲 |
+| 21 | Tenant Settings UI | Medium | ✅ |
 | 23 | Deployment, Docs & E2E | Low | 🔲 |
 

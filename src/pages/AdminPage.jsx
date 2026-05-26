@@ -1,10 +1,11 @@
 /**
- * AdminPage — document management and model configuration panel.
+ * AdminPage — document management panel (Knowledge Base).
  *
  * Composes:
- * - ModelSelector (read-only model config cards)
  * - DocumentUploader (drag-and-drop zone)
  * - IngestionStatus (document table with polling)
+ *
+ * Model configuration has been moved to Settings → LLM Provider tab.
  *
  * Security:
  * - RBAC guard: only admin/agent roles can access (viewer → redirect)
@@ -25,8 +26,6 @@ import { listDocuments, deleteDocument } from '../api/ingestApi'
 import { extractErrorMessage } from '../api/client'
 import DocumentUploader from '../components/admin/DocumentUploader'
 import IngestionStatus from '../components/admin/IngestionStatus'
-import ModelSelector from '../components/admin/ModelSelector'
-import TemperatureSlider from '../components/admin/TemperatureSlider'
 import '../styles/admin.css'
 
 /** Status values that trigger polling. */
@@ -171,7 +170,7 @@ export default function AdminPage() {
       {/* Header */}
       <header className="admin-header">
         <div className="admin-header-left">
-          <h1 className="admin-title">Document Management</h1>
+          <h1 className="admin-title">Knowledge Base</h1>
           <p className="admin-subtitle">
             Upload, monitor, and manage your knowledge base documents
           </p>
@@ -208,19 +207,6 @@ export default function AdminPage() {
           <span>{error}</span>
         </div>
       )}
-
-      {/* Model Configuration */}
-      <section className="admin-section" aria-labelledby="admin-models-heading">
-        <h2 className="admin-section-title" id="admin-models-heading">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <circle cx="9" cy="9" r="3" stroke="currentColor" strokeWidth="1.3" />
-            <path d="M9 1.5v3m0 9v3m7.5-7.5h-3m-9 0h-3m11.3-5.3l-2.12 2.12m-6.36 6.36L5.2 12.8m10.6 0l-2.12-2.12M7.32 7.32L5.2 5.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-          </svg>
-          Model Configuration
-        </h2>
-        <ModelSelector />
-        <TemperatureSlider />
-      </section>
 
       {/* Document Upload */}
       <section className="admin-section" aria-labelledby="admin-upload-heading">
