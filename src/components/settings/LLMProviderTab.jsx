@@ -15,6 +15,21 @@ const PROVIDERS = [
   { value: 'gemini', label: 'Google Gemini' },
 ]
 
+const GEMINI_CHAT_MODELS = [
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+  { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' },
+  { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)' },
+  { value: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite' },
+  { value: 'gemma-4-31b-it', label: 'Gemma 4 31B IT' },
+  { value: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B A4B IT' },
+]
+
+const GEMINI_EMBEDDING_MODELS = [
+  { value: 'gemini-embedding-2', label: 'Gemini Embedding 2' },
+  { value: 'gemini-embedding-001', label: 'Gemini Embedding 001' },
+  { value: 'gemini-embedding-2-preview', label: 'Gemini Embedding 2 (Preview)' },
+]
+
 /**
  * @param {{ config: object, onChange: Function, onSave: Function, saving: boolean, tenantId: string }} props
  */
@@ -31,6 +46,10 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
   const [apiKeyStatus, setApiKeyStatus] = useState(null)
   const [savingKey, setSavingKey] = useState(false)
 
+  const [embedApiKey, setEmbedApiKey] = useState('')
+  const [embedApiKeyStatus, setEmbedApiKeyStatus] = useState(null)
+  const [savingEmbedKey, setSavingEmbedKey] = useState(false)
+
   const isDirty = useMemo(() => {
     return (
       config.chat_provider !== initial.chat_provider ||
@@ -41,18 +60,25 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
     )
   }, [config, initial])
 
-  // Check if Gemini API key is configured
+  // Check if Gemini API keys are configured
   useState(() => {
     if (!tenantId) return
     listSecrets(tenantId)
       .then((data) => {
         const keys = data.secrets || data.keys || []
-        const hasKey = keys.some(
+        const hasChatKey = keys.some(
           (s) => (typeof s === 'string' ? s : s.key) === 'gemini_api_key',
         )
-        setApiKeyStatus(hasKey ? 'configured' : 'none')
+        const hasEmbedKey = keys.some(
+          (s) => (typeof s === 'string' ? s : s.key) === 'gemini_embedding_api_key',
+        )
+        setApiKeyStatus(hasChatKey ? 'configured' : 'none')
+        setEmbedApiKeyStatus(hasEmbedKey ? 'configured' : 'none')
       })
-      .catch(() => setApiKeyStatus('none'))
+      .catch(() => {
+        setApiKeyStatus('none')
+        setEmbedApiKeyStatus('none')
+      })
   })
 
   const handleChange = useCallback(
@@ -78,11 +104,30 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
     }
   }, [apiKey, tenantId])
 
+  const handleSaveEmbedApiKey = useCallback(async () => {
+    if (!embedApiKey.trim() || !tenantId) return
+    setSavingEmbedKey(true)
+    try {
+      await createSecret(tenantId, 'gemini_embedding_api_key', embedApiKey.trim())
+      setEmbedApiKey('')
+      setEmbedApiKeyStatus('configured')
+    } catch (err) {
+      setEmbedApiKeyStatus('error')
+      void extractErrorMessage(err)
+    } finally {
+      setSavingEmbedKey(false)
+    }
+  }, [embedApiKey, tenantId])
+
   const handleSave = useCallback(() => {
     onSave({ ...config })
   }, [config, onSave])
 
-  const showGeminiKey = config.chat_provider === 'gemini' || config.embedding_provider === 'gemini'
+  const isChatChanged = config.chat_provider !== initial.chat_provider || config.chat_model !== initial.chat_model
+  const showGeminiChatKey = config.chat_provider === 'gemini' && (apiKeyStatus !== 'configured' || isChatChanged)
+
+  const isEmbedChanged = config.embedding_provider !== initial.embedding_provider || config.embedding_model !== initial.embedding_model
+  const showGeminiEmbedKey = config.embedding_provider === 'gemini' && (embedApiKeyStatus !== 'configured' || isEmbedChanged)
 
   return (
     <div className="settings-panel">
@@ -120,17 +165,72 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
             <div className="settings-field">
               <label htmlFor="llm-chat-model" className="settings-label">
                 Chat Model
+                {config.chat_provider === 'gemini' && apiKeyStatus === 'configured' && !isChatChanged && (
+                  <span className="settings-status-ok" style={{ marginLeft: '8px', fontSize: '0.85em' }}>✓ Key Configured</span>
+                )}
               </label>
-              <input
-                id="llm-chat-model"
-                type="text"
-                className="settings-input"
-                value={config.chat_model || ''}
-                onChange={(e) => handleChange('chat_model', e.target.value)}
-                placeholder="e.g. gemini-1.5-flash"
-              />
+              {config.chat_provider === 'gemini' ? (
+                <select
+                  id="llm-chat-model"
+                  className="settings-select"
+                  value={config.chat_model || 'gemini-3.1-flash-lite'}
+                  onChange={(e) => handleChange('chat_model', e.target.value)}
+                >
+                  <option value="" disabled>Select a model...</option>
+                  {GEMINI_CHAT_MODELS.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="llm-chat-model"
+                  type="text"
+                  className="settings-input"
+                  value={config.chat_model || ''}
+                  onChange={(e) => handleChange('chat_model', e.target.value)}
+                  placeholder="e.g. llama3:8b"
+                />
+              )}
             </div>
           </div>
+
+          {/* Gemini Chat API Key */}
+          {showGeminiChatKey && (
+            <div className="settings-field sf-animate-fade-in" style={{ marginTop: '1.25rem' }}>
+              <label htmlFor="llm-api-key" className="settings-label">
+                Gemini API Key
+              </label>
+              <div className="settings-field-row">
+                <input
+                  id="llm-api-key"
+                  type="password"
+                  className="settings-input"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter Gemini Chat API key…"
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  className="sf-btn sf-btn-secondary sf-btn-sm"
+                  onClick={handleSaveApiKey}
+                  disabled={savingKey || !apiKey.trim()}
+                >
+                  {savingKey ? 'Saving…' : 'Store Key'}
+                </button>
+              </div>
+              <p className="settings-hint">
+                API key stored securely. Current key cannot be displayed.
+              </p>
+              {apiKeyStatus === 'none' && (
+                <span className="settings-status settings-status-warn">
+                  No API key set
+                </span>
+              )}
+            </div>
+          )}
         </fieldset>
 
         <fieldset className="settings-fieldset">
@@ -160,17 +260,72 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
             <div className="settings-field">
               <label htmlFor="llm-embed-model" className="settings-label">
                 Embedding Model
+                {config.embedding_provider === 'gemini' && embedApiKeyStatus === 'configured' && !isEmbedChanged && (
+                  <span className="settings-status-ok" style={{ marginLeft: '8px', fontSize: '0.85em' }}>✓ Key Configured</span>
+                )}
               </label>
-              <input
-                id="llm-embed-model"
-                type="text"
-                className="settings-input"
-                value={config.embedding_model || ''}
-                onChange={(e) => handleChange('embedding_model', e.target.value)}
-                placeholder="e.g. text-embedding-004"
-              />
+              {config.embedding_provider === 'gemini' ? (
+                <select
+                  id="llm-embed-model"
+                  className="settings-select"
+                  value={config.embedding_model || 'gemini-embedding-2'}
+                  onChange={(e) => handleChange('embedding_model', e.target.value)}
+                >
+                  <option value="" disabled>Select an embedding model...</option>
+                  {GEMINI_EMBEDDING_MODELS.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="llm-embed-model"
+                  type="text"
+                  className="settings-input"
+                  value={config.embedding_model || ''}
+                  onChange={(e) => handleChange('embedding_model', e.target.value)}
+                  placeholder="e.g. nomic-embed-text"
+                />
+              )}
             </div>
           </div>
+
+          {/* Gemini Embedding API Key */}
+          {showGeminiEmbedKey && (
+            <div className="settings-field sf-animate-fade-in" style={{ marginTop: '1.25rem' }}>
+              <label htmlFor="llm-embed-api-key" className="settings-label">
+                Gemini API Key
+              </label>
+              <div className="settings-field-row">
+                <input
+                  id="llm-embed-api-key"
+                  type="password"
+                  className="settings-input"
+                  value={embedApiKey}
+                  onChange={(e) => setEmbedApiKey(e.target.value)}
+                  placeholder="Enter Gemini Embedding API key…"
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  className="sf-btn sf-btn-secondary sf-btn-sm"
+                  onClick={handleSaveEmbedApiKey}
+                  disabled={savingEmbedKey || !embedApiKey.trim()}
+                >
+                  {savingEmbedKey ? 'Saving…' : 'Store Key'}
+                </button>
+              </div>
+              <p className="settings-hint">
+                API key stored securely. Current key cannot be displayed.
+              </p>
+              {embedApiKeyStatus === 'none' && (
+                <span className="settings-status settings-status-warn">
+                  No API key set
+                </span>
+              )}
+            </div>
+          )}
         </fieldset>
 
         <fieldset className="settings-fieldset">
@@ -199,51 +354,6 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
             </div>
           </div>
         </fieldset>
-
-        {/* Gemini API Key */}
-        {showGeminiKey && (
-          <fieldset className="settings-fieldset">
-            <legend className="settings-legend">Gemini API Key</legend>
-
-            <div className="settings-field">
-              <label htmlFor="llm-api-key" className="settings-label">
-                API Key
-              </label>
-              <div className="settings-field-row">
-                <input
-                  id="llm-api-key"
-                  type="password"
-                  className="settings-input"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter Gemini API key…"
-                  autoComplete="off"
-                />
-                <button
-                  type="button"
-                  className="sf-btn sf-btn-secondary sf-btn-sm"
-                  onClick={handleSaveApiKey}
-                  disabled={savingKey || !apiKey.trim()}
-                >
-                  {savingKey ? 'Saving…' : 'Store Key'}
-                </button>
-              </div>
-              <p className="settings-hint">
-                API key stored securely. Current key cannot be displayed.
-              </p>
-              {apiKeyStatus === 'configured' && (
-                <span className="settings-status settings-status-ok">
-                  ✓ API key configured
-                </span>
-              )}
-              {apiKeyStatus === 'none' && (
-                <span className="settings-status settings-status-warn">
-                  No API key set
-                </span>
-              )}
-            </div>
-          </fieldset>
-        )}
 
         {/* Save */}
         <div className="settings-actions">

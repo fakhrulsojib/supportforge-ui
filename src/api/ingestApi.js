@@ -75,3 +75,14 @@ export async function getDocumentStatus(documentId) {
 export async function deleteDocument(documentId) {
   await client.delete(`${API_ROUTES.DOCUMENTS}/${documentId}`)
 }
+
+/**
+ * Retry ingestion for a failed document.
+ *
+ * @param {string} documentId - Document UUID.
+ * @returns {Promise<{document_id: string, filename: string, status: string, message: string}>}
+ */
+export async function retryDocument(documentId) {
+  const response = await client.post(`${API_ROUTES.DOCUMENTS}/${documentId}/retry`)
+  return response.data
+}

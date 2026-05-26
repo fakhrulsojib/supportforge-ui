@@ -44,13 +44,27 @@ function formatStatus(status) {
  * @param {{
  *   documents: Array<{id: string, filename: string, file_type: string, chunk_count: number, status: string, created_at: string}>,
  *   onDelete: (documentId: string) => void,
+ *   onRetry: (documentId: string) => void,
  *   isLoading: boolean,
  *   userRole: string
  * }} props
  */
-export default function IngestionStatus({ documents, onDelete, isLoading, userRole }) {
+export default function IngestionStatus({ documents, onDelete, onRetry, isLoading, userRole }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  const [retryingId, setRetryingId] = useState(null)
+
+  const handleRetryClick = useCallback(
+    async (docId) => {
+      setRetryingId(docId)
+      try {
+        await onRetry(docId)
+      } finally {
+        setRetryingId(null)
+      }
+    },
+    [onRetry],
+  )
 
   const handleDeleteClick = useCallback((docId) => {
     setConfirmDeleteId(docId)
@@ -155,6 +169,22 @@ export default function IngestionStatus({ documents, onDelete, isLoading, userRo
                 {isAdmin && (
                   <td data-label="Actions">
                     <div className="admin-doc-actions">
+                      {doc.status === 'failed' && !isConfirming && (
+                        <button
+                          type="button"
+                          className={`sf-btn sf-btn-ghost sf-btn-sm admin-retry-btn${retryingId === doc.id ? ' admin-retry-spinning' : ''}`}
+                          onClick={() => handleRetryClick(doc.id)}
+                          disabled={retryingId === doc.id}
+                          aria-label={`Retry ingestion for ${doc.filename}`}
+                          title="Retry ingestion"
+                          id={`admin-retry-${doc.id}`}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M13.5 8a5.5 5.5 0 11-1.3-3.56" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M13.5 3v1.5H12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      )}
                       {!isConfirming && (
                         <button
                           type="button"

@@ -270,7 +270,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
                   <button
                     type="button"
                     className={`sidebar-link ${groupActive ? 'sidebar-link-active' : ''}`}
-                    onClick={() => setAdminGroupOpen((prev) => !prev)}
+                    onClick={() => {
+                      if (isCollapsed) {
+                        onToggleCollapse()
+                        setAdminGroupOpen(true)
+                      } else {
+                        setAdminGroupOpen((prev) => !prev)
+                      }
+                    }}
                     title={isCollapsed ? item.label : undefined}
                     id={`sidebar-nav-${item.icon}`}
                     aria-expanded={adminGroupOpen}

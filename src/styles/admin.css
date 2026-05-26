@@ -807,6 +807,25 @@
   gap: var(--sf-space-2);
 }
 
+/* Retry button */
+.admin-retry-btn {
+  color: var(--sf-color-warning-600);
+}
+
+.admin-retry-btn:hover:not(:disabled) {
+  color: var(--sf-color-warning-500);
+  background: hsla(var(--sf-color-warning-hsl, 38, 92%, 50%), 0.1);
+}
+
+.admin-retry-spinning svg {
+  animation: admin-spin 0.8s linear infinite;
+}
+
+@keyframes admin-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Delete confirmation */
 .admin-delete-confirm {
   display: flex;

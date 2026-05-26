@@ -54,7 +54,12 @@
 /* ── Panel ───────────────────────────────────────────────────── */
 
 .settings-panel {
+  width: 100%;
+}
+
+.settings-container {
   max-width: 900px;
+  margin: 0 auto;
 }
 
 /* ── Form ────────────────────────────────────────────────────── */
@@ -840,6 +845,14 @@
 .sidebar-group-items-open {
   max-height: 200px;
   opacity: 1;
+}
+
+.sidebar-collapsed .sidebar-group-items {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-group-chevron {
+  display: none !important;
 }
 
 .sidebar-sub-link {

@@ -141,97 +141,99 @@ export default function SettingsPage() {
 
   return (
     <div className="admin-page" id="settings-page">
-      {/* Header */}
-      <header className="admin-header">
-        <div className="admin-header-left">
-          <h1 className="admin-title">Settings</h1>
-          <p className="admin-subtitle">
-            Configure your tenant's agent, LLM, tools, and branding
-          </p>
-        </div>
-      </header>
+      <div className="settings-container">
+        {/* Header */}
+        <header className="admin-header">
+          <div className="admin-header-left">
+            <h1 className="admin-title">Settings</h1>
+            <p className="admin-subtitle">
+              Configure your tenant's agent, LLM, tools, and branding
+            </p>
+          </div>
+        </header>
 
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`settings-toast settings-toast-${toast.type}`}
-          role="status"
-          aria-live="polite"
-          id="settings-toast"
-        >
-          <span>{toast.type === 'success' ? '✓' : '✗'}</span>
-          <span>{toast.message}</span>
-          <button
-            type="button"
-            className="settings-toast-close"
-            onClick={() => setToast(null)}
-            aria-label="Dismiss notification"
+        {/* Toast */}
+        {toast && (
+          <div
+            className={`settings-toast settings-toast-${toast.type}`}
+            role="status"
+            aria-live="polite"
+            id="settings-toast"
           >
-            ×
-          </button>
-        </div>
-      )}
+            <span>{toast.type === 'success' ? '✓' : '✗'}</span>
+            <span>{toast.message}</span>
+            <button
+              type="button"
+              className="settings-toast-close"
+              onClick={() => setToast(null)}
+              aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
-      {/* Error Bar */}
-      {error && (
-        <div className="admin-error-bar" role="alert" id="settings-error">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M8 5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <circle cx="8" cy="11.5" r="0.75" fill="currentColor" />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
+        {/* Error Bar */}
+        {error && (
+          <div className="admin-error-bar" role="alert" id="settings-error">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M8 5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
 
-      {/* Loading */}
-      {loading && (
-        <div className="admin-empty-state" id="settings-loading">
-          <div className="admin-skeleton-row">
-            <div className="admin-skeleton-block admin-skeleton-wide" />
-            <div className="admin-skeleton-block admin-skeleton-narrow" />
+        {/* Loading */}
+        {loading && (
+          <div className="admin-empty-state" id="settings-loading">
+            <div className="admin-skeleton-row">
+              <div className="admin-skeleton-block admin-skeleton-wide" />
+              <div className="admin-skeleton-block admin-skeleton-narrow" />
+            </div>
+            <div className="admin-skeleton-row">
+              <div className="admin-skeleton-block admin-skeleton-wide" />
+              <div className="admin-skeleton-block admin-skeleton-narrow" />
+            </div>
+            <div className="admin-skeleton-row">
+              <div className="admin-skeleton-block admin-skeleton-wide" />
+              <div className="admin-skeleton-block admin-skeleton-narrow" />
+            </div>
           </div>
-          <div className="admin-skeleton-row">
-            <div className="admin-skeleton-block admin-skeleton-wide" />
-            <div className="admin-skeleton-block admin-skeleton-narrow" />
-          </div>
-          <div className="admin-skeleton-row">
-            <div className="admin-skeleton-block admin-skeleton-wide" />
-            <div className="admin-skeleton-block admin-skeleton-narrow" />
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Tabs + Content */}
-      {!loading && !error && configJson && (
-        <>
-          <div className="settings-tabs" role="tablist" aria-label="Settings categories">
-            {TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                role="tab"
-                className={`settings-tab ${activeTab === tab.key ? 'settings-tab-active' : ''}`}
-                aria-selected={activeTab === tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                id={`settings-tab-${tab.key}`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Tabs + Content */}
+        {!loading && !error && configJson && (
+          <>
+            <div className="settings-tabs" role="tablist" aria-label="Settings categories">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  role="tab"
+                  className={`settings-tab ${activeTab === tab.key ? 'settings-tab-active' : ''}`}
+                  aria-selected={activeTab === tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  id={`settings-tab-${tab.key}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-          <div className="settings-tab-content" role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`}>
-            {activeTab === 'agent' && <AgentTab {...tabProps} />}
-            {activeTab === 'llm' && <LLMProviderTab {...tabProps} />}
-            {activeTab === 'tools' && <ToolsTab {...tabProps} />}
-            {activeTab === 'secrets' && <SecretsTab {...tabProps} />}
-            {activeTab === 'hooks' && <EventHooksTab {...tabProps} />}
-            {activeTab === 'widget' && <WidgetTab {...tabProps} />}
-            {activeTab === 'moderation' && <ModerationTab {...tabProps} />}
-          </div>
-        </>
-      )}
+            <div className="settings-tab-content" role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`}>
+              {activeTab === 'agent' && <AgentTab {...tabProps} />}
+              {activeTab === 'llm' && <LLMProviderTab {...tabProps} />}
+              {activeTab === 'tools' && <ToolsTab {...tabProps} />}
+              {activeTab === 'secrets' && <SecretsTab {...tabProps} />}
+              {activeTab === 'hooks' && <EventHooksTab {...tabProps} />}
+              {activeTab === 'widget' && <WidgetTab {...tabProps} />}
+              {activeTab === 'moderation' && <ModerationTab {...tabProps} />}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }

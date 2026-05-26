@@ -22,7 +22,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { listDocuments, deleteDocument } from '../api/ingestApi'
+import { listDocuments, deleteDocument, retryDocument } from '../api/ingestApi'
 import { extractErrorMessage } from '../api/client'
 import DocumentUploader from '../components/admin/DocumentUploader'
 import IngestionStatus from '../components/admin/IngestionStatus'
@@ -123,6 +123,26 @@ export default function AdminPage() {
         await deleteDocument(documentId)
         // Remove from local state immediately for responsive UX
         setDocuments((prev) => prev.filter((doc) => doc.id !== documentId))
+      } catch (err) {
+        setError(extractErrorMessage(err))
+      }
+    },
+    [],
+  )
+
+  /** Handle document retry. */
+  const handleRetry = useCallback(
+    async (documentId) => {
+      try {
+        const result = await retryDocument(documentId)
+        // Update local state immediately for responsive UX
+        setDocuments((prev) =>
+          prev.map((doc) =>
+            doc.id === documentId
+              ? { ...doc, status: result.status || 'pending' }
+              : doc,
+          ),
+        )
       } catch (err) {
         setError(extractErrorMessage(err))
       }
@@ -237,6 +257,7 @@ export default function AdminPage() {
         <IngestionStatus
           documents={documents}
           onDelete={handleDelete}
+          onRetry={handleRetry}
           isLoading={isLoading}
           userRole={userRole}
         />
