@@ -37,7 +37,7 @@ const NAV_ITEMS = [
   {
     path: '/admin',
     label: 'Admin',
-    roles: ['admin', 'agent'],
+    roles: ['admin', 'agent', 'superadmin'],
     icon: 'admin',
     group: true,
     children: [
@@ -145,6 +145,12 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, o
   const [adminGroupOpen, setAdminGroupOpen] = useState(
     () => location.pathname.startsWith('/admin') || location.pathname.startsWith('/settings'),
   )
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/settings')) {
+      setAdminGroupOpen(true)
+    }
+  }, [location.pathname])
 
   // Fetch unreviewed count for badge
   const [badgeCount, setBadgeCount] = useState(0)

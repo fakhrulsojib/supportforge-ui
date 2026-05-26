@@ -9,7 +9,7 @@
  * - No secrets or tokens rendered or logged
  */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { getTenantConfig, updateTenantConfig } from '../api/settingsApi'
@@ -86,7 +86,8 @@ export default function SettingsPage() {
       if (!user?.tenantId) return
       setSaving(true)
       try {
-        const data = await updateTenantConfig(user.tenantId, updatedConfig || configJson)
+        const payload = updatedConfig || configJson
+        const data = await updateTenantConfig(user.tenantId, payload)
         setConfigJson(data.config_json || {})
         setToast({ type: 'success', message: 'Settings saved successfully' })
       } catch (err) {
@@ -97,6 +98,15 @@ export default function SettingsPage() {
     },
     [user?.tenantId, configJson],
   )
+
+  // ── Tab Props ─────────────────────────────────────────────────
+  const tabProps = useMemo(() => ({
+    config: configJson || {},
+    onChange: handleChange,
+    onSave: handleSave,
+    saving,
+    tenantId: user?.tenantId,
+  }), [configJson, handleChange, handleSave, saving, user?.tenantId])
 
   // ── Access Denied ─────────────────────────────────────────────
 
@@ -125,15 +135,7 @@ export default function SettingsPage() {
     )
   }
 
-  // ── Tab Props ─────────────────────────────────────────────────
 
-  const tabProps = {
-    config: configJson || {},
-    onChange: handleChange,
-    onSave: handleSave,
-    saving,
-    tenantId: user?.tenantId,
-  }
 
   // ── Render ────────────────────────────────────────────────────
 
