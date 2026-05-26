@@ -21,7 +21,7 @@ SupportForge is a production-grade, multi-tenant AI customer support agent. This
 | Phase 13 | `phase-13/analytics-backend` | Remove stale "not implemented" comments from analytics UI code |
 | Phase 18 | `phase-18/user-management-ui` | User management + approval frontend |
 | Phase 20 | `phase-20/moderation-dashboard-ui` | Moderation dashboard frontend |
-| Phase 21 | `phase-21/ab-testing-config` | Settings page for tenant config (all tabs) |
+| Phase 21 | `phase-21/tenant-settings-ui` | Settings page for tenant config (all tabs) |
 | Phase 23 | `phase-23/deployment-e2e` | Final polish, accessibility, performance audit, screenshots |
 | Voice V1.6 | `feature/voice-v1` | VoiceButton, useVoice hook, voiceApi client |
 

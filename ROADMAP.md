@@ -49,7 +49,7 @@
 - [x] Browser test: full chat flow at 375px, 768px, 1440px ✅
 
 ### 3.4 — Admin Panel ✅
-- [x] `ingestApi.js` — upload, list, delete documents
+- [x] `ingestApi.js` — upload, list, delete, retry documents
 - [x] `DocumentUploader.jsx` — drag-and-drop, file validation, progress bar
 - [x] `IngestionStatus.jsx` — document table with status badges
 - [x] `ModelSelector.jsx` — display current models (moved to Settings → LLM Provider tab)
@@ -128,18 +128,23 @@
 
 ---
 
-## Upcoming Phases (18–23) 🔲
-
-> See `supportforge_plan.md` for detailed task lists and gotchas.
+## Completed Phases ✅
 
 | Phase | Name | Priority | Status |
 |---|---|---|---|
 | 8 | Feedback Review Queue | High | ✅ |
 | 12 | Tenant Provisioning UI + Failed Queries UI | High | ✅ |
 | 13 | Analytics Backend API (comment cleanup) | High | ✅ |
+| 21 | Tenant Settings UI | Medium | ✅ |
+
+## Upcoming Phases 🔲
+
+> See `supportforge_plan.md` for detailed task lists and gotchas.
+
+| Phase | Name | Priority | Status |
+|---|---|---|---|
 | V1.6 | Voice Input UI | High | 🔧 (`feature/voice-v1`) |
 | 18 | User Management UI | Medium | 🔲 |
 | 20 | Moderation Dashboard UI | Medium | 🔲 |
-| 21 | Tenant Settings UI | Medium | ✅ |
 | 23 | Deployment, Docs & E2E | Low | 🔲 |
 

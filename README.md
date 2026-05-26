@@ -21,7 +21,7 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 
 - **Real-Time Chat** — Token-by-token streaming via WebSocket with typing indicators
 - **Source Citations** — Collapsible cards showing retrieved knowledge base chunks
-- **Admin Panel** — Drag-and-drop document upload, ingestion status tracking
+- **Admin Panel** — Drag-and-drop document upload, ingestion status tracking, retry failed documents
 - **Tenant Settings** — Agent behavior, LLM provider config, tools, secrets, event hooks, widget customization, moderation rules
 - **Analytics Dashboard** — Conversation trends, intent clouds, satisfaction gauges
 - **Review Queue** — Negative feedback, escalations, flagged messages, and failed queries
@@ -44,6 +44,8 @@ The frontend for SupportForge — a multi-tenant AI customer support platform. B
 | Routing | React Router v6 |
 | HTTP Client | Axios |
 | Styling | Vanilla CSS + Custom Properties |
+| Icons | lucide-react |
+| Markdown | react-markdown |
 | State | React Context + Hooks |
 | Font | Inter (Google Fonts) |
 
