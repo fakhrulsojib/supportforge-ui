@@ -570,7 +570,7 @@ export default function ReviewPage() {
       {/* Empty State */}
       {!loading && items.length === 0 && !error && (
         <div className="admin-empty-state" id="review-empty">
-          <svg className="admin-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="admin-empty-icon" viewBox="0 0 24 24" width="64" height="64" fill="none" aria-hidden="true">
             <path
               d="M9 12l2 2 4-4m6 2a10 10 0 11-20 0 10 10 0 0120 0z"
               stroke="currentColor"

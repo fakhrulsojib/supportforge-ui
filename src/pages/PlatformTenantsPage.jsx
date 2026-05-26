@@ -310,7 +310,7 @@ export default function PlatformTenantsPage() {
       {/* Empty State */}
       {!loading && tenants.length === 0 && !error && (
         <div className="admin-empty-state" id="platform-empty">
-          <svg className="admin-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="admin-empty-icon" viewBox="0 0 24 24" width="64" height="64" fill="none" aria-hidden="true">
             <rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" />
             <path d="M3 10h18" stroke="currentColor" strokeWidth="1.5" />
             <path d="M10 10v10" stroke="currentColor" strokeWidth="1.5" />

@@ -109,7 +109,7 @@ export default function IngestionStatus({ documents, onDelete, onRetry, isLoadin
   if (!isLoading && documents.length === 0) {
     return (
       <div className="admin-empty-state">
-        <svg className="admin-empty-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <svg className="admin-empty-icon" viewBox="0 0 64 64" width="64" height="64" fill="none" aria-hidden="true">
           <rect x="12" y="8" width="40" height="48" rx="4" stroke="currentColor" strokeWidth="2.5" />
           <path d="M24 22h16M24 32h12M24 42h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>

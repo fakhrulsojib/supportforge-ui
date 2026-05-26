@@ -120,6 +120,15 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
   }, [embedApiKey, tenantId])
 
   const handleSave = useCallback(() => {
+    // Validate: if a provider is selected, a model must be chosen
+    if (config.chat_provider === 'gemini' && !config.chat_model) {
+      alert('Please select a Chat Model before saving.')
+      return
+    }
+    if (config.embedding_provider === 'gemini' && !config.embedding_model) {
+      alert('Please select an Embedding Model before saving.')
+      return
+    }
     onSave({ ...config })
   }, [config, onSave])
 
@@ -173,7 +182,7 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
                 <select
                   id="llm-chat-model"
                   className="settings-select"
-                  value={config.chat_model || 'gemini-3.1-flash-lite'}
+                  value={config.chat_model || ''}
                   onChange={(e) => handleChange('chat_model', e.target.value)}
                 >
                   <option value="" disabled>Select a model...</option>
@@ -268,7 +277,7 @@ export default function LLMProviderTab({ config, onChange, onSave, saving, tenan
                 <select
                   id="llm-embed-model"
                   className="settings-select"
-                  value={config.embedding_model || 'gemini-embedding-2'}
+                  value={config.embedding_model || ''}
                   onChange={(e) => handleChange('embedding_model', e.target.value)}
                 >
                   <option value="" disabled>Select an embedding model...</option>
